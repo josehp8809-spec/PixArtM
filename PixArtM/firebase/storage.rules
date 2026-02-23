@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to get event data
+    function getEvent(eventId) {
+      return firestore.get(/databases/(default)/documents/events/$(eventId));
+    }
+    
+    // Photos stored in /events/{eventId}/{captureId}.jpg
+    match /events/{eventId}/{captureId} {
+      // Read only if event exists and is not cleaned
+      allow read: if getEvent(eventId).data.status != 'cleaned';
+      
+      // No direct writes from clients (only via Cloud Functions)
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+    "indexes": [],
+    "fieldOverrides": [
+        {
+            "collectionGroup": "events",
+            "fieldPath": "slug",
+            "indexes": [
+                {
+                    "order": "ASCENDING",
+                    "queryScope": "COLLECTION"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "events",
+            "fieldPath": "status",
+            "indexes": [
+                {
+                    "order": "ASCENDING",
+                    "queryScope": "COLLECTION"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "events",
+            "fieldPath": "galleryExpiresAt",
+            "indexes": [
+                {
+                    "order": "ASCENDING",
+                    "queryScope": "COLLECTION"
+                }
+            ]
+        }
+    ]
+}

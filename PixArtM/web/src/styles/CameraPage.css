@@ -1,0 +1,385 @@
+/**
+ * Camera Page Styles
+ * Modern, mobile-first design with vibrant aesthetics
+ */
+
+.camera-page {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Loading state */
+.camera-page.loading,
+.camera-page.error {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: white;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+/* Header */
+.camera-header {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  z-index: 10;
+}
+
+.camera-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.photo-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.photo-counter .count {
+  color: #4ade80;
+  font-size: 1.75rem;
+}
+
+.photo-counter .separator {
+  opacity: 0.6;
+}
+
+.photo-counter .limit {
+  opacity: 0.8;
+}
+
+/* Camera viewport */
+.camera-viewport {
+  flex: 1;
+  position: relative;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-video.hidden,
+.camera-canvas.hidden {
+  display: none;
+}
+
+/* Countdown overlay */
+.countdown-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.countdown-number {
+  font-size: 8rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: countdownPulse 1s ease-out;
+}
+
+@keyframes countdownPulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Photo preview */
+.photo-preview {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 80px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 15;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Upload progress */
+.upload-progress {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  z-index: 15;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.progress-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.upload-progress p {
+  margin: 0;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Controls */
+.camera-controls {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 2rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  z-index: 10;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.control-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Capture button */
+.capture-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.capture-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.capture-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.capture-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.capture-btn-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.capture-btn.capturing .capture-btn-inner {
+  background: #ef4444;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+/* Status messages */
+.status-message {
+  position: fixed;
+  bottom: 8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 500;
+  text-align: center;
+  max-width: 90%;
+  z-index: 25;
+  animation: slideUp 0.3s ease-out;
+}
+
+.status-message.error {
+  background: #ef4444;
+  color: white;
+}
+
+.status-message.warning {
+  background: #f59e0b;
+  color: white;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .camera-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .photo-counter {
+    font-size: 1rem;
+  }
+
+  .photo-counter .count {
+    font-size: 1.5rem;
+  }
+
+  .camera-controls {
+    gap: 1.5rem;
+  }
+
+  .control-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.25rem;
+  }
+
+  .capture-btn {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+/* Landscape mode */
+@media (orientation: landscape) and (max-height: 600px) {
+  .camera-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .camera-header h1 {
+    font-size: 1rem;
+  }
+
+  .camera-controls {
+    padding: 1rem;
+  }
+
+  .countdown-number {
+    font-size: 6rem;
+  }
+}

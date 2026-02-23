@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if event is accessible
+    function isEventAccessible(eventData) {
+      return eventData.status == 'active' || eventData.status == 'expired';
+    }
+    
+    // Events collection
+    match /events/{eventId} {
+      // Public read for active/expired events
+      allow read: if isEventAccessible(resource.data);
+      
+      // No direct writes from clients (only via Admin SDK or Cloud Functions)
+      allow write: if false;
+      
+      // Captures subcollection
+      match /captures/{captureId} {
+        // Read only if parent event is not cleaned
+        allow read: if isEventAccessible(get(/databases/$(database)/documents/events/$(eventId)).data);
+        
+        // No writes from clients
+        allow write: if false;
+      }
+    }
+  }
+}
