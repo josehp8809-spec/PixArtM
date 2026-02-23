@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getEventById, getEventCaptures, generateAlbumZip } from '../services/firebaseService';
+import { getEventById, getEventCaptures, generateAlbumZip } from '../services/supabaseService';
 import { useGallery } from '../hooks/useGallery';
 import LazyImage from '../components/LazyImage';
 import { Event, Capture } from '../../../shared/types/index';

@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCamera } from '../hooks/useCamera';
-import { getEventBySlug, reserveCapture, uploadPhoto, isEventActive, hasReachedLimit, getRemainingPhotos } from '../services/firebaseService';
+import { getEventBySlug, reserveCapture, uploadPhoto, isEventActive, hasReachedLimit, getRemainingPhotos } from '../services/supabaseService';
 import { compressImage, applyFrameOverlay, downloadToDevice } from '../utils/imageProcessing';
 import { Event } from '../../../shared/types/index';
 import CameraFallback from '../components/CameraFallback';
