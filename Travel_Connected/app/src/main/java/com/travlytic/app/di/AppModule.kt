@@ -8,6 +8,9 @@ import com.travlytic.app.data.db.dao.ResponseLogDao
 import com.travlytic.app.data.db.dao.SheetDataDao
 import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.data.sheets.SheetsRepository
+import com.travlytic.app.engine.GeminiAgent
+import com.travlytic.app.engine.SummaryGenerator
+import com.travlytic.app.engine.TtsManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,31 +32,32 @@ object AppModule {
         ).fallbackToDestructiveMigration().build()
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     fun provideSheetDataDao(db: AppDatabase): SheetDataDao = db.sheetDataDao()
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     fun provideRegisteredSheetDao(db: AppDatabase): RegisteredSheetDao = db.registeredSheetDao()
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     fun provideResponseLogDao(db: AppDatabase): ResponseLogDao = db.responseLogDao()
 
-    @Provides
-    @Singleton
-    fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences {
-        return AppPreferences(context)
-    }
+    @Provides @Singleton
+    fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences =
+        AppPreferences(context)
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     fun provideSheetsRepository(
         @ApplicationContext context: Context,
         sheetDataDao: SheetDataDao,
         registeredSheetDao: RegisteredSheetDao
-    ): SheetsRepository {
-        return SheetsRepository(context, sheetDataDao, registeredSheetDao)
-    }
+    ): SheetsRepository = SheetsRepository(context, sheetDataDao, registeredSheetDao)
+
+    @Provides @Singleton
+    fun provideGeminiAgent(): GeminiAgent = GeminiAgent()
+
+    @Provides @Singleton
+    fun provideSummaryGenerator(): SummaryGenerator = SummaryGenerator()
+
+    @Provides @Singleton
+    fun provideTtsManager(@ApplicationContext context: Context): TtsManager = TtsManager(context)
 }

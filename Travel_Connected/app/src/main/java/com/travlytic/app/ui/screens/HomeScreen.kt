@@ -42,7 +42,8 @@ import java.util.*
 fun HomeScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onNavigateToSettings: () -> Unit,
-    onNavigateToSchedule: () -> Unit
+    onNavigateToSchedule: () -> Unit,
+    onNavigateToSummary: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -130,6 +131,10 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToSummary) {
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = "Resumen",
+                            tint = TravlyticBlue)
+                    }
                     IconButton(onClick = onNavigateToSchedule) {
                         Icon(Icons.Filled.Schedule, contentDescription = "Horarios",
                             tint = if (uiState.isServiceEnabled) TravlyticGreen else TravlyticOnSurface2)

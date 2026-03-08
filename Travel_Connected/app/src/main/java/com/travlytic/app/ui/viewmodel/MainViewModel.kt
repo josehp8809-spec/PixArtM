@@ -17,6 +17,11 @@ import com.travlytic.app.data.db.entities.RegisteredSheet
 import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.data.sheets.SheetsRepository
 import com.travlytic.app.data.sheets.SyncResult
+import com.travlytic.app.engine.GeminiAgent
+import com.travlytic.app.engine.SessionSummary
+import com.travlytic.app.engine.SummaryGenerator
+import com.travlytic.app.engine.TtsManager
+import com.travlytic.app.engine.TtsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
@@ -56,17 +61,35 @@ data class TestMessageState(
     val response: String = "",
     val error: String = ""
 )
+
+data class SummaryUiState(
+    val isLoading: Boolean = false,
+    val summary: SessionSummary? = null,
+    val error: String = "",
+    val selectedPeriod: String = "Hoy",  // "Hoy", "Semana", "Todo"
+    val speechRate: Float = 1.0f
+)
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appPreferences: AppPreferences,
     private val sheetsRepository: SheetsRepository,
     private val registeredSheetDao: RegisteredSheetDao,
-    private val responseLogDao: ResponseLogDao
+    private val responseLogDao: ResponseLogDao,
+    private val geminiAgent: GeminiAgent,
+    private val summaryGenerator: SummaryGenerator,
+    private val ttsManager: TtsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    // ─── Summary state ───────────────────────────────────────────────
+    private val _summaryUiState = MutableStateFlow(SummaryUiState())
+    val summaryUiState: StateFlow<SummaryUiState> = _summaryUiState.asStateFlow()
+
+    val ttsState: StateFlow<TtsState> = ttsManager.ttsState
 
     // Settings screen state
     val geminiApiKey: StateFlow<String> = appPreferences.geminiApiKey
@@ -395,6 +418,91 @@ class MainViewModel @Inject constructor(
         val current = appPreferences.scheduleDays.first().toMutableSet()
         if (day in current) current.remove(day) else current.add(day)
         appPreferences.setScheduleDays(current)
+    }
+
+    // ─── Session Summary + TTS ────────────────────────────────────────────────
+
+    fun generateSummary() {
+        val period = _summaryUiState.value.selectedPeriod
+        viewModelScope.launch {
+            val apiKey = appPreferences.geminiApiKey.first()
+            if (apiKey.isBlank()) {
+                _summaryUiState.update { it.copy(error = "❌ Configura tu Gemini API Key primero") }
+                return@launch
+            }
+
+            _summaryUiState.update { it.copy(isLoading = true, error = "", summary = null) }
+
+            try {
+                // Filtrar logs según el período seleccionado
+                val allLogs = responseLogDao.observeRecent(500).first()
+                val now = System.currentTimeMillis()
+                val filteredLogs = when (period) {
+                    "Hoy" -> {
+                        val todayStart = java.util.Calendar.getInstance().apply {
+                            set(java.util.Calendar.HOUR_OF_DAY, 0)
+                            set(java.util.Calendar.MINUTE, 0)
+                            set(java.util.Calendar.SECOND, 0)
+                        }.timeInMillis
+                        allLogs.filter { it.timestamp >= todayStart }
+                    }
+                    "Semana" -> {
+                        val weekStart = now - (7 * 24 * 60 * 60 * 1000L)
+                        allLogs.filter { it.timestamp >= weekStart }
+                    }
+                    else -> allLogs
+                }
+
+                if (filteredLogs.isEmpty()) {
+                    _summaryUiState.update {
+                        it.copy(isLoading = false, error = "📭 No hay actividad para '$period' aún.")
+                    }
+                    return@launch
+                }
+
+                val summary = summaryGenerator.generateSummary(
+                    apiKey = apiKey,
+                    logs = filteredLogs,
+                    periodLabel = period.lowercase()
+                )
+
+                _summaryUiState.update {
+                    it.copy(isLoading = false, summary = summary, error = "")
+                }
+                Log.d(TAG, "Resumen generado con ${filteredLogs.size} logs")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error generando resumen", e)
+                _summaryUiState.update {
+                    it.copy(isLoading = false, error = "❌ ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun speakSummary() {
+        val text = _summaryUiState.value.summary?.narrativeText ?: return
+        ttsManager.setSpeechRate(_summaryUiState.value.speechRate)
+        ttsManager.speak(text)
+    }
+
+    fun stopSpeaking() {
+        ttsManager.stop()
+    }
+
+    fun setSpeechRate(rate: Float) {
+        _summaryUiState.update { it.copy(speechRate = rate) }
+        ttsManager.setSpeechRate(rate)
+    }
+
+    fun setSummaryPeriod(period: String) {
+        _summaryUiState.update { it.copy(selectedPeriod = period, summary = null, error = "") }
+        ttsManager.stop()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager.stop()
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────
