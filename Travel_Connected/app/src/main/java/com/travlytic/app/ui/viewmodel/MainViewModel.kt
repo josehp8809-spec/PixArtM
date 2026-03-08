@@ -106,6 +106,14 @@ class MainViewModel @Inject constructor(
     val botEnabled: StateFlow<Boolean> = appPreferences.botEnabled
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
+    // Profile state
+    val profileUserName: StateFlow<String> = appPreferences.profileUserName
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
+    val profileBusinessName: StateFlow<String> = appPreferences.profileBusinessName
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
+    val profileTone: StateFlow<String> = appPreferences.profileTone
+        .stateIn(viewModelScope, SharingStarted.Lazily, "Profesional y amable")
+
     // ─── Schedule State ───────────────────────────────────────────────
     val scheduleState: StateFlow<ScheduleState> = combine(
         appPreferences.scheduleEnabled,
@@ -214,11 +222,18 @@ class MainViewModel @Inject constructor(
 
             try {
                 val prompt = appPreferences.systemPrompt.first()
+                val usrName = appPreferences.profileUserName.first()
+                val busName = appPreferences.profileBusinessName.first()
+                val tne = appPreferences.profileTone.first()
+
                 val response = geminiAgent.generateResponse(
                     apiKey = apiKey,
                     systemPrompt = prompt,
                     contactName = "Test",
-                    userMessage = message
+                    userMessage = message,
+                    userName = usrName,
+                    businessName = busName,
+                    tone = tne
                 )
 
                 _testMsgState.value = TestMessageState(
@@ -401,6 +416,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun saveProfileInfo(userName: String, businessName: String, tone: String) {
+        viewModelScope.launch {
+            appPreferences.setProfileUserName(userName)
+            appPreferences.setProfileBusinessName(businessName)
+            appPreferences.setProfileTone(tone)
+            showSnackbar("✅ Perfil guardado exitosamente")
+        }
+    }
+
     // ─── Training Rules & Export/Import ────────────────────────────────
     
     val trainingRules: StateFlow<List<TrainingRule>> = trainingRuleDao.observeAll()
@@ -437,8 +461,17 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val prompt = appPreferences.systemPrompt.first()
+                val usrName = appPreferences.profileUserName.first()
+                val busName = appPreferences.profileBusinessName.first()
+                val tne = appPreferences.profileTone.first()
                 val rules = trainingRules.value
-                val config = AiConfigExport(systemPrompt = prompt, trainingRules = rules)
+                val config = AiConfigExport(
+                    systemPrompt = prompt,
+                    profileUserName = usrName,
+                    profileBusinessName = busName,
+                    profileTone = tne,
+                    trainingRules = rules
+                )
                 val json = Gson().toJson(config)
                 _exportEvent.value = json
             } catch (e: Exception) {
@@ -452,6 +485,10 @@ class MainViewModel @Inject constructor(
             try {
                 val config = Gson().fromJson(jsonString, AiConfigExport::class.java)
                 appPreferences.setSystemPrompt(config.systemPrompt)
+                config.profileUserName?.let { appPreferences.setProfileUserName(it) }
+                config.profileBusinessName?.let { appPreferences.setProfileBusinessName(it) }
+                config.profileTone?.let { appPreferences.setProfileTone(it) }
+                
                 trainingRuleDao.deleteAll()
                 if (!config.trainingRules.isNullOrEmpty()) {
                     trainingRuleDao.insertAll(config.trainingRules.map { it.copy(id = 0) })

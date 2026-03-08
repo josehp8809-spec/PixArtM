@@ -26,16 +26,23 @@ class GeminiAgent @Inject constructor(
      * usando el contenido de los Google Sheets como contexto.
      *
      * @param apiKey Gemini API Key del usuario
+     * @param apiKey Gemini API Key del usuario
      * @param systemPrompt Prompt del sistema configurado
      * @param contactName Nombre del contacto que envió el mensaje
      * @param userMessage Mensaje recibido
+     * @param userName Nombre del responsable o bot
+     * @param businessName Nombre del negocio
+     * @param tone Tono de respuesta
      * @return Respuesta generada por Gemini o null si hay error
      */
     suspend fun generateResponse(
         apiKey: String,
         systemPrompt: String,
         contactName: String,
-        userMessage: String
+        userMessage: String,
+        userName: String = "",
+        businessName: String = "",
+        tone: String = ""
     ): String? {
         if (apiKey.isBlank()) {
             Log.w(TAG, "Gemini API Key no configurada")
@@ -52,10 +59,14 @@ class GeminiAgent @Inject constructor(
             }
 
             // 2. Cargar Reglas y Ejemplos Activos
+            // 2. Cargar Reglas y Ejemplos Activos
             val activeRules = trainingRuleDao.getActiveRules()
             
             // 3. Construir el prompt completo
-            val fullPrompt = buildPrompt(systemPrompt, sheetContext, activeRules, contactName, userMessage)
+            val fullPrompt = buildPrompt(
+                systemPrompt, sheetContext, activeRules, contactName, userMessage,
+                userName, businessName, tone
+            )
 
             // 4. Configurar y llamar a Gemini
             val model = GenerativeModel(
@@ -125,7 +136,10 @@ class GeminiAgent @Inject constructor(
         sheetContext: String,
         activeRules: List<com.travlytic.app.data.db.entities.TrainingRule>,
         contactName: String,
-        userMessage: String
+        userMessage: String,
+        userName: String,
+        businessName: String,
+        tone: String
     ): String {
         val rules = activeRules.filter { it.type == "RULE" }
         val examples = activeRules.filter { it.type == "EXAMPLE" }
@@ -142,6 +156,12 @@ class GeminiAgent @Inject constructor(
 
         return """
 $systemPrompt
+
+=== PERFIL DE IDENTIDAD ===
+Tu Nombre / Agente: ${if(userName.isNotBlank()) userName else "Travlytic Bot"}
+Empresa / Negocio: ${if(businessName.isNotBlank()) businessName else "N/A"}
+Tono de respuesta indicado: ${if(tone.isNotBlank()) tone else "Profesional y amable"}
+
 $rulesText
 $examplesText
 

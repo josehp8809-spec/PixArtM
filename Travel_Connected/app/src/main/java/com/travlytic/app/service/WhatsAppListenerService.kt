@@ -104,15 +104,21 @@ class WhatsAppListenerService : NotificationListenerService() {
                 val delayMs = appPreferences.autoReplyDelayMs.first()
                 delay(delayMs)
 
-                // Obtener el system prompt
+                // Obtener el system prompt y datos de perfil
                 val systemPrompt = appPreferences.systemPrompt.first()
+                val usrName = appPreferences.profileUserName.first()
+                val busName = appPreferences.profileBusinessName.first()
+                val tne = appPreferences.profileTone.first()
 
                 // Generar respuesta con Gemini
                 val response = geminiAgent.generateResponse(
                     apiKey = apiKey,
                     systemPrompt = systemPrompt,
                     contactName = contactName,
-                    userMessage = messageText
+                    userMessage = messageText,
+                    userName = usrName,
+                    businessName = busName,
+                    tone = tne
                 )
 
                 if (response.isNullOrBlank()) {

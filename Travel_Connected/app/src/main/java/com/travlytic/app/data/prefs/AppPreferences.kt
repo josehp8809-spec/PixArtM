@@ -19,6 +19,11 @@ class AppPreferences(private val context: Context) {
         val GOOGLE_ACCOUNT_EMAIL  = stringPreferencesKey("google_account_email")
         val AUTO_REPLY_DELAY_MS   = longPreferencesKey("auto_reply_delay_ms")
 
+        // ─── Profile ───────────────────────────────────────────────────
+        val PROFILE_USER_NAME     = stringPreferencesKey("profile_user_name")
+        val PROFILE_BUSINESS_NAME = stringPreferencesKey("profile_business_name")
+        val PROFILE_TONE          = stringPreferencesKey("profile_tone")
+
         // ─── Scheduler ────────────────────────────────────────────────
         val SCHEDULE_ENABLED  = booleanPreferencesKey("schedule_enabled")
         val SCHEDULE_START_H  = intPreferencesKey("schedule_start_hour")
@@ -53,6 +58,16 @@ REGLAS:
     // ─── System Prompt ────────────────────────────────────────────────
     val systemPrompt: Flow<String> = context.dataStore.data.map { it[SYSTEM_PROMPT] ?: DEFAULT_SYSTEM_PROMPT }
     suspend fun setSystemPrompt(prompt: String) = context.dataStore.edit { it[SYSTEM_PROMPT] = prompt }
+
+    // ─── Profile ──────────────────────────────────────────────────────
+    val profileUserName: Flow<String> = context.dataStore.data.map { it[PROFILE_USER_NAME] ?: "" }
+    suspend fun setProfileUserName(name: String) = context.dataStore.edit { it[PROFILE_USER_NAME] = name }
+
+    val profileBusinessName: Flow<String> = context.dataStore.data.map { it[PROFILE_BUSINESS_NAME] ?: "" }
+    suspend fun setProfileBusinessName(name: String) = context.dataStore.edit { it[PROFILE_BUSINESS_NAME] = name }
+
+    val profileTone: Flow<String> = context.dataStore.data.map { it[PROFILE_TONE] ?: "Profesional y amable" }
+    suspend fun setProfileTone(tone: String) = context.dataStore.edit { it[PROFILE_TONE] = tone }
 
     // ─── Google Account ───────────────────────────────────────────────
     val googleAccountEmail: Flow<String> = context.dataStore.data.map { it[GOOGLE_ACCOUNT_EMAIL] ?: "" }

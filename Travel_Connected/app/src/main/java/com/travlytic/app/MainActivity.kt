@@ -16,6 +16,7 @@ import com.travlytic.app.ui.screens.ScheduleScreen
 import com.travlytic.app.ui.screens.SettingsScreen
 import com.travlytic.app.ui.screens.SummaryScreen
 import com.travlytic.app.ui.screens.TrainingScreen
+import com.travlytic.app.ui.screens.ProfileScreen
 import com.travlytic.app.ui.theme.TravlyticTheme
 import com.travlytic.app.ui.theme.TravlyticSurface
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,7 +61,8 @@ fun TravlyticNavHost() {
         composable("settings") {
             SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToTraining = { navController.navigate("training") }
+                onNavigateToTraining = { navController.navigate("training") },
+                onNavigateToProfile = { navController.navigate("profile") }
             )
         }
         composable("schedule") {
@@ -75,6 +77,11 @@ fun TravlyticNavHost() {
         }
         composable("training") {
             TrainingScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("profile") {
+            ProfileScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

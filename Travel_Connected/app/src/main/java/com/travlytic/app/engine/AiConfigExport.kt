@@ -7,6 +7,10 @@ import com.travlytic.app.data.db.entities.TrainingRule
  */
 data class AiConfigExport(
     val version: Int = 1,
+    val version: Int = 1,
     val systemPrompt: String,
+    val profileUserName: String? = null,
+    val profileBusinessName: String? = null,
+    val profileTone: String? = null,
     val trainingRules: List<TrainingRule>
 )

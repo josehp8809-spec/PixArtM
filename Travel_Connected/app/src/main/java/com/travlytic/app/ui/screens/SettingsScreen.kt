@@ -19,16 +19,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.travlytic.app.ui.theme.*
 import com.travlytic.app.ui.viewmodel.MainViewModel
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToTraining: () -> Unit
+    onNavigateToTraining: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     val geminiKey by viewModel.geminiApiKey.collectAsState()
     val systemPrompt by viewModel.systemPrompt.collectAsState()
@@ -38,6 +48,22 @@ fun SettingsScreen(
     var apiKeyInput by remember(geminiKey) { mutableStateOf(geminiKey) }
     var promptInput by remember(systemPrompt) { mutableStateOf(systemPrompt) }
     var showApiKey by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Google Sign-In launcher
+    val signInLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                viewModel.onGoogleSignInSuccess(account)
+            } catch (e: ApiException) {
+                // Error manejado silenciosamente / info via snackbar en viewmodel
+            }
+        }
+    }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
@@ -69,6 +95,36 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ─── Perfil ────────────────────────────────────────────────────
+            SettingsSection(title = "👤 Perfil y Personalización") {
+                Text(
+                    "Agrega el nombre de tu empresa y el tono de respuesta.",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = onNavigateToProfile,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticSurface3)
+                ) {
+                    Icon(Icons.Filled.Person, null, modifier = Modifier.size(16.dp), tint = TravlyticBlue)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Editar Perfil", color = TravlyticBlue)
+                }
+            }
+
+            // ─── Google Account ────────────────────────────────────────────
+            SettingsSection(title = "☁️ Sincronización") {
+                GoogleAccountCard(
+                    email = uiState.googleAccountEmail,
+                    onSignIn = {
+                        val client = viewModel.getGoogleSignInClient(context)
+                        signInLauncher.launch(client.signInIntent)
+                    },
+                    onSignOut = { viewModel.signOut() }
+                )
+            }
+
             // ─── Gemini API Key ────────────────────────────────────────
             SettingsSection(title = "🤖 Gemini AI") {
                 Text(
@@ -247,3 +303,64 @@ fun settingsTextFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedLabelColor = TravlyticBlue,
     unfocusedLabelColor = TravlyticOnSurface2
 )
+
+@Composable
+fun GoogleAccountCard(
+    email: String,
+    onSignIn: () -> Unit,
+    onSignOut: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(40.dp).clip(CircleShape)
+                        .background(if (email.isNotBlank()) TravlyticBlue else TravlyticSurface2),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        if (email.isNotBlank()) Icons.Filled.Person else Icons.Outlined.Person,
+                        null, tint = Color.White
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text("Google Account", color = TravlyticOnSurface2, fontSize = 11.sp)
+                    Text(
+                        if (email.isNotBlank()) email else "Sin conectar",
+                        color = TravlyticOnSurface,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.widthIn(max = 160.dp)
+                    )
+                }
+            }
+            if (email.isNotBlank()) {
+                IconButton(onClick = onSignOut) {
+                    Icon(Icons.Filled.Logout, "Cerrar sesión",
+                        tint = TravlyticOnSurface2, modifier = Modifier.size(20.dp))
+                }
+            } else {
+                FilledTonalButton(
+                    onClick = onSignIn,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = TravlyticBlue.copy(alpha = 0.2f)
+                    )
+                ) {
+                    Text("Conectar", color = TravlyticBlue, fontSize = 13.sp)
+                }
+            }
+        }
+    }
+}
