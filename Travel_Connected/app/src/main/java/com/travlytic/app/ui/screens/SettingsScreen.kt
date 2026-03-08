@@ -27,7 +27,8 @@ import com.travlytic.app.ui.viewmodel.MainViewModel
 @Composable
 fun SettingsScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToTraining: () -> Unit
 ) {
     val geminiKey by viewModel.geminiApiKey.collectAsState()
     val systemPrompt by viewModel.systemPrompt.collectAsState()
@@ -171,6 +172,24 @@ fun SettingsScreen(
                         Spacer(Modifier.width(4.dp))
                         Text("Guardar")
                     }
+                }
+            }
+
+            // ─── Entrenamiento IA ──────────────────────────────────────────
+            SettingsSection(title = "🧠 Entrenamiento IA") {
+                Text(
+                    "Agrega reglas estrictas o enseña a Gemini cómo responder usando ejemplos (Few-Shot).",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = onNavigateToTraining,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                ) {
+                    Icon(Icons.Filled.School, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Abrir Panel de Entrenamiento")
                 }
             }
 

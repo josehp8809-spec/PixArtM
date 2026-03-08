@@ -15,6 +15,10 @@ import com.travlytic.app.data.db.dao.ResponseLogDao
 import com.travlytic.app.data.db.entities.ResponseLog
 import com.travlytic.app.data.db.entities.RegisteredSheet
 import com.travlytic.app.data.prefs.AppPreferences
+import com.travlytic.app.data.db.dao.TrainingRuleDao
+import com.travlytic.app.data.db.entities.TrainingRule
+import com.travlytic.app.engine.AiConfigExport
+import com.google.gson.Gson
 import com.travlytic.app.data.sheets.SheetsRepository
 import com.travlytic.app.data.sheets.SyncResult
 import com.travlytic.app.engine.GeminiAgent
@@ -77,6 +81,7 @@ class MainViewModel @Inject constructor(
     private val sheetsRepository: SheetsRepository,
     private val registeredSheetDao: RegisteredSheetDao,
     private val responseLogDao: ResponseLogDao,
+    private val trainingRuleDao: TrainingRuleDao,
     private val geminiAgent: GeminiAgent,
     private val summaryGenerator: SummaryGenerator,
     private val ttsManager: TtsManager
@@ -393,6 +398,68 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             appPreferences.setSystemPrompt(AppPreferences.DEFAULT_SYSTEM_PROMPT)
             showSnackbar("Prompt restablecido al valor predeterminado")
+        }
+    }
+
+    // ─── Training Rules & Export/Import ────────────────────────────────
+    
+    val trainingRules: StateFlow<List<TrainingRule>> = trainingRuleDao.observeAll()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    private val _exportEvent = MutableStateFlow<String?>(null)
+    val exportEvent: StateFlow<String?> = _exportEvent.asStateFlow()
+
+    fun clearExportEvent() {
+        _exportEvent.value = null
+    }
+
+    fun addTrainingRule(type: String, input: String, output: String?) {
+        viewModelScope.launch {
+            trainingRuleDao.insert(TrainingRule(type = type, input = input, output = output))
+            showSnackbar("Regla agregada exitosamente")
+        }
+    }
+
+    fun toggleTrainingRule(rule: TrainingRule) {
+        viewModelScope.launch {
+            trainingRuleDao.update(rule.copy(isActive = !rule.isActive))
+        }
+    }
+
+    fun deleteTrainingRule(rule: TrainingRule) {
+        viewModelScope.launch {
+            trainingRuleDao.delete(rule)
+            showSnackbar("Regla eliminada")
+        }
+    }
+
+    fun exportConfiguration() {
+        viewModelScope.launch {
+            try {
+                val prompt = appPreferences.systemPrompt.first()
+                val rules = trainingRules.value
+                val config = AiConfigExport(systemPrompt = prompt, trainingRules = rules)
+                val json = Gson().toJson(config)
+                _exportEvent.value = json
+            } catch (e: Exception) {
+                showSnackbar("❌ Error al exportar: ${e.message}")
+            }
+        }
+    }
+
+    fun importConfiguration(jsonString: String) {
+        viewModelScope.launch {
+            try {
+                val config = Gson().fromJson(jsonString, AiConfigExport::class.java)
+                appPreferences.setSystemPrompt(config.systemPrompt)
+                trainingRuleDao.deleteAll()
+                if (!config.trainingRules.isNullOrEmpty()) {
+                    trainingRuleDao.insertAll(config.trainingRules.map { it.copy(id = 0) })
+                }
+                showSnackbar("✅ Configuración IA importada exitosamente")
+            } catch (e: Exception) {
+                showSnackbar("❌ Error cargando archivo: el formato JSON no es válido")
+            }
         }
     }
 

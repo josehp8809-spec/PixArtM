@@ -6,6 +6,7 @@ import com.travlytic.app.data.db.AppDatabase
 import com.travlytic.app.data.db.dao.RegisteredSheetDao
 import com.travlytic.app.data.db.dao.ResponseLogDao
 import com.travlytic.app.data.db.dao.SheetDataDao
+import com.travlytic.app.data.db.dao.TrainingRuleDao
 import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.data.sheets.SheetsRepository
 import com.travlytic.app.engine.GeminiAgent
@@ -42,6 +43,9 @@ object AppModule {
     fun provideResponseLogDao(db: AppDatabase): ResponseLogDao = db.responseLogDao()
 
     @Provides @Singleton
+    fun provideTrainingRuleDao(db: AppDatabase): TrainingRuleDao = db.trainingRuleDao()
+
+    @Provides @Singleton
     fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences =
         AppPreferences(context)
 
@@ -53,7 +57,11 @@ object AppModule {
     ): SheetsRepository = SheetsRepository(context, sheetDataDao, registeredSheetDao)
 
     @Provides @Singleton
-    fun provideGeminiAgent(): GeminiAgent = GeminiAgent()
+    fun provideGeminiAgent(
+        sheetDataDao: SheetDataDao,
+        registeredSheetDao: RegisteredSheetDao,
+        trainingRuleDao: TrainingRuleDao
+    ): GeminiAgent = GeminiAgent(sheetDataDao, registeredSheetDao, trainingRuleDao)
 
     @Provides @Singleton
     fun provideSummaryGenerator(): SummaryGenerator = SummaryGenerator()

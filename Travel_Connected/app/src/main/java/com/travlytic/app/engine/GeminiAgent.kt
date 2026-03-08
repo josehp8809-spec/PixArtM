@@ -5,7 +5,7 @@ import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
 import com.travlytic.app.data.db.dao.SheetDataDao
-import com.travlytic.app.data.db.dao.RegisteredSheetDao
+import com.travlytic.app.data.db.dao.TrainingRuleDao
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
@@ -16,7 +16,8 @@ private const val TAG = "GeminiAgent"
 @Singleton
 class GeminiAgent @Inject constructor(
     private val sheetDataDao: SheetDataDao,
-    private val registeredSheetDao: RegisteredSheetDao
+    private val registeredSheetDao: RegisteredSheetDao,
+    private val trainingRuleDao: TrainingRuleDao
 ) {
     private val gson = Gson()
 
@@ -50,10 +51,13 @@ class GeminiAgent @Inject constructor(
                 return "No tengo información disponible en este momento. Por favor sincroniza tu base de conocimiento."
             }
 
-            // 2. Construir el prompt completo
-            val fullPrompt = buildPrompt(systemPrompt, sheetContext, contactName, userMessage)
+            // 2. Cargar Reglas y Ejemplos Activos
+            val activeRules = trainingRuleDao.getActiveRules()
+            
+            // 3. Construir el prompt completo
+            val fullPrompt = buildPrompt(systemPrompt, sheetContext, activeRules, contactName, userMessage)
 
-            // 3. Configurar y llamar a Gemini
+            // 4. Configurar y llamar a Gemini
             val model = GenerativeModel(
                 modelName = "gemini-2.5-flash",
                 apiKey = apiKey,
@@ -114,25 +118,41 @@ class GeminiAgent @Inject constructor(
     }
 
     /**
-     * Construye el prompt final que se enviará a Gemini.
+     * Construye el prompt final que se enviará a Gemini integrando las reglas y ejemplos.
      */
     private fun buildPrompt(
         systemPrompt: String,
         sheetContext: String,
+        activeRules: List<com.travlytic.app.data.db.entities.TrainingRule>,
         contactName: String,
         userMessage: String
     ): String {
+        val rules = activeRules.filter { it.type == "RULE" }
+        val examples = activeRules.filter { it.type == "EXAMPLE" }
+        
+        val rulesText = if (rules.isNotEmpty()) {
+            "\n=== REGLAS ESTRICTAS DE COMPORTAMIENTO ===\n" +
+            rules.joinToString("\n") { "- ${it.input}" }
+        } else ""
+
+        val examplesText = if (examples.isNotEmpty()) {
+            "\n=== EJEMPLOS DE RESPUESTAS (ESTILO FEW-SHOT) ===\n" +
+            examples.joinToString("\n\n") { "Si el usuario dice: \"${it.input}\"\nDebes responder exactamente así: \"${it.output}\"" }
+        } else ""
+
         return """
 $systemPrompt
+$rulesText
+$examplesText
 
-=== BASE DE CONOCIMIENTO ===
+=== BASE DE CONOCIMIENTO (OBLIGATORIO) ===
 $sheetContext
 
-=== MENSAJE RECIBIDO ===
+=== MENSAJE ACTUAL RECIÉN RECIBIDO ===
 Contacto: $contactName
 Mensaje: $userMessage
 
-=== TU RESPUESTA ===
+=== TU RESPUESTA (Directa y Natural) ===
 """.trimIndent()
     }
 }
