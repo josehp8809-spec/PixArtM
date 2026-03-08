@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Travlytic" parent="android:Theme.Material.NoTitleBar">
+        <item name="android:statusBarColor">@color/surface_primary</item>
+        <item name="android:navigationBarColor">@color/surface_primary</item>
+        <item name="android:windowBackground">@color/surface_primary</item>
+        <item name="android:colorPrimary">@color/travlytic_blue</item>
+    </style>
+</resources>

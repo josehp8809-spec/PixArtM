@@ -1,0 +1,116 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+}
+
+android {
+    namespace 'com.travlytic.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.travlytic.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.8'
+    }
+
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += '/META-INF/DEPENDENCIES'
+        }
+    }
+}
+
+dependencies {
+    // Android Core
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+
+    // Jetpack Compose BOM
+    implementation platform('androidx.compose:compose-bom:2024.02.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-extended'
+    implementation 'androidx.navigation:navigation-compose:2.7.7'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    // ViewModel + Compose
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
+
+    // Hilt (Dependency Injection)
+    implementation 'com.google.dagger:hilt-android:2.50'
+    ksp 'com.google.dagger:hilt-android-compiler:2.50'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
+
+    // Room (SQLite local DB)
+    implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+    ksp 'androidx.room:room-compiler:2.6.1'
+
+    // DataStore (API Key y preferencias)
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
+
+    // Google Sign-In
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+
+    // Google API Client (Sheets API v4)
+    implementation('com.google.api-client:google-api-client-android:2.2.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation('com.google.apis:google-api-services-sheets:v4-rev612-1.25.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.36.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.44.1'
+
+    // Gemini AI SDK
+    implementation 'com.google.ai.client.generativeai:generativeai:0.7.0'
+
+    // Gson (JSON)
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
