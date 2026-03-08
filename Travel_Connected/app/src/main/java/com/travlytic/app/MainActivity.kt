@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.travlytic.app.ui.screens.HomeScreen
+import com.travlytic.app.ui.screens.ScheduleScreen
 import com.travlytic.app.ui.screens.SettingsScreen
 import com.travlytic.app.ui.theme.TravlyticTheme
 import com.travlytic.app.ui.theme.TravlyticSurface
@@ -49,11 +50,17 @@ fun TravlyticNavHost() {
     ) {
         composable("home") {
             HomeScreen(
-                onNavigateToSettings = { navController.navigate("settings") }
+                onNavigateToSettings = { navController.navigate("settings") },
+                onNavigateToSchedule = { navController.navigate("schedule") }
             )
         }
         composable("settings") {
             SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("schedule") {
+            ScheduleScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

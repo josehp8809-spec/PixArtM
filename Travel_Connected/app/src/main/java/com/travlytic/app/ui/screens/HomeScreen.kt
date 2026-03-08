@@ -39,7 +39,8 @@ import java.util.*
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToSchedule: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -73,6 +74,26 @@ fun HomeScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = TravlyticSurface,
+        floatingActionButton = {
+            // ─── FAB Activación Rápida ───────────────────────────────────────────
+            ExtendedFloatingActionButton(
+                onClick = { viewModel.toggleBot(!uiState.isServiceEnabled) },
+                icon = {
+                    Icon(
+                        if (uiState.isServiceEnabled) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        if (uiState.isServiceEnabled) "Desactivar Bot" else "Activar Bot",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                containerColor = if (uiState.isServiceEnabled) TravlyticRed else TravlyticGreen,
+                contentColor = Color.White
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -104,6 +125,10 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToSchedule) {
+                        Icon(Icons.Filled.Schedule, contentDescription = "Horarios",
+                            tint = if (uiState.isServiceEnabled) TravlyticGreen else TravlyticOnSurface2)
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = "Configuración",
                             tint = TravlyticOnSurface2)

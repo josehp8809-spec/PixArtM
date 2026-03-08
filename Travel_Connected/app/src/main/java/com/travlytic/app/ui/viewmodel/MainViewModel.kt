@@ -35,6 +35,16 @@ data class UiState(
     val snackbarMessage: String? = null
 )
 
+data class ScheduleState(
+    val enabled: Boolean = false,
+    val startHour: Int = 8,
+    val startMinute: Int = 0,
+    val endHour: Int = 20,
+    val endMinute: Int = 0,
+    val activeDays: Set<Int> = setOf(1, 2, 3, 4, 5)
+)
+
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -56,6 +66,25 @@ class MainViewModel @Inject constructor(
 
     val botEnabled: StateFlow<Boolean> = appPreferences.botEnabled
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    // ─── Schedule State ───────────────────────────────────────────────
+    val scheduleState: StateFlow<ScheduleState> = combine(
+        appPreferences.scheduleEnabled,
+        appPreferences.scheduleStartHour,
+        appPreferences.scheduleStartMinute,
+        appPreferences.scheduleEndHour,
+        appPreferences.scheduleEndMinute,
+        appPreferences.scheduleDays
+    ) { values ->
+        ScheduleState(
+            enabled      = values[0] as Boolean,
+            startHour    = values[1] as Int,
+            startMinute  = values[2] as Int,
+            endHour      = values[3] as Int,
+            endMinute    = values[4] as Int,
+            activeDays   = @Suppress("UNCHECKED_CAST") (values[5] as Set<Int>)
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, ScheduleState())
 
     init {
         observeRegisteredSheets()
@@ -252,6 +281,30 @@ class MainViewModel @Inject constructor(
             appPreferences.setSystemPrompt(AppPreferences.DEFAULT_SYSTEM_PROMPT)
             showSnackbar("Prompt restablecido al valor predeterminado")
         }
+    }
+
+    // ─── Scheduler ────────────────────────────────────────────────────
+
+    fun setScheduleEnabled(enabled: Boolean) = viewModelScope.launch {
+        appPreferences.setScheduleEnabled(enabled)
+    }
+
+    fun setScheduleStart(hour: Int, minute: Int) = viewModelScope.launch {
+        appPreferences.setScheduleStart(hour, minute)
+    }
+
+    fun setScheduleEnd(hour: Int, minute: Int) = viewModelScope.launch {
+        appPreferences.setScheduleEnd(hour, minute)
+    }
+
+    fun setScheduleDays(days: Set<Int>) = viewModelScope.launch {
+        appPreferences.setScheduleDays(days)
+    }
+
+    fun toggleScheduleDay(day: Int) = viewModelScope.launch {
+        val current = appPreferences.scheduleDays.first().toMutableSet()
+        if (day in current) current.remove(day) else current.add(day)
+        appPreferences.setScheduleDays(current)
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────

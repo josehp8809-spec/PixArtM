@@ -19,6 +19,7 @@ import com.travlytic.app.engine.GeminiAgent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import java.util.Calendar
 import javax.inject.Inject
 
 private const val TAG = "WhatsAppListener"
@@ -64,6 +65,12 @@ class WhatsAppListenerService : NotificationListenerService() {
                 // Verificar que el bot está habilitado
                 val botEnabled = appPreferences.botEnabled.first()
                 if (!botEnabled) return@launch
+
+                // Verificar horario programado
+                if (!isWithinSchedule()) {
+                    Log.d(TAG, "Fuera del horario programado, ignorando mensaje")
+                    return@launch
+                }
 
                 // Verificar que tenemos API Key
                 val apiKey = appPreferences.geminiApiKey.first()
@@ -197,5 +204,41 @@ class WhatsAppListenerService : NotificationListenerService() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()
+    }
+
+    /**
+     * Verifica si el momento actual está dentro del horario programado.
+     * Si el schedule no está habilitado, siempre retorna true (24/7).
+     */
+    private suspend fun isWithinSchedule(): Boolean {
+        val scheduleEnabled = appPreferences.scheduleEnabled.first()
+        if (!scheduleEnabled) return true
+
+        val now = Calendar.getInstance()
+        val currentHour = now.get(Calendar.HOUR_OF_DAY)
+        val currentMinute = now.get(Calendar.MINUTE)
+        // Calendar.DAY_OF_WEEK: 1=Dom, 2=Lun... Normalizamos a 1=Lun, 7=Dom
+        val calDay = now.get(Calendar.DAY_OF_WEEK)
+        val dayNum = if (calDay == Calendar.SUNDAY) 7 else calDay - 1
+
+        val activeDays = appPreferences.scheduleDays.first()
+        if (dayNum !in activeDays) return false
+
+        val startH = appPreferences.scheduleStartHour.first()
+        val startM = appPreferences.scheduleStartMinute.first()
+        val endH   = appPreferences.scheduleEndHour.first()
+        val endM   = appPreferences.scheduleEndMinute.first()
+
+        val currentMins = currentHour * 60 + currentMinute
+        val startMins   = startH * 60 + startM
+        val endMins     = endH * 60 + endM
+
+        return if (endMins > startMins) {
+            // Rango normal: ej 08:00 → 20:00
+            currentMins in startMins..endMins
+        } else {
+            // Rango nocturno: ej 22:00 → 06:00
+            currentMins >= startMins || currentMins <= endMins
+        }
     }
 }
