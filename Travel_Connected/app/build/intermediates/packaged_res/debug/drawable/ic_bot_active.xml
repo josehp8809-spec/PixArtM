@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background gradient circle -->
+    <path
+        android:pathData="M54,0 A54,54 0 1,1 54,108 A54,54 0 1,1 54,0 Z"
+        android:fillColor="#1A73E8"/>
+
+    <!-- Brain/AI icon shape -->
+    <group android:translateX="22" android:translateY="22">
+        <!-- Neural brain shape simplified -->
+        <path
+            android:pathData="M32,8 C22,8 14,16 14,26 C14,30 15.5,34 18,37 C16.5,39 16,41 16,43 C16,49 20,54 26,55 C26,55 28,64 32,64 C36,64 38,55 38,55 C44,54 48,49 48,43 C48,41 47.5,39 46,37 C48.5,34 50,30 50,26 C50,16 42,8 32,8Z"
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.95"/>
+        <!-- Highlights -->
+        <path
+            android:pathData="M24,22 C24,20 26,18 28,18 C30,18 32,20 32,22 C32,24 30,26 28,26 C26,26 24,24 24,22Z"
+            android:fillColor="#1A73E8"/>
+        <path
+            android:pathData="M34,28 C34,26 36,24 38,24 C40,24 42,26 42,28 C42,30 40,32 38,32 C36,32 34,30 34,28Z"
+            android:fillColor="#1A73E8"/>
+        <path
+            android:pathData="M26,36 C26,34 28,32 30,32 C32,32 34,34 34,36 C34,38 32,40 30,40 C28,40 26,38 26,36Z"
+            android:fillColor="#00C853"/>
+    </group>
+</vector>

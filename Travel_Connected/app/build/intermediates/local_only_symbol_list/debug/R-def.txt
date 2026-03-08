@@ -1,0 +1,32 @@
+R_DEF: Internal format may change without notice
+local
+color on_surface_primary
+color on_surface_secondary
+color surface_primary
+color surface_secondary
+color surface_tertiary
+color travlytic_blue
+color travlytic_blue_dark
+color travlytic_blue_light
+color travlytic_green
+color travlytic_orange
+color travlytic_red
+drawable ic_bot_active
+drawable travlytic_logo
+mipmap ic_launcher
+mipmap ic_launcher_round
+string add_sheet
+string app_description
+string app_name
+string bot_active
+string bot_inactive
+string connect_google
+string no_logs
+string no_sheets
+string notification_permission_warning
+string settings
+string sync_all
+string travlytic_notification_active
+string travlytic_notification_channel
+style Theme.Travlytic
+xml network_security_config
