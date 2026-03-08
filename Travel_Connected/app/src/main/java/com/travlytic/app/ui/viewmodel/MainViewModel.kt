@@ -264,6 +264,7 @@ class MainViewModel @Inject constructor(
         GoogleSignIn.getClient(
             context,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(com.travlytic.app.R.string.default_web_client_id))
                 .requestEmail()
                 .requestScopes(
                     com.google.android.gms.common.api.Scope(SheetsScopes.SPREADSHEETS_READONLY)

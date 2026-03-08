@@ -13,4 +13,7 @@
     <string name="no_logs">Sin respuestas enviadas aún</string>
     <string name="travlytic_notification_channel">Travlytic Bot</string>
     <string name="travlytic_notification_active">Servicio activo de respuesta automática</string>
+
+    <!-- Google Cloud Web Client ID -->
+    <string name="default_web_client_id">131974621188-30hln0o1cut3th929r5cgtg6unmhl2hl.apps.googleusercontent.com</string>
 </resources>
