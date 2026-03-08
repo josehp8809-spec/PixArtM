@@ -21,6 +21,7 @@ string app_name
 string bot_active
 string bot_inactive
 string connect_google
+string default_web_client_id
 string no_logs
 string no_sheets
 string notification_permission_warning

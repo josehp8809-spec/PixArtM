@@ -17,6 +17,7 @@
     <string name="bot_active">Bot Activo</string>
     <string name="bot_inactive">Bot Inactivo</string>
     <string name="connect_google">Conectar Google</string>
+    <string name="default_web_client_id">131974621188-30hln0o1cut3th929r5cgtg6unmhl2hl.apps.googleusercontent.com</string>
     <string name="no_logs">Sin respuestas enviadas aún</string>
     <string name="no_sheets">Agrega un Google Sheet para comenzar</string>
     <string name="notification_permission_warning">Activa el permiso de Notificaciones para que el bot funcione</string>
