@@ -31,7 +31,9 @@ import com.google.android.gms.common.api.ApiException
 import com.travlytic.app.data.db.entities.RegisteredSheet
 import com.travlytic.app.data.db.entities.ResponseLog
 import com.travlytic.app.ui.theme.*
+import com.travlytic.app.ui.viewmodel.DashboardState
 import com.travlytic.app.ui.viewmodel.MainViewModel
+import com.travlytic.app.ui.viewmodel.TestMessageState
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,8 +46,11 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val dashboardState by viewModel.dashboardState.collectAsState()
+    val testMsgState by viewModel.testMsgState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showAddSheetDialog by remember { mutableStateOf(false) }
+    var showTestMessage by remember { mutableStateOf(false) }
     val isListenerEnabled = remember { viewModel.isNotificationListenerEnabled() }
 
     // Google Sign-In launcher
@@ -156,7 +161,12 @@ fun HomeScreen(
                 )
             }
 
-            // ─── Google Account ────────────────────────────────────────
+            // ─── Dashboard Card ────────────────────────────────────────────
+            item {
+                DashboardCard(dashboardState)
+            }
+
+            // ─── Google Account ────────────────────────────────────────────
             item {
                 GoogleAccountCard(
                     email = uiState.googleAccountEmail,
@@ -220,7 +230,41 @@ fun HomeScreen(
                 }
             }
 
-            // ─── Response Log ──────────────────────────────────────────
+            // ─── Test Message Section ─────────────────────────────────────
+            item {
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "🧪 Probar Bot",
+                        color = TravlyticOnSurface,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                    TextButton(onClick = { showTestMessage = !showTestMessage }) {
+                        Text(
+                            if (showTestMessage) "Ocultar" else "Abrir",
+                            color = TravlyticBlue, fontSize = 12.sp
+                        )
+                    }
+                }
+                AnimatedVisibility(
+                    visible = showTestMessage,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    TestMessageCard(
+                        state = testMsgState,
+                        onSend = { viewModel.testMessage(it) },
+                        onClear = { viewModel.clearTestMessage() }
+                    )
+                }
+            }
+
+            // ─── Response Log ───────────────────────────────────────────────
             item {
                 Spacer(Modifier.height(4.dp))
                 Row(
@@ -540,4 +584,173 @@ fun AddSheetDialog(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
             TextButton(onClick = onDismiss) { Text("Cancelar", color = TravlyticOnSurface2) }
         }
     )
+}
+
+// ─── Dashboard Card ───────────────────────────────────────────────────────────
+
+@Composable
+fun DashboardCard(state: DashboardState) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF0D2137) // azul muy oscuro
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            DashboardStat(
+                icon = "💬",
+                value = "${state.repliesToday}",
+                label = "Hoy"
+            )
+            DashboardDivider()
+            DashboardStat(
+                icon = "📅",
+                value = "${state.repliesThisWeek}",
+                label = "Esta semana"
+            )
+            DashboardDivider()
+            DashboardStat(
+                icon = "📚",
+                value = "${state.totalKnowledgeRows}",
+                label = "Filas KB"
+            )
+            DashboardDivider()
+            DashboardStat(
+                icon = "📊",
+                value = "${state.activeSheetsCount}",
+                label = "Sheets"
+            )
+        }
+    }
+}
+
+@Composable
+private fun DashboardStat(icon: String, value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(icon, fontSize = 18.sp)
+        Spacer(Modifier.height(2.dp))
+        Text(
+            value,
+            color = TravlyticOnSurface,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+        Text(label, color = TravlyticOnSurface2, fontSize = 10.sp)
+    }
+}
+
+@Composable
+private fun DashboardDivider() {
+    Divider(
+        modifier = Modifier
+            .height(40.dp)
+            .width(1.dp),
+        color = TravlyticSurface3
+    )
+}
+
+// ─── Test Message Card ────────────────────────────────────────────────────────
+
+@Composable
+fun TestMessageCard(
+    state: TestMessageState,
+    onSend: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    var inputText by remember { mutableStateOf("") }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(Modifier.padding(14.dp)) {
+            Text(
+                "Escribe un mensaje para ver cómo respondería el bot:",
+                color = TravlyticOnSurface2, fontSize = 12.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("¿Cuál es el horario?", fontSize = 12.sp) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = TravlyticBlue,
+                        unfocusedBorderColor = TravlyticSurface3,
+                        focusedTextColor = TravlyticOnSurface,
+                        unfocusedTextColor = TravlyticOnSurface
+                    )
+                )
+                Spacer(Modifier.width(8.dp))
+                IconButton(
+                    onClick = { onSend(inputText) },
+                    enabled = inputText.isNotBlank() && !state.isLoading,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(
+                            if (inputText.isNotBlank() && !state.isLoading)
+                                TravlyticBlue else TravlyticSurface3
+                        )
+                        .size(44.dp)
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(Icons.Filled.Send, "Enviar",
+                            tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
+                }
+            }
+
+            // Respuesta de Gemini
+            if (state.response.isNotBlank()) {
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0x1500C853))
+                        .padding(10.dp)
+                ) {
+                    Text("🤖 ", fontSize = 14.sp)
+                    Text(
+                        state.response,
+                        color = TravlyticOnSurface,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
+                TextButton(
+                    onClick = { onClear(); inputText = "" },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Limpiar", color = TravlyticOnSurface2, fontSize = 11.sp)
+                }
+            }
+
+            // Error
+            if (state.error.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Text(state.error, color = TravlyticRed, fontSize = 12.sp)
+            }
+        }
+    }
 }

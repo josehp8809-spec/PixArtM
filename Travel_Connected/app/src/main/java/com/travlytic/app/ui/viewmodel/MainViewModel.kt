@@ -44,7 +44,18 @@ data class ScheduleState(
     val activeDays: Set<Int> = setOf(1, 2, 3, 4, 5)
 )
 
+data class DashboardState(
+    val repliesToday: Int = 0,
+    val repliesThisWeek: Int = 0,
+    val totalKnowledgeRows: Int = 0,
+    val activeSheetsCount: Int = 0
+)
 
+data class TestMessageState(
+    val isLoading: Boolean = false,
+    val response: String = "",
+    val error: String = ""
+)
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -86,11 +97,20 @@ class MainViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, ScheduleState())
 
+    // ─── Dashboard State ────────────────────────────────────────────
+    private val _dashboardState = MutableStateFlow(DashboardState())
+    val dashboardState: StateFlow<DashboardState> = _dashboardState.asStateFlow()
+
+    // ─── Test Message State ──────────────────────────────────────────
+    private val _testMsgState = MutableStateFlow(TestMessageState())
+    val testMsgState: StateFlow<TestMessageState> = _testMsgState.asStateFlow()
+
     init {
         observeRegisteredSheets()
         observeRecentLogs()
         observeGoogleAccount()
         observeServiceStatus()
+        observeDashboard()
     }
 
     private fun observeRegisteredSheets() {
@@ -115,6 +135,76 @@ class MainViewModel @Inject constructor(
         appPreferences.botEnabled
             .onEach { enabled -> _uiState.update { it.copy(isServiceEnabled = enabled) } }
             .launchIn(viewModelScope)
+    }
+
+    private fun observeDashboard() {
+        // Actualiza el dashboard cada vez que cambian los logs o los sheets
+        viewModelScope.launch {
+            combine(
+                responseLogDao.observeRecent(500),
+                registeredSheetDao.observeAll()
+            ) { logs, sheets ->
+                val now = System.currentTimeMillis()
+                val todayStart = java.util.Calendar.getInstance().apply {
+                    set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    set(java.util.Calendar.MINUTE, 0)
+                    set(java.util.Calendar.SECOND, 0)
+                }.timeInMillis
+                val weekStart = todayStart - (6 * 24 * 60 * 60 * 1000L)
+
+                val repliesToday = logs.count { it.timestamp >= todayStart }
+                val repliesWeek  = logs.count { it.timestamp >= weekStart }
+                val activeSheets = sheets.filter { it.isEnabled }
+
+                // Suma total de filas de todos los sheets activos
+                val totalRows = activeSheets.sumOf { it.rowCount }
+
+                DashboardState(
+                    repliesToday = repliesToday,
+                    repliesThisWeek = repliesWeek,
+                    totalKnowledgeRows = totalRows,
+                    activeSheetsCount = activeSheets.size
+                )
+            }.collect { dashboard ->
+                _dashboardState.value = dashboard
+            }
+        }
+    }
+
+    // ─── Test Message ──────────────────────────────────────────────────────────
+
+    fun testMessage(message: String) {
+        if (message.isBlank()) return
+        viewModelScope.launch {
+            val apiKey = appPreferences.geminiApiKey.first()
+            if (apiKey.isBlank()) {
+                _testMsgState.value = TestMessageState(error = "❌ Configura tu Gemini API Key primero")
+                return@launch
+            }
+
+            _testMsgState.value = TestMessageState(isLoading = true)
+
+            try {
+                val prompt = appPreferences.systemPrompt.first()
+                val response = geminiAgent.generateResponse(
+                    apiKey = apiKey,
+                    systemPrompt = prompt,
+                    contactName = "Test",
+                    userMessage = message
+                )
+
+                _testMsgState.value = TestMessageState(
+                    response = response ?: "Sin respuesta. Verifica que tienes Sheets sincronizados.",
+                    error = ""
+                )
+            } catch (e: Exception) {
+                _testMsgState.value = TestMessageState(error = "❌ ${e.message}")
+            }
+        }
+    }
+
+    fun clearTestMessage() {
+        _testMsgState.value = TestMessageState()
     }
 
     // ─── Google Sign-In ───────────────────────────────────────────────
