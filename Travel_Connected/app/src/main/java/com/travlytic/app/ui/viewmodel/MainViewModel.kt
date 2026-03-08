@@ -114,6 +114,14 @@ class MainViewModel @Inject constructor(
     val profileTone: StateFlow<String> = appPreferences.profileTone
         .stateIn(viewModelScope, SharingStarted.Lazily, "Profesional y amable")
 
+    // Canales
+    val channelWhatsApp: StateFlow<Boolean> = appPreferences.channelWhatsApp
+        .stateIn(viewModelScope, SharingStarted.Lazily, true)
+    val channelFbMessenger: StateFlow<Boolean> = appPreferences.channelFbMessenger
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val channelIgDirect: StateFlow<Boolean> = appPreferences.channelIgDirect
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
     // ─── Schedule State ───────────────────────────────────────────────
     val scheduleState: StateFlow<ScheduleState> = combine(
         appPreferences.scheduleEnabled,
@@ -423,6 +431,20 @@ class MainViewModel @Inject constructor(
             appPreferences.setProfileTone(tone)
             showSnackbar("✅ Perfil guardado exitosamente")
         }
+    }
+
+    // ─── Canales ──────────────────────────────────────────────────────
+
+    fun toggleChannelWhatsApp(enabled: Boolean) = viewModelScope.launch {
+        appPreferences.setChannelWhatsApp(enabled)
+    }
+
+    fun toggleChannelFbMessenger(enabled: Boolean) = viewModelScope.launch {
+        appPreferences.setChannelFbMessenger(enabled)
+    }
+
+    fun toggleChannelIgDirect(enabled: Boolean) = viewModelScope.launch {
+        appPreferences.setChannelIgDirect(enabled)
     }
 
     // ─── Training Rules & Export/Import ────────────────────────────────

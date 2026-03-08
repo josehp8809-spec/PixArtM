@@ -19,6 +19,11 @@ class AppPreferences(private val context: Context) {
         val GOOGLE_ACCOUNT_EMAIL  = stringPreferencesKey("google_account_email")
         val AUTO_REPLY_DELAY_MS   = longPreferencesKey("auto_reply_delay_ms")
 
+        // ─── Canales ───────────────────────────────────────────────────
+        val CHANNEL_WHATSAPP      = booleanPreferencesKey("channel_whatsapp")
+        val CHANNEL_FB_MESSENGER  = booleanPreferencesKey("channel_fb_messenger")
+        val CHANNEL_IG_DIRECT     = booleanPreferencesKey("channel_ig_direct")
+
         // ─── Profile ───────────────────────────────────────────────────
         val PROFILE_USER_NAME     = stringPreferencesKey("profile_user_name")
         val PROFILE_BUSINESS_NAME = stringPreferencesKey("profile_business_name")
@@ -58,6 +63,16 @@ REGLAS:
     // ─── System Prompt ────────────────────────────────────────────────
     val systemPrompt: Flow<String> = context.dataStore.data.map { it[SYSTEM_PROMPT] ?: DEFAULT_SYSTEM_PROMPT }
     suspend fun setSystemPrompt(prompt: String) = context.dataStore.edit { it[SYSTEM_PROMPT] = prompt }
+
+    // ─── Canales ──────────────────────────────────────────────────────
+    val channelWhatsApp: Flow<Boolean> = context.dataStore.data.map { it[CHANNEL_WHATSAPP] ?: true }
+    suspend fun setChannelWhatsApp(enabled: Boolean) = context.dataStore.edit { it[CHANNEL_WHATSAPP] = enabled }
+
+    val channelFbMessenger: Flow<Boolean> = context.dataStore.data.map { it[CHANNEL_FB_MESSENGER] ?: false }
+    suspend fun setChannelFbMessenger(enabled: Boolean) = context.dataStore.edit { it[CHANNEL_FB_MESSENGER] = enabled }
+
+    val channelIgDirect: Flow<Boolean> = context.dataStore.data.map { it[CHANNEL_IG_DIRECT] ?: false }
+    suspend fun setChannelIgDirect(enabled: Boolean) = context.dataStore.edit { it[CHANNEL_IG_DIRECT] = enabled }
 
     // ─── Profile ──────────────────────────────────────────────────────
     val profileUserName: Flow<String> = context.dataStore.data.map { it[PROFILE_USER_NAME] ?: "" }

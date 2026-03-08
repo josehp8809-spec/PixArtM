@@ -39,7 +39,8 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToTraining: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToKnowledge: () -> Unit
+    onNavigateToKnowledge: () -> Unit,
+    onNavigateToChannels: () -> Unit
 ) {
     val geminiKey by viewModel.geminiApiKey.collectAsState()
     val systemPrompt by viewModel.systemPrompt.collectAsState()
@@ -247,6 +248,24 @@ fun SettingsScreen(
                         Spacer(Modifier.width(4.dp))
                         Text("Guardar")
                     }
+                }
+            }
+
+            // ─── Canales ───────────────────────────────────────────────────
+            SettingsSection(title = "📲 Canales") {
+                Text(
+                    "Elige en qué apps el bot contestará mensajes.",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = onNavigateToChannels,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticSurface3)
+                ) {
+                    Icon(Icons.Filled.Forum, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Gestionar Canales Activos")
                 }
             }
 

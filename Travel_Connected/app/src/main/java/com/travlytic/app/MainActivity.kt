@@ -18,6 +18,7 @@ import com.travlytic.app.ui.screens.SummaryScreen
 import com.travlytic.app.ui.screens.TrainingScreen
 import com.travlytic.app.ui.screens.ProfileScreen
 import com.travlytic.app.ui.screens.KnowledgeBaseScreen
+import com.travlytic.app.ui.screens.ChannelsScreen
 import com.travlytic.app.ui.theme.TravlyticTheme
 import com.travlytic.app.ui.theme.TravlyticSurface
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,7 +65,8 @@ fun TravlyticNavHost() {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToTraining = { navController.navigate("training") },
                 onNavigateToProfile = { navController.navigate("profile") },
-                onNavigateToKnowledge = { navController.navigate("knowledge") }
+                onNavigateToKnowledge = { navController.navigate("knowledge") },
+                onNavigateToChannels = { navController.navigate("channels") }
             )
         }
         composable("schedule") {
@@ -89,6 +91,11 @@ fun TravlyticNavHost() {
         }
         composable("knowledge") {
             KnowledgeBaseScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("channels") {
+            ChannelsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

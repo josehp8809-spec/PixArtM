@@ -8,9 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.service.notification.NotificationListenerService
+import android.os.Bundle
+import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.RemoteInput
 import com.travlytic.app.R
 import com.travlytic.app.data.db.dao.ResponseLogDao
 import com.travlytic.app.data.db.entities.ResponseLog
@@ -22,13 +25,15 @@ import kotlinx.coroutines.flow.first
 import java.util.Calendar
 import javax.inject.Inject
 
-private const val TAG = "WhatsAppListener"
+private const val TAG = "UniversalListener"
 private const val WHATSAPP_PACKAGE = "com.whatsapp"
 private const val WHATSAPP_BUSINESS_PACKAGE = "com.whatsapp.w4b"
+private const val FB_MESSENGER_PACKAGE = "com.facebook.orca"
+private const val IG_DIRECT_PACKAGE = "com.instagram.android"
 private const val TRAVLYTIC_CHANNEL_ID = "travlytic_service"
 
 @AndroidEntryPoint
-class WhatsAppListenerService : NotificationListenerService() {
+class UniversalListenerService : NotificationListenerService() {
 
     @Inject lateinit var geminiAgent: GeminiAgent
     @Inject lateinit var responseLogDao: ResponseLogDao
@@ -36,13 +41,21 @@ class WhatsAppListenerService : NotificationListenerService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    // Mapa para evitar responder al mismo contacto/mensaje dos veces
+    // ─── Motor Anti-Bucle ──────────────────────────────────────────────
     private val recentlyReplied = mutableMapOf<String, Long>()
     private val REPLY_COOLDOWN_MS = 30_000L // 30 segundos de cooldown por contacto
 
+    // Caché circular estricto (últimos 15 mensajes) para Anti-Bucle de IA a IA
+    private val recentResponseHashes = object : LinkedHashMap<Int, Long>(15, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, Long>?): Boolean {
+            return size > 15
+        }
+    }
+    private val ANTI_LOOP_COOLDOWN_MS = 30_000L // 30 segundos IGNORANDO ecos
+
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "WhatsAppListenerService iniciado")
+        Log.d(TAG, "UniversalListenerService iniciado")
         createNotificationChannel()
         startForeground(1, buildForegroundNotification())
     }
@@ -50,22 +63,33 @@ class WhatsAppListenerService : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        Log.d(TAG, "WhatsAppListenerService detenido")
+        Log.d(TAG, "UniversalListenerService detenido")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         sbn ?: return
 
-        // Solo procesar notificaciones de WhatsApp (normal o Business)
-        val pkg = sbn.packageName
-        if (pkg != WHATSAPP_PACKAGE && pkg != WHATSAPP_BUSINESS_PACKAGE) return
-
         serviceScope.launch {
             try {
-                // Verificar que el bot está habilitado
+                // Verificar que el bot global está habilitado
                 val botEnabled = appPreferences.botEnabled.first()
                 if (!botEnabled) return@launch
 
+                val pkg = sbn.packageName
+                
+                // Verificar qué canales están permitidos
+                val isWhatsappEnabled = appPreferences.channelWhatsApp.first()
+                val isFbEnabled = appPreferences.channelFbMessenger.first()
+                val isIgEnabled = appPreferences.channelIgDirect.first()
+
+                val isAllowedPackage = when (pkg) {
+                    WHATSAPP_PACKAGE, WHATSAPP_BUSINESS_PACKAGE -> isWhatsappEnabled
+                    FB_MESSENGER_PACKAGE -> isFbEnabled
+                    IG_DIRECT_PACKAGE -> isIgEnabled
+                    else -> false
+                }
+
+                if (!isAllowedPackage) return@launch
                 // Verificar horario programado
                 if (!isWithinSchedule()) {
                     Log.d(TAG, "Fuera del horario programado, ignorando mensaje")
@@ -80,15 +104,45 @@ class WhatsAppListenerService : NotificationListenerService() {
                 }
 
                 val notification = sbn.notification ?: return@launch
-                val extras = notification.extras ?: return@launch
+                
+                // ─── Motor Anti-Bucle: Filtros de Seguridad ─────────────────
+                
+                // 1. Descartar sumarios (historias o "Tienes 4 mensajes de 2 chats")
+                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) {
+                    Log.d(TAG, "Ignorando notificación de tipo GROUP_SUMMARY")
+                    return@launch
+                }
 
-                // Extraer contacto y mensaje
+                // 2. Extraer extras
+                val extras = notification.extras ?: return@launch
                 val contactName = extras.getString("android.title") ?: return@launch
                 val messageText = extras.getCharSequence("android.text")?.toString() ?: return@launch
 
-                // Ignorar mensajes grupales (contienen ":" en el título normalmente) y mensajes vacíos
+                // 3. Checar mensajes vacíos o nulos
                 if (messageText.isBlank()) return@launch
                 if (contactName.isBlank()) return@launch
+
+                // 4. Asegurarnos que viene como MENSAJE (Evita intentos de historias o estados)
+                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
+                val isMessagingStyle = template == "androidx.core.app.NotificationCompat\$MessagingStyle" || 
+                                       template == "android.app.Notification\$MessagingStyle"
+
+                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) {
+                    // IG no siempre usa MessagingStyle para nuevos mensajes.
+                    // Pero para WP y FB obligamos MessagingStyle
+                    Log.d(TAG, "Ignorando porque NO es un mensaje directo (Template: $template)")
+                    return@launch
+                }
+
+                // 5. Anti-Bucle estricto: ¿Este mensaje es uno de nuestros ECOS recientes?
+                val messageHash = messageText.hashCode()
+                val lastTimeSeenRaw = recentResponseHashes[messageHash]
+                val now = System.currentTimeMillis()
+                
+                if (lastTimeSeenRaw != null && (now - lastTimeSeenRaw < ANTI_LOOP_COOLDOWN_MS)) {
+                    Log.w(TAG, "⛔ AUTO-CHECK: Este mensaje coincide con uno que mandamos recientemente. Bloqueando Bucle.")
+                    return@launch
+                }
 
                 // Cooldown: evitar spam de respuestas al mismo contacto
                 val now = System.currentTimeMillis()
@@ -126,12 +180,16 @@ class WhatsAppListenerService : NotificationListenerService() {
                     return@launch
                 }
 
-                // Enviar la respuesta por WhatsApp usando RemoteInput
-                val sent = sendWhatsAppReply(sbn, response)
+                // Enviar la respuesta usando RemoteInput (Universal)
+                val sent = sendUniversalReply(sbn, response)
 
                 if (sent) {
-                    // Marcar cooldown
-                    recentlyReplied[contactName] = now
+                    // Registrar en la caché Anti-Bucle el HASH de NUESTRA PROPIA RESPUESTA
+                    // Esto evita que si la otra pantalla nos refleja, le re-contestemos.
+                    recentResponseHashes[response.hashCode()] = System.currentTimeMillis()
+
+                    // Marcar cooldown clásico
+                    recentlyReplied[contactName] = System.currentTimeMillis()
 
                     // Guardar en log
                     responseLogDao.insert(
@@ -139,10 +197,10 @@ class WhatsAppListenerService : NotificationListenerService() {
                             contact = contactName,
                             incomingMessage = messageText,
                             sentResponse = response,
-                            timestamp = now
+                            timestamp = System.currentTimeMillis()
                         )
                     )
-                    Log.d(TAG, "Respuesta enviada a '$contactName': $response")
+                    Log.d(TAG, "Respuesta enviada a '$contactName' [$pkg]: $response")
                 }
 
             } catch (e: Exception) {
@@ -152,34 +210,48 @@ class WhatsAppListenerService : NotificationListenerService() {
     }
 
     /**
-     * Envía una respuesta usando la acción RemoteInput de la notificación de WhatsApp.
+     * Envía una respuesta de vuelta buscando RECURSIVAMENTE cualquier RemoteInput válido en las Actions
      */
-    private fun sendWhatsAppReply(sbn: StatusBarNotification, replyText: String): Boolean {
+    private fun sendUniversalReply(sbn: StatusBarNotification, replyText: String): Boolean {
         val notification = sbn.notification ?: return false
         val actions = notification.actions ?: return false
 
-        // Buscar la acción de "Responder"
-        val replyAction = actions.firstOrNull { action ->
-            action.remoteInputs != null && action.remoteInputs.isNotEmpty()
-        } ?: run {
-            Log.w(TAG, "No se encontró acción de reply en la notificación")
+        // 1. Buscar recursivamente el Action con RemoteInput
+        var targetAction: Notification.Action? = null
+        var targetRemoteInput: RemoteInput? = null
+
+        for (action in actions) {
+            val remoteInputs = action.remoteInputs
+            if (remoteInputs != null) {
+                for (remoteInput in remoteInputs) {
+                    if (remoteInput.allowFreeFormInput) {
+                        targetAction = action
+                        targetRemoteInput = remoteInput
+                        break
+                    }
+                }
+            }
+            if (targetAction != null) break
+        }
+
+        if (targetAction == null || targetRemoteInput == null) {
+            Log.w(TAG, "No se encontró ningún RemoteInput (Botón Responder) en la notificación")
             return false
         }
 
+        // 2. Ejecutar la acción
         return try {
-            val remoteInput = replyAction.remoteInputs.first()
             val intent = Intent()
             val bundle = Bundle()
-            bundle.putCharSequence(remoteInput.resultKey, replyText)
-            androidx.core.app.RemoteInput.addResultsToIntent(
-                arrayOf(
-                    androidx.core.app.RemoteInput.Builder(remoteInput.resultKey).build()
-                ),
+            bundle.putCharSequence(targetRemoteInput.resultKey, replyText)
+            
+            RemoteInput.addResultsToIntent(
+                arrayOf(targetRemoteInput),
                 intent,
                 bundle
             )
 
-            replyAction.actionIntent.send(this, 0, intent)
+            targetAction.actionIntent.send(this, 0, intent)
             true
         } catch (e: PendingIntent.CanceledException) {
             Log.e(TAG, "PendingIntent cancelado al intentar responder", e)
