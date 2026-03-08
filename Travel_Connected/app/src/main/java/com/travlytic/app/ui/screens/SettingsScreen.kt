@@ -38,7 +38,8 @@ fun SettingsScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToTraining: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToKnowledge: () -> Unit
 ) {
     val geminiKey by viewModel.geminiApiKey.collectAsState()
     val systemPrompt by viewModel.systemPrompt.collectAsState()
@@ -95,6 +96,24 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ─── Base de Conocimiento (Sheets) ─────────────────────────────
+            SettingsSection(title = "📚 Fuente de Conocimiento") {
+                Text(
+                    "Agrega y sincroniza los Google Sheets de donde Gemini sacará las respuestas.",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = onNavigateToKnowledge,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                ) {
+                    Icon(Icons.Filled.TableChart, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Gestionar Documentos")
+                }
+            }
+
             // ─── Perfil ────────────────────────────────────────────────────
             SettingsSection(title = "👤 Perfil y Personalización") {
                 Text(

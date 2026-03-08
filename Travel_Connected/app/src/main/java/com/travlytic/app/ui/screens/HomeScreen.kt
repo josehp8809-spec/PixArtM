@@ -30,11 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.travlytic.app.R
-import com.travlytic.app.data.db.entities.RegisteredSheet
-import com.travlytic.app.data.db.entities.ResponseLog
-import com.travlytic.app.ui.theme.*
-import com.travlytic.app.ui.viewmodel.DashboardState
-import com.travlytic.app.ui.viewmodel.MainViewModel
 import com.travlytic.app.ui.viewmodel.TestMessageState
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,7 +47,8 @@ fun HomeScreen(
     val dashboardState by viewModel.dashboardState.collectAsState()
     val testMsgState by viewModel.testMsgState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showAddSheetDialog by remember { mutableStateOf(false) }
+    val testMsgState by viewModel.testMsgState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     var showTestMessage by remember { mutableStateOf(false) }
     val isListenerEnabled = remember { viewModel.isNotificationListenerEnabled() }
 
@@ -147,58 +143,6 @@ fun HomeScreen(
                 DashboardCard(dashboardState)
             }
 
-            // ─── Sheets Section ────────────────────────────────────────
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "📊 Google Sheets",
-                        color = TravlyticOnSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
-                    )
-                    Row {
-                        if (uiState.registeredSheets.isNotEmpty()) {
-                            IconButton(
-                                onClick = { viewModel.syncAllSheets() },
-                                enabled = !uiState.isLoading
-                            ) {
-                                Icon(Icons.Filled.Sync, "Sincronizar todos",
-                                    tint = TravlyticBlue, modifier = Modifier.size(20.dp))
-                            }
-                        }
-                        FilledTonalButton(
-                            onClick = { showAddSheetDialog = true },
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = TravlyticSurface3
-                            )
-                        ) {
-                            Icon(Icons.Filled.Add, null, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text("Agregar", fontSize = 13.sp)
-                        }
-                    }
-                }
-            }
-
-            if (uiState.registeredSheets.isEmpty()) {
-                item {
-                    EmptySheetPlaceholder()
-                }
-            } else {
-                items(uiState.registeredSheets, key = { it.spreadsheetId }) { sheet ->
-                    SheetCard(
-                        sheet = sheet,
-                        isSyncing = uiState.syncingSheetId == sheet.spreadsheetId,
-                        onSync = { viewModel.syncSheet(sheet.spreadsheetId) },
-                        onRemove = { viewModel.removeSheet(sheet.spreadsheetId) }
-                    )
-                }
-            }
-
             // ─── Test Message Section ─────────────────────────────────────
             item {
                 Spacer(Modifier.height(4.dp))
@@ -275,15 +219,6 @@ fun HomeScreen(
         }
     }
 
-    // ─── Add Sheet Dialog ─────────────────────────────────────────────
-    if (showAddSheetDialog) {
-        AddSheetDialog(
-            onDismiss = { showAddSheetDialog = false },
-            onAdd = { input ->
-                showAddSheetDialog = false
-                viewModel.addSheet(input)
-            }
-        )
     }
 }
 
@@ -355,80 +290,6 @@ fun BotStatusCard(
 
 
 @Composable
-fun SheetCard(
-    sheet: RegisteredSheet,
-    isSyncing: Boolean,
-    onSync: () -> Unit,
-    onRemove: () -> Unit
-) {
-    val dateFormat = remember { SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
-                    .background(Color(0x2200C853)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Filled.TableChart, null,
-                    tint = TravlyticGreen, modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(sheet.title, color = TravlyticOnSurface,
-                    fontWeight = FontWeight.Medium, fontSize = 14.sp,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    if (sheet.lastSynced == 0L) "Sin sincronizar"
-                    else "${sheet.rowCount} filas · ${dateFormat.format(Date(sheet.lastSynced))}",
-                    color = TravlyticOnSurface2, fontSize = 11.sp
-                )
-            }
-
-            if (isSyncing) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp),
-                    color = TravlyticBlue, strokeWidth = 2.dp)
-            } else {
-                IconButton(onClick = onSync, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Filled.Refresh, "Sincronizar",
-                        tint = TravlyticBlue, modifier = Modifier.size(18.dp))
-                }
-            }
-            IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
-                Icon(Icons.Filled.DeleteOutline, "Eliminar",
-                    tint = TravlyticRed.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun EmptySheetPlaceholder() {
-    Box(
-        modifier = Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(TravlyticSurface2)
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Outlined.TableChart, null,
-                tint = TravlyticOnSurface2, modifier = Modifier.size(36.dp))
-            Spacer(Modifier.height(8.dp))
-            Text("Agrega un Google Sheet para comenzar",
-                color = TravlyticOnSurface2, fontSize = 13.sp)
-        }
-    }
-}
-
-@Composable
 fun ResponseLogCard(log: ResponseLog) {
     val dateFormat = remember { SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()) }
 
@@ -455,46 +316,6 @@ fun ResponseLogCard(log: ResponseLog) {
                 fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
-}
-
-@Composable
-fun AddSheetDialog(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
-    var input by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = TravlyticSurface2,
-        title = { Text("Agregar Google Sheet", color = TravlyticOnSurface) },
-        text = {
-            Column {
-                Text("Pega el ID o URL del Google Sheet:",
-                    color = TravlyticOnSurface2, fontSize = 13.sp)
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = input,
-                    onValueChange = { input = it },
-                    placeholder = { Text("ID o URL del Sheet...", fontSize = 12.sp) },
-                    singleLine = false,
-                    minLines = 2,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TravlyticBlue,
-                        unfocusedBorderColor = TravlyticSurface3,
-                        focusedTextColor = TravlyticOnSurface,
-                        unfocusedTextColor = TravlyticOnSurface
-                    )
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { if (input.isNotBlank()) onAdd(input) },
-                colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
-            ) { Text("Agregar") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = TravlyticOnSurface2) }
-        }
-    )
 }
 
 // ─── Dashboard Card ───────────────────────────────────────────────────────────
