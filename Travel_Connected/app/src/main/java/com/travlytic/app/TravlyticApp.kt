@@ -4,7 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class TravlyticApp : Application() {
+class MinitoApp : Application() {
     override fun onCreate() {
         super.onCreate()
     }

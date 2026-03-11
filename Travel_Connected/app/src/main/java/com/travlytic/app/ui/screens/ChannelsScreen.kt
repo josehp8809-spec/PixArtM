@@ -29,16 +29,16 @@ fun ChannelsScreen(
     val igEnabled by viewModel.channelIgDirect.collectAsState()
 
     Scaffold(
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Canales IA", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Canales IA", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -51,7 +51,7 @@ fun ChannelsScreen(
         ) {
             Text(
                 "Selecciona en qué aplicaciones deseas que la IA intercepte notificaciones de CHAT para responder automáticamente. Los Estados e Historias serán ignorados.",
-                color = TravlyticOnSurface2, fontSize = 13.sp, lineHeight = 18.sp
+                color = MinItoOnSurface2, fontSize = 13.sp, lineHeight = 18.sp
             )
             
             Spacer(Modifier.height(8.dp))
@@ -93,7 +93,7 @@ fun ChannelCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -103,17 +103,17 @@ fun ChannelCard(
             Text(icon, fontSize = 24.sp)
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(name, color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                Text(description, color = TravlyticOnSurface2, fontSize = 11.sp)
+                Text(name, color = MinItoOnSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(description, color = MinItoOnSurface2, fontSize = 11.sp)
             }
             Switch(
                 checked = isEnabled,
                 onCheckedChange = onToggle,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = TravlyticGreen,
-                    uncheckedThumbColor = TravlyticOnSurface2,
-                    uncheckedTrackColor = TravlyticSurface3
+                    checkedTrackColor = MinItoGreen,
+                    uncheckedThumbColor = MinItoOnSurface2,
+                    uncheckedTrackColor = MinItoSurface3
                 )
             )
         }

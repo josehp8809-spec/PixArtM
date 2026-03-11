@@ -68,16 +68,16 @@ fun SettingsScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Configuración", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Configuración", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -92,14 +92,14 @@ fun SettingsScreen(
             // ─── Base de Conocimiento ─────────────────────────────
             SettingsSection(title = "📚 Fuente de Conocimiento") {
                 Text(
-                    "Agrega archivos Excel locales y URLs web de donde Gemini tomará las respuestas.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    "Agrega archivos Excel locales de donde Gemini tomará las respuestas.",
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = onNavigateToKnowledge,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                 ) {
                     Icon(Icons.Filled.TableChart, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
@@ -111,17 +111,17 @@ fun SettingsScreen(
             SettingsSection(title = "👤 Perfil y Personalización") {
                 Text(
                     "Agrega el nombre de tu empresa y el tono de respuesta.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = onNavigateToProfile,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticSurface3)
+                    colors = ButtonDefaults.buttonColors(containerColor = MinItoSurface3)
                 ) {
-                    Icon(Icons.Filled.Person, null, modifier = Modifier.size(16.dp), tint = TravlyticBlue)
+                    Icon(Icons.Filled.Person, null, modifier = Modifier.size(16.dp), tint = MinItoBlue)
                     Spacer(Modifier.width(8.dp))
-                    Text("Editar Perfil", color = TravlyticBlue)
+                    Text("Editar Perfil", color = MinItoBlue)
                 }
             }
 
@@ -129,7 +129,7 @@ fun SettingsScreen(
             SettingsSection(title = "💬 Mensajes Automáticos") {
                 Text(
                     "Mensaje de Bienvenida (Primer contacto)",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 OutlinedTextField(
                     value = welcomeInput,
@@ -147,7 +147,7 @@ fun SettingsScreen(
                     Button(
                         onClick = { viewModel.saveWelcomeMessage(welcomeInput) },
                         enabled = welcomeInput != welcomeMessage,
-                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                     ) {
                         Text("Guardar Bienvenida")
                     }
@@ -157,7 +157,7 @@ fun SettingsScreen(
 
                 Text(
                     "Mensaje de Escalado (Cuando el AI no sabe qué responder)",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 OutlinedTextField(
                     value = escalationInput,
@@ -175,7 +175,7 @@ fun SettingsScreen(
                     Button(
                         onClick = { viewModel.saveEscalationMessage(escalationInput) },
                         enabled = escalationInput != escalationMessage,
-                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                     ) {
                         Text("Guardar Escalado")
                     }
@@ -191,17 +191,17 @@ fun SettingsScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             "Recordatorio de Inactividad (5 min)",
-                            color = TravlyticOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                            color = MinItoOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
                         )
                         Text(
                             "Enviar si el usuario no responde después de 5 min.",
-                            color = TravlyticOnSurface2, fontSize = 12.sp
+                            color = MinItoOnSurface2, fontSize = 12.sp
                         )
                     }
                     Switch(
                         checked = autoReminderEnabled,
                         onCheckedChange = { viewModel.saveAutoReminderEnabled(it) },
-                        colors = SwitchDefaults.colors(checkedThumbColor = TravlyticBlue, checkedTrackColor = TravlyticBlue.copy(alpha = 0.5f))
+                        colors = SwitchDefaults.colors(checkedThumbColor = MinItoBlue, checkedTrackColor = MinItoBlue.copy(alpha = 0.5f))
                     )
                 }
 
@@ -222,7 +222,7 @@ fun SettingsScreen(
                         Button(
                             onClick = { viewModel.saveAutoReminderMessage(autoReminderInput) },
                             enabled = autoReminderInput != autoReminderMessage,
-                            colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                            colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                         ) {
                             Text("Guardar Recordatorio")
                         }
@@ -234,7 +234,7 @@ fun SettingsScreen(
             SettingsSection(title = "🤖 Gemini AI") {
                 Text(
                     "Obtén tu API Key gratis en aistudio.google.com",
-                    color = TravlyticBlueLight, fontSize = 12.sp
+                    color = MinItoBlueLight, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
@@ -246,7 +246,7 @@ fun SettingsScreen(
                         IconButton(onClick = { showApiKey = !showApiKey }) {
                             Icon(
                                 if (showApiKey) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                null, tint = TravlyticOnSurface2
+                                null, tint = MinItoOnSurface2
                             )
                         }
                     },
@@ -268,17 +268,17 @@ fun SettingsScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             "Búsqueda de IA (Internet)",
-                            color = TravlyticOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                            color = MinItoOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
                         )
                         Text(
                             "Permite que el bot use conocimiento general si lo autorizas en tus reglas.",
-                            color = TravlyticOnSurface2, fontSize = 12.sp
+                            color = MinItoOnSurface2, fontSize = 12.sp
                         )
                     }
                     Switch(
                         checked = internetSearchEnabled,
                         onCheckedChange = { viewModel.saveInternetSearchEnabled(it) },
-                        colors = SwitchDefaults.colors(checkedThumbColor = TravlyticBlue, checkedTrackColor = TravlyticBlue.copy(alpha = 0.5f))
+                        colors = SwitchDefaults.colors(checkedThumbColor = MinItoBlue, checkedTrackColor = MinItoBlue.copy(alpha = 0.5f))
                     )
                 }
                 Spacer(Modifier.height(8.dp))
@@ -289,7 +289,7 @@ fun SettingsScreen(
                     Button(
                         onClick = { viewModel.saveGeminiApiKey(apiKeyInput) },
                         enabled = apiKeyInput.isNotBlank() && apiKeyInput != geminiKey,
-                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                     ) {
                         Icon(Icons.Filled.Save, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
@@ -301,16 +301,16 @@ fun SettingsScreen(
                 if (geminiKey.isNotBlank()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.CheckCircle, null,
-                            tint = TravlyticGreen, modifier = Modifier.size(14.dp))
+                            tint = MinItoGreen, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("API Key configurada", color = TravlyticGreen, fontSize = 12.sp)
+                        Text("API Key configurada", color = MinItoGreen, fontSize = 12.sp)
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Warning, null,
-                            tint = TravlyticOrange, modifier = Modifier.size(14.dp))
+                            tint = MinItoOrange, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("API Key no configurada", color = TravlyticOrange, fontSize = 12.sp)
+                        Text("API Key no configurada", color = MinItoOrange, fontSize = 12.sp)
                     }
                 }
             }
@@ -319,7 +319,7 @@ fun SettingsScreen(
             SettingsSection(title = "📝 Prompt del Sistema") {
                 Text(
                     "Define cómo Gemini responde los mensajes.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
@@ -341,7 +341,7 @@ fun SettingsScreen(
                             viewModel.resetSystemPrompt()
                             promptInput = com.travlytic.app.data.prefs.AppPreferences.DEFAULT_SYSTEM_PROMPT
                         },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = TravlyticOnSurface2),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MinItoOnSurface2),
                         border = ButtonDefaults.outlinedButtonBorder.copy()
                     ) {
                         Icon(Icons.Filled.Restore, null, modifier = Modifier.size(16.dp))
@@ -351,7 +351,7 @@ fun SettingsScreen(
                     Button(
                         onClick = { viewModel.saveSystemPrompt(promptInput) },
                         enabled = promptInput != systemPrompt && promptInput.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                     ) {
                         Icon(Icons.Filled.Save, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
@@ -364,13 +364,13 @@ fun SettingsScreen(
             SettingsSection(title = "📲 Canales") {
                 Text(
                     "Elige en qué apps el bot contestará mensajes.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = onNavigateToChannels,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticSurface3)
+                    colors = ButtonDefaults.buttonColors(containerColor = MinItoSurface3)
                 ) {
                     Icon(Icons.Filled.Forum, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
@@ -382,13 +382,13 @@ fun SettingsScreen(
             SettingsSection(title = "🧠 Entrenamiento IA") {
                 Text(
                     "Agrega reglas estrictas o enseña a Gemini cómo responder usando ejemplos (Few-Shot).",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = onNavigateToTraining,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                 ) {
                     Icon(Icons.Filled.School, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
@@ -400,7 +400,7 @@ fun SettingsScreen(
             SettingsSection(title = "⚙️ Sistema") {
                 Text(
                     "Restaura todas las configuraciones globales, reglas y mensajes a sus valores de fábrica originales.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 Button(
@@ -452,20 +452,20 @@ fun InfoRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, color = TravlyticOnSurface2, fontSize = 13.sp)
-        Text(value, color = TravlyticOnSurface, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = MinItoOnSurface2, fontSize = 13.sp)
+        Text(value, color = MinItoOnSurface, fontSize = 13.sp, fontWeight = FontWeight.Medium)
     }
 }
 
 @Composable
 fun settingsTextFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = TravlyticBlue,
-    unfocusedBorderColor = TravlyticSurface3,
-    focusedTextColor = TravlyticOnSurface,
-    unfocusedTextColor = TravlyticOnSurface,
-    cursorColor = TravlyticBlue,
-    focusedLabelColor = TravlyticBlue,
-    unfocusedLabelColor = TravlyticOnSurface2
+    focusedBorderColor = MinItoBlue,
+    unfocusedBorderColor = MinItoSurface3,
+    focusedTextColor = MinItoOnSurface,
+    unfocusedTextColor = MinItoOnSurface,
+    cursorColor = MinItoBlue,
+    focusedLabelColor = MinItoBlue,
+    unfocusedLabelColor = MinItoOnSurface2
 )
 
 @Composable
@@ -476,7 +476,7 @@ fun GoogleAccountCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface3),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -488,7 +488,7 @@ fun GoogleAccountCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier.size(40.dp).clip(CircleShape)
-                        .background(if (email.isNotBlank()) TravlyticBlue else TravlyticSurface2),
+                        .background(if (email.isNotBlank()) MinItoBlue else MinItoSurface2),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -498,10 +498,10 @@ fun GoogleAccountCard(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text("Google Account", color = TravlyticOnSurface2, fontSize = 11.sp)
+                    Text("Google Account", color = MinItoOnSurface2, fontSize = 11.sp)
                     Text(
                         if (email.isNotBlank()) email else "Sin conectar",
-                        color = TravlyticOnSurface,
+                        color = MinItoOnSurface,
                         fontWeight = FontWeight.Medium,
                         fontSize = 13.sp,
                         maxLines = 1,
@@ -513,16 +513,16 @@ fun GoogleAccountCard(
             if (email.isNotBlank()) {
                 IconButton(onClick = onSignOut) {
                     Icon(Icons.Filled.Logout, "Cerrar sesión",
-                        tint = TravlyticOnSurface2, modifier = Modifier.size(20.dp))
+                        tint = MinItoOnSurface2, modifier = Modifier.size(20.dp))
                 }
             } else {
                 FilledTonalButton(
                     onClick = onSignIn,
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = TravlyticBlue.copy(alpha = 0.2f)
+                        containerColor = MinItoBlue.copy(alpha = 0.2f)
                     )
                 ) {
-                    Text("Conectar", color = TravlyticBlue, fontSize = 13.sp)
+                    Text("Conectar", color = MinItoBlue, fontSize = 13.sp)
                 }
             }
         }

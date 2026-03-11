@@ -71,7 +71,7 @@ fun HomeScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         floatingActionButton = {
             // ─── FAB Activación Rápida ───────────────────────────────────────────
             ExtendedFloatingActionButton(
@@ -88,7 +88,7 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold
                     )
                 },
-                containerColor = if (uiState.isServiceEnabled) TravlyticRed else TravlyticGreen,
+                containerColor = if (uiState.isServiceEnabled) MinItoRed else MinItoGreen,
                 contentColor = Color.White
             )
         },
@@ -106,29 +106,29 @@ fun HomeScreen(
                     Text(
                             "MINI-TO",
                             fontWeight = FontWeight.Bold,
-                            color = TravlyticOnSurface
+                            color = MinItoOnSurface
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.forceSync() }) {
                         Icon(Icons.Filled.Sync, contentDescription = "Sincronizar",
-                            tint = TravlyticBlue)
+                            tint = MinItoBlue)
                     }
                     IconButton(onClick = onNavigateToSummary) {
                         Icon(Icons.Filled.AutoAwesome, contentDescription = "Resumen",
-                            tint = TravlyticBlue)
+                            tint = MinItoBlue)
                     }
                     IconButton(onClick = onNavigateToSchedule) {
                         Icon(Icons.Filled.Schedule, contentDescription = "Horarios",
-                            tint = if (uiState.isServiceEnabled) TravlyticGreen else TravlyticOnSurface2)
+                            tint = if (uiState.isServiceEnabled) MinItoGreen else MinItoOnSurface2)
                     }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = "Configuración",
-                            tint = TravlyticOnSurface2)
+                            tint = MinItoOnSurface2)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -166,7 +166,7 @@ fun HomeScreen(
                     ) {
                         Text(
                             "🚨 Alertas de Escalado",
-                            color = TravlyticOrange,
+                            color = MinItoOrange,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
@@ -187,14 +187,14 @@ fun HomeScreen(
                 ) {
                     Text(
                         "🧪 Probar Bot",
-                        color = TravlyticOnSurface,
+                        color = MinItoOnSurface,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
                     )
                     TextButton(onClick = { showTestMessage = !showTestMessage }) {
                         Text(
                             if (showTestMessage) "Ocultar" else "Abrir",
-                            color = TravlyticBlue, fontSize = 12.sp
+                            color = MinItoBlue, fontSize = 12.sp
                         )
                     }
                 }
@@ -221,13 +221,13 @@ fun HomeScreen(
                 ) {
                     Text(
                         "💬 Respuestas recientes",
-                        color = TravlyticOnSurface,
+                        color = MinItoOnSurface,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
                     )
                     if (uiState.recentLogs.isNotEmpty()) {
                         TextButton(onClick = { viewModel.clearLogs() }) {
-                            Text("Borrar", color = TravlyticRed, fontSize = 12.sp)
+                            Text("Borrar", color = MinItoRed, fontSize = 12.sp)
                         }
                     }
                 }
@@ -240,7 +240,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text("Sin respuestas enviadas aún",
-                            color = TravlyticOnSurface2, fontSize = 13.sp)
+                            color = MinItoOnSurface2, fontSize = 13.sp)
                     }
                 }
             } else {
@@ -265,7 +265,7 @@ fun BotStatusCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
@@ -275,10 +275,10 @@ fun BotStatusCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Estado del Bot", color = TravlyticOnSurface2, fontSize = 12.sp)
+                    Text("Estado del Bot", color = MinItoOnSurface2, fontSize = 12.sp)
                     Text(
                         if (isServiceEnabled) "🟢 Activo" else "🔴 Inactivo",
-                        color = if (isServiceEnabled) TravlyticGreen else TravlyticRed,
+                        color = if (isServiceEnabled) MinItoGreen else MinItoRed,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
@@ -288,9 +288,9 @@ fun BotStatusCard(
                     onCheckedChange = onToggle,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = TravlyticGreen,
-                        uncheckedThumbColor = TravlyticOnSurface2,
-                        uncheckedTrackColor = TravlyticSurface3
+                        checkedTrackColor = MinItoGreen,
+                        uncheckedThumbColor = MinItoOnSurface2,
+                        uncheckedTrackColor = MinItoSurface3
                     )
                 )
             }
@@ -307,11 +307,11 @@ fun BotStatusCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Outlined.Warning, null,
-                        tint = TravlyticOrange, modifier = Modifier.size(16.dp))
+                        tint = MinItoOrange, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
                         "⚠️ Activa el permiso de Notificaciones → Toca aquí",
-                        color = TravlyticOrange, fontSize = 12.sp
+                        color = MinItoOrange, fontSize = 12.sp
                     )
                 }
             }
@@ -327,7 +327,7 @@ fun ResponseLogCard(log: ResponseLog) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface3),
         shape = RoundedCornerShape(10.dp)
     ) {
         Column(Modifier.padding(12.dp)) {
@@ -335,16 +335,16 @@ fun ResponseLogCard(log: ResponseLog) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("👤 ${log.contact}", color = TravlyticBlueLight,
+                Text("👤 ${log.contact}", color = MinItoBlueLight,
                     fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 Text(dateFormat.format(Date(log.timestamp)),
-                    color = TravlyticOnSurface2, fontSize = 11.sp)
+                    color = MinItoOnSurface2, fontSize = 11.sp)
             }
             Spacer(Modifier.height(4.dp))
-            Text("📩 ${log.incomingMessage}", color = TravlyticOnSurface2,
+            Text("📩 ${log.incomingMessage}", color = MinItoOnSurface2,
                 fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(2.dp))
-            Text("🤖 ${log.sentResponse}", color = TravlyticOnSurface,
+            Text("🤖 ${log.sentResponse}", color = MinItoOnSurface,
                 fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
@@ -405,7 +405,7 @@ private fun DashboardStat(icon: String, value: String, label: String) {
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        Text(label, color = TravlyticOnSurface2, fontSize = 10.sp)
+        Text(label, color = MinItoOnSurface2, fontSize = 10.sp)
     }
 }
 
@@ -415,7 +415,7 @@ private fun DashboardDivider() {
         modifier = Modifier
             .height(40.dp)
             .width(1.dp),
-        color = TravlyticSurface3
+        color = MinItoSurface3
     )
 }
 
@@ -431,13 +431,13 @@ fun TestMessageCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(Modifier.padding(14.dp)) {
             Text(
                 "Escribe un mensaje para ver cómo respondería el bot:",
-                color = TravlyticOnSurface2, fontSize = 12.sp
+                color = MinItoOnSurface2, fontSize = 12.sp
             )
             Spacer(Modifier.height(8.dp))
             Row(
@@ -451,10 +451,10 @@ fun TestMessageCard(
                     placeholder = { Text("¿Cuál es el horario?", fontSize = 12.sp) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TravlyticBlue,
-                        unfocusedBorderColor = TravlyticSurface3,
-                        focusedTextColor = TravlyticOnSurface,
-                        unfocusedTextColor = TravlyticOnSurface
+                        focusedBorderColor = MinItoBlue,
+                        unfocusedBorderColor = MinItoSurface3,
+                        focusedTextColor = MinItoOnSurface,
+                        unfocusedTextColor = MinItoOnSurface
                     )
                 )
                 Spacer(Modifier.width(8.dp))
@@ -465,7 +465,7 @@ fun TestMessageCard(
                         .clip(CircleShape)
                         .background(
                             if (inputText.isNotBlank() && !state.isLoading)
-                                TravlyticBlue else TravlyticSurface3
+                                MinItoBlue else MinItoSurface3
                         )
                         .size(44.dp)
                 ) {
@@ -495,7 +495,7 @@ fun TestMessageCard(
                     Text("🤖 ", fontSize = 14.sp)
                     Text(
                         state.response,
-                        color = TravlyticOnSurface,
+                        color = MinItoOnSurface,
                         fontSize = 13.sp,
                         lineHeight = 18.sp,
                         modifier = Modifier.weight(1f)
@@ -506,13 +506,13 @@ fun TestMessageCard(
                     onClick = { onClear(); inputText = "" },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text("Limpiar", color = TravlyticOnSurface2, fontSize = 11.sp)
+                    Text("Limpiar", color = MinItoOnSurface2, fontSize = 11.sp)
                 }
             }
 
             if (state.error.isNotBlank()) {
                 Spacer(Modifier.height(8.dp))
-                Text(state.error, color = TravlyticRed, fontSize = 12.sp)
+                Text(state.error, color = MinItoRed, fontSize = 12.sp)
             }
         }
     }
@@ -522,7 +522,7 @@ fun TestMessageCard(
 fun EscalationCard(log: EscalationLog, onResolve: (EscalationLog) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface3),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
@@ -530,22 +530,22 @@ fun EscalationCard(log: EscalationLog, onResolve: (EscalationLog) -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(log.contact, color = TravlyticOnSurface, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(log.contact, color = MinItoOnSurface, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text(
                     SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp)),
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
             }
             Spacer(Modifier.height(8.dp))
             Text(
                 "Pregunta: \"${log.originalMessage}\"",
-                color = TravlyticOnSurface2, fontSize = 13.sp,
+                color = MinItoOnSurface2, fontSize = 13.sp,
                 maxLines = 3, overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(12.dp))
             Button(
                 onClick = { onResolve(log) },
-                colors = ButtonDefaults.buttonColors(containerColor = TravlyticOrange),
+                colors = ButtonDefaults.buttonColors(containerColor = MinItoOrange),
                 modifier = Modifier.align(Alignment.End),
                 shape = RoundedCornerShape(8.dp)
             ) {

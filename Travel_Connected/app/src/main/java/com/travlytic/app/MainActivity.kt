@@ -19,8 +19,8 @@ import com.travlytic.app.ui.screens.TrainingScreen
 import com.travlytic.app.ui.screens.ProfileScreen
 import com.travlytic.app.ui.screens.KnowledgeBaseScreen
 import com.travlytic.app.ui.screens.ChannelsScreen
-import com.travlytic.app.ui.theme.TravlyticTheme
-import com.travlytic.app.ui.theme.TravlyticSurface
+import com.travlytic.app.ui.theme.MinItoTheme
+import com.travlytic.app.ui.theme.MinItoSurface
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,12 +29,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TravlyticTheme {
+            MinItoTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = TravlyticSurface
+                    color = MinItoSurface
                 ) {
-                    TravlyticNavHost()
+                    MinItoNavHost()
                 }
             }
         }
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TravlyticNavHost() {
+fun MinItoNavHost() {
     val navController = rememberNavController()
 
     NavHost(

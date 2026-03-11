@@ -39,7 +39,6 @@ fun KnowledgeBaseScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     
-    var showAddUrlDialog by remember { mutableStateOf(false) }
     var pendingExcelUri by remember { mutableStateOf<Uri?>(null) }
     
     val excelPickerLauncher = rememberLauncherForActivityResult(
@@ -59,16 +58,16 @@ fun KnowledgeBaseScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Base de Conocimiento", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Base de Conocimiento", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -84,7 +83,7 @@ fun KnowledgeBaseScreen(
             ) {
                 Text(
                     "📚 Documentación Local",
-                    color = TravlyticOnSurface,
+                    color = MinItoOnSurface,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
@@ -95,7 +94,7 @@ fun KnowledgeBaseScreen(
                 ) {
                     FilledTonalButton(
                         onClick = { excelPickerLauncher.launch(arrayOf("*/*")) },
-                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = TravlyticGreen.copy(alpha=0.2f), contentColor = TravlyticGreen)
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = MinItoGreen.copy(alpha=0.2f), contentColor = MinItoGreen)
                     ) {
                         Icon(Icons.Filled.UploadFile, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
@@ -106,12 +105,12 @@ fun KnowledgeBaseScreen(
             Spacer(Modifier.height(8.dp))
             Text(
                 "La IA utilizará esta información para responder a tus clientes.",
-                color = TravlyticOnSurface2, fontSize = 13.sp, lineHeight = 18.sp
+                color = MinItoOnSurface2, fontSize = 13.sp, lineHeight = 18.sp
             )
             Spacer(Modifier.height(16.dp))
 
             if (uiState.isLoading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = TravlyticBlue)
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = MinItoBlue)
                 Spacer(Modifier.height(16.dp))
             }
 
@@ -159,7 +158,7 @@ fun KnowledgeCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface3),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -168,20 +167,20 @@ fun KnowledgeCard(
         ) {
             Box(
                 modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
-                    .background(TravlyticGreen.copy(0.2f)),
+                    .background(MinItoGreen.copy(0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.TableChart, null,
-                    tint = TravlyticGreen, modifier = Modifier.size(20.dp))
+                    tint = MinItoGreen, modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(item.reference, color = TravlyticOnSurface,
+                Text(item.reference, color = MinItoOnSurface,
                     fontWeight = FontWeight.Medium, fontSize = 14.sp,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
                     "Act. ${dateFormat.format(Date(item.lastUpdated))}",
-                    color = TravlyticOnSurface2, fontSize = 11.sp,
+                    color = MinItoOnSurface2, fontSize = 11.sp,
                     maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }
@@ -194,7 +193,7 @@ fun KnowledgeCard(
 
             IconButton(onClick = onDelete, modifier = Modifier.size(36.dp)) {
                 Icon(Icons.Filled.DeleteOutline, "Eliminar",
-                    tint = TravlyticRed.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+                    tint = MinItoRed.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -205,16 +204,16 @@ fun EmptyKnowledgePlaceholder() {
     Box(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(TravlyticSurface2)
+            .background(MinItoSurface2)
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.Folder, null,
-                tint = TravlyticOnSurface2, modifier = Modifier.size(36.dp))
+                tint = MinItoOnSurface2, modifier = Modifier.size(36.dp))
             Spacer(Modifier.height(8.dp))
             Text("Sube un Excel/CSV para comenzar",
-                color = TravlyticOnSurface2, fontSize = 13.sp)
+                color = MinItoOnSurface2, fontSize = 13.sp)
         }
     }
 }
@@ -233,12 +232,12 @@ fun AddReferenceDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = TravlyticSurface2,
-        title = { Text(title, color = TravlyticOnSurface) },
+        containerColor = MinItoSurface2,
+        title = { Text(title, color = MinItoOnSurface) },
         text = {
             Column {
                 if (showSourceInput) {
-                    Text(label, color = TravlyticOnSurface2, fontSize = 13.sp)
+                    Text(label, color = MinItoOnSurface2, fontSize = 13.sp)
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = source,
@@ -246,13 +245,13 @@ fun AddReferenceDialog(
                         placeholder = { Text(placeholder, fontSize = 12.sp) },
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TravlyticOnSurface,
-                            unfocusedTextColor = TravlyticOnSurface
+                            focusedTextColor = MinItoOnSurface,
+                            unfocusedTextColor = MinItoOnSurface
                         )
                     )
                     Spacer(Modifier.height(16.dp))
                 }
-                Text("Nombre de Referencia:", color = TravlyticOnSurface2, fontSize = 13.sp)
+                Text("Nombre de Referencia:", color = MinItoOnSurface2, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = reference,
@@ -260,8 +259,8 @@ fun AddReferenceDialog(
                     placeholder = { Text("Ej. Precios 2024", fontSize = 12.sp) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TravlyticOnSurface,
-                        unfocusedTextColor = TravlyticOnSurface
+                        focusedTextColor = MinItoOnSurface,
+                        unfocusedTextColor = MinItoOnSurface
                     )
                 )
             }
@@ -269,11 +268,11 @@ fun AddReferenceDialog(
         confirmButton = {
             Button(
                 onClick = { if (reference.isNotBlank() && (!showSourceInput || source.isNotBlank())) onConfirm(source, reference) },
-                colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
             ) { Text("Guardar") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = TravlyticOnSurface2) }
+            TextButton(onClick = onDismiss) { Text("Cancelar", color = MinItoOnSurface2) }
         }
     )
 }

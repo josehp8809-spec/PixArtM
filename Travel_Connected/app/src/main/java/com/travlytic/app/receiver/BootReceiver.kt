@@ -15,7 +15,7 @@ private const val TAG = "BootReceiver"
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.d(TAG, "Dispositivo reiniciado. Travlytic listo.")
+            Log.d(TAG, "Dispositivo reiniciado. MINI-TO listo.")
         }
     }
 }

@@ -46,16 +46,16 @@ fun ScheduleScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Horarios", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Horarios", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -71,7 +71,7 @@ fun ScheduleScreen(
             // ─── Enable Schedule Toggle ───────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+                colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
@@ -82,19 +82,19 @@ fun ScheduleScreen(
                     ) {
                         Column {
                             Text("⏰ Programación de Horario",
-                                color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold)
+                                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
                             Text(
                                 if (scheduleState.enabled) "El bot responde solo en el horario definido"
                                 else "El bot responde las 24 horas",
-                                color = TravlyticOnSurface2, fontSize = 12.sp
+                                color = MinItoOnSurface2, fontSize = 12.sp
                             )
                         }
                         Switch(
                             checked = scheduleState.enabled,
                             onCheckedChange = { viewModel.setScheduleEnabled(it) },
                             colors = SwitchDefaults.colors(
-                                checkedTrackColor = TravlyticBlue,
-                                uncheckedTrackColor = TravlyticSurface3
+                                checkedTrackColor = MinItoBlue,
+                                uncheckedTrackColor = MinItoSurface3
                             )
                         )
                     }
@@ -107,12 +107,12 @@ fun ScheduleScreen(
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+                        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             Text("🕐 Rango de horas",
-                                color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold)
+                                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(16.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -128,12 +128,12 @@ fun ScheduleScreen(
 
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Filled.ArrowForward, null,
-                                        tint = TravlyticOnSurface2, modifier = Modifier.size(20.dp))
+                                        tint = MinItoOnSurface2, modifier = Modifier.size(20.dp))
                                     Text(calculateDuration(
                                         scheduleState.startHour, scheduleState.startMinute,
                                         scheduleState.endHour, scheduleState.endMinute
                                     ),
-                                        color = TravlyticOnSurface2, fontSize = 11.sp)
+                                        color = MinItoOnSurface2, fontSize = 11.sp)
                                 }
 
                                 TimePickerButton(
@@ -149,12 +149,12 @@ fun ScheduleScreen(
                     // ─── Days of week ─────────────────────────────────
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+                        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             Text("📅 Días activos",
-                                color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold)
+                                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
                             Spacer(Modifier.height(12.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -197,8 +197,8 @@ fun ScheduleScreen(
                                     onClick = { viewModel.setScheduleDays((1..7).toSet()) },
                                     label = { Text("Todos", fontSize = 11.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = TravlyticGreen.copy(alpha = 0.2f),
-                                        selectedLabelColor = TravlyticGreen
+                                        selectedContainerColor = MinItoGreen.copy(alpha = 0.2f),
+                                        selectedLabelColor = MinItoGreen
                                     )
                                 )
                             }
@@ -209,7 +209,7 @@ fun ScheduleScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = TravlyticGreen.copy(alpha = 0.08f)
+                            containerColor = MinItoGreen.copy(alpha = 0.08f)
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -218,11 +218,11 @@ fun ScheduleScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(Icons.Filled.Info, null,
-                                tint = TravlyticGreen, modifier = Modifier.size(18.dp))
+                                tint = MinItoGreen, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(10.dp))
                             Text(
                                 buildScheduleSummary(scheduleState),
-                                color = TravlyticGreen, fontSize = 12.sp, lineHeight = 18.sp
+                                color = MinItoGreen, fontSize = 12.sp, lineHeight = 18.sp
                             )
                         }
                     }
@@ -243,11 +243,11 @@ fun DayChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
             .size(36.dp)
             .clip(CircleShape)
             .background(
-                if (isSelected) TravlyticBlue else TravlyticSurface3
+                if (isSelected) MinItoBlue else MinItoSurface3
             )
             .border(
                 width = 1.dp,
-                color = if (isSelected) TravlyticBlue else TravlyticSurface3,
+                color = if (isSelected) MinItoBlue else MinItoSurface3,
                 shape = CircleShape
             )
             .clickable { onClick() },
@@ -255,7 +255,7 @@ fun DayChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
     ) {
         Text(
             label,
-            color = if (isSelected) Color.White else TravlyticOnSurface2,
+            color = if (isSelected) Color.White else MinItoOnSurface2,
             fontSize = 13.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
@@ -271,13 +271,13 @@ fun TimePickerButton(
     onTimePicked: (Int, Int) -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, color = TravlyticOnSurface2, fontSize = 12.sp)
+        Text(label, color = MinItoOnSurface2, fontSize = 12.sp)
         Spacer(Modifier.height(4.dp))
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(TravlyticSurface3)
-                .border(1.dp, TravlyticBlue.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                .background(MinItoSurface3)
+                .border(1.dp, MinItoBlue.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
                 .clickable {
                     TimePickerDialog(context, { _, h, m ->
                         onTimePicked(h, m)
@@ -288,7 +288,7 @@ fun TimePickerButton(
         ) {
             Text(
                 String.format("%02d:%02d", hour, minute),
-                color = TravlyticOnSurface,
+                color = MinItoOnSurface,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp
             )

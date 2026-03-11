@@ -11,8 +11,8 @@
     <string name="notification_permission_warning">Activa el permiso de Notificaciones para que el bot funcione</string>
     <string name="no_sheets">Agrega un Google Sheet para comenzar</string>
     <string name="no_logs">Sin respuestas enviadas aún</string>
-    <string name="travlytic_notification_channel">MINI-TO Bot</string>
-    <string name="travlytic_notification_active">MINI-TO • Servicio activo de respuesta automática</string>
+    <string name="minito_notification_channel">MINI-TO Bot</string>
+    <string name="minito_notification_active">MINI-TO • Servicio activo de respuesta automática</string>
 
     <!-- Google Cloud Web Client ID -->
     <string name="default_web_client_id">131974621188-30hln0o1cut3th929r5cgtg6unmhl2hl.apps.googleusercontent.com</string>

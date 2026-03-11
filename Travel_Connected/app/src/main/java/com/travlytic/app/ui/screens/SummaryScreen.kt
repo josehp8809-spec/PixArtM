@@ -44,16 +44,16 @@ fun SummaryScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
                 title = {
                     Text("Resumen de Sesión",
-                        color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold)
+                        color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
                 actions = {
@@ -67,13 +67,13 @@ fun SummaryScreen(
                             label = { Text(period, fontSize = 11.sp) },
                             modifier = Modifier.padding(end = 4.dp),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = TravlyticBlue.copy(alpha = 0.25f),
-                                selectedLabelColor = TravlyticBlue
+                                selectedContainerColor = MinItoBlue.copy(alpha = 0.25f),
+                                selectedLabelColor = MinItoBlue
                             )
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -123,9 +123,9 @@ fun SummaryScreen(
                         onClick = { viewModel.generateSummary() },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = TravlyticBlue
+                            contentColor = MinItoBlue
                         ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, TravlyticBlue.copy(alpha = 0.5f))
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MinItoBlue.copy(alpha = 0.5f))
                     ) {
                         Icon(Icons.Filled.Refresh, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
@@ -179,14 +179,14 @@ fun AudioPlayerCard(
                 .background(
                     Brush.linearGradient(
                         listOf(
-                            TravlyticBlue.copy(alpha = 0.25f),
-                            TravlyticGreen.copy(alpha = 0.15f)
+                            MinItoBlue.copy(alpha = 0.25f),
+                            MinItoGreen.copy(alpha = 0.15f)
                         )
                     )
                 )
                 .border(
                     1.dp,
-                    Brush.linearGradient(listOf(TravlyticBlue.copy(0.5f), TravlyticGreen.copy(0.3f))),
+                    Brush.linearGradient(listOf(MinItoBlue.copy(0.5f), MinItoGreen.copy(0.3f))),
                     RoundedCornerShape(20.dp)
                 )
         ) {
@@ -196,7 +196,7 @@ fun AudioPlayerCard(
             ) {
                 Text(
                     "🎙️ Resumen en voz",
-                    color = TravlyticOnSurface2,
+                    color = MinItoOnSurface2,
                     fontSize = 12.sp
                 )
                 Spacer(Modifier.height(16.dp))
@@ -210,8 +210,8 @@ fun AudioPlayerCard(
                         .background(
                             Brush.radialGradient(
                                 listOf(
-                                    if (isSpeaking) TravlyticRed else TravlyticBlue,
-                                    if (isSpeaking) TravlyticRed.copy(0.7f) else TravlyticBlue.copy(0.7f)
+                                    if (isSpeaking) MinItoRed else MinItoBlue,
+                                    if (isSpeaking) MinItoRed.copy(0.7f) else MinItoBlue.copy(0.7f)
                                 )
                             )
                         )
@@ -230,7 +230,7 @@ fun AudioPlayerCard(
 
                 Text(
                     if (isSpeaking) "Reproduciendo..." else "Toca para escuchar el resumen",
-                    color = if (isSpeaking) TravlyticGreen else TravlyticOnSurface2,
+                    color = if (isSpeaking) MinItoGreen else MinItoOnSurface2,
                     fontSize = 12.sp,
                     fontWeight = if (isSpeaking) FontWeight.SemiBold else FontWeight.Normal
                 )
@@ -248,15 +248,15 @@ fun AudioPlayerCard(
                         valueRange = 0.5f..2.0f,
                         modifier = Modifier.width(160.dp).padding(horizontal = 8.dp),
                         colors = SliderDefaults.colors(
-                            thumbColor = TravlyticBlue,
-                            activeTrackColor = TravlyticBlue
+                            thumbColor = MinItoBlue,
+                            activeTrackColor = MinItoBlue
                         )
                     )
                     Text("🐇", fontSize = 14.sp)
                 }
                 Text(
                     "Velocidad: ${String.format("%.1f", speechRate)}x",
-                    color = TravlyticOnSurface2, fontSize = 10.sp
+                    color = MinItoOnSurface2, fontSize = 10.sp
                 )
             }
         }
@@ -269,11 +269,11 @@ fun AudioPlayerCard(
 fun StatisticsCard(summary: SessionSummary) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("📊 Estadísticas", color = TravlyticOnSurface,
+            Text("📊 Estadísticas", color = MinItoOnSurface,
                 fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(14.dp))
             Row(
@@ -284,19 +284,19 @@ fun StatisticsCard(summary: SessionSummary) {
                     icon = Icons.Filled.Message,
                     value = "${summary.totalReplies}",
                     label = "Respuestas",
-                    color = TravlyticBlue
+                    color = MinItoBlue
                 )
                 StatPill(
                     icon = Icons.Filled.People,
                     value = "${summary.uniqueContacts}",
                     label = "Contactos",
-                    color = TravlyticGreen
+                    color = MinItoGreen
                 )
                 StatPill(
                     icon = Icons.Filled.Warning,
                     value = "${summary.totalEscalations}",
                     label = "Escalados",
-                    color = TravlyticOrange
+                    color = MinItoOrange
                 )
             }
         }
@@ -314,7 +314,7 @@ fun StatPill(icon: ImageVector, value: String, label: String, color: Color) {
     ) {
         Icon(icon, null, tint = color, modifier = Modifier.size(22.dp))
         Spacer(Modifier.height(4.dp))
-        Text(value, color = TravlyticOnSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        Text(value, color = MinItoOnSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
         Text(label, color = color, fontSize = 11.sp)
     }
 }
@@ -325,11 +325,11 @@ fun StatPill(icon: ImageVector, value: String, label: String, color: Color) {
 fun TopContactsCard(contacts: List<Pair<String, Int>>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("👤 Contactos más activos", color = TravlyticOnSurface,
+            Text("👤 Contactos más activos", color = MinItoOnSurface,
                 fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(10.dp))
             contacts.forEachIndexed { index, (name, count) ->
@@ -353,7 +353,7 @@ fun ContactBar(rank: Int, name: String, count: Int, progress: Float) {
         1 -> Color(0xFFFFD700) // Oro
         2 -> Color(0xFFC0C0C0) // Plata
         3 -> Color(0xFFCD7F32) // Bronce
-        else -> TravlyticBlue.copy(alpha = 0.7f)
+        else -> MinItoBlue.copy(alpha = 0.7f)
     }
     Column {
         Row(
@@ -364,16 +364,16 @@ fun ContactBar(rank: Int, name: String, count: Int, progress: Float) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("#$rank", color = barColor, fontWeight = FontWeight.Bold,
                     fontSize = 12.sp, modifier = Modifier.width(24.dp))
-                Text(name, color = TravlyticOnSurface, fontSize = 13.sp, maxLines = 1)
+                Text(name, color = MinItoOnSurface, fontSize = 13.sp, maxLines = 1)
             }
-            Text("$count msg", color = TravlyticOnSurface2, fontSize = 11.sp)
+            Text("$count msg", color = MinItoOnSurface2, fontSize = 11.sp)
         }
         Spacer(Modifier.height(3.dp))
         LinearProgressIndicator(
             progress = progress,
             modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
             color = barColor,
-            trackColor = TravlyticSurface3
+            trackColor = MinItoSurface3
         )
     }
 }
@@ -384,11 +384,11 @@ fun ContactBar(rank: Int, name: String, count: Int, progress: Float) {
 fun TopicsCard(topics: List<String>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("🔍 Tópicos frecuentes", color = TravlyticOnSurface,
+            Text("🔍 Tópicos frecuentes", color = MinItoOnSurface,
                 fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(10.dp))
             Row(
@@ -399,11 +399,11 @@ fun TopicsCard(topics: List<String>) {
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(TravlyticBlue.copy(alpha = 0.15f))
-                            .border(1.dp, TravlyticBlue.copy(0.3f), RoundedCornerShape(20.dp))
+                            .background(MinItoBlue.copy(alpha = 0.15f))
+                            .border(1.dp, MinItoBlue.copy(0.3f), RoundedCornerShape(20.dp))
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
-                        Text(topic, color = TravlyticBlue, fontSize = 12.sp,
+                        Text(topic, color = MinItoBlue, fontSize = 12.sp,
                             fontWeight = FontWeight.Medium)
                     }
                 }
@@ -418,21 +418,21 @@ fun TopicsCard(topics: List<String>) {
 fun NarrativeCard(text: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.AutoAwesome, null,
-                    tint = TravlyticBlue, modifier = Modifier.size(16.dp))
+                    tint = MinItoBlue, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Resumen generado por Gemini", color = TravlyticOnSurface,
+                Text("Resumen generado por Gemini", color = MinItoOnSurface,
                     fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
             Spacer(Modifier.height(10.dp))
             Text(
                 text,
-                color = TravlyticOnSurface,
+                color = MinItoOnSurface,
                 fontSize = 14.sp,
                 lineHeight = 21.sp
             )
@@ -446,17 +446,17 @@ fun NarrativeCard(text: String) {
 fun LoadingCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularProgressIndicator(color = TravlyticBlue)
+            CircularProgressIndicator(color = MinItoBlue)
             Spacer(Modifier.height(16.dp))
             Text("Gemini está analizando tu sesión...",
-                color = TravlyticOnSurface2, fontSize = 14.sp)
+                color = MinItoOnSurface2, fontSize = 14.sp)
         }
     }
 }
@@ -465,7 +465,7 @@ fun LoadingCard() {
 fun EmptySummaryCard(onGenerate: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -473,17 +473,17 @@ fun EmptySummaryCard(onGenerate: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(Icons.Filled.AutoAwesome, null,
-                tint = TravlyticOnSurface2, modifier = Modifier.size(48.dp))
+                tint = MinItoOnSurface2, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(12.dp))
             Text("Sin resumen generado aún",
-                color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold)
+                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
             Text("Genera un resumen de la actividad del bot y escúchalo en voz alta.",
-                color = TravlyticOnSurface2, fontSize = 12.sp,
+                color = MinItoOnSurface2, fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
             Button(
                 onClick = onGenerate,
-                colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
             ) {
                 Icon(Icons.Filled.AutoAwesome, null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
@@ -497,17 +497,17 @@ fun EmptySummaryCard(onGenerate: () -> Unit) {
 fun ErrorCard(error: String, onRetry: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(error, color = TravlyticRed, fontSize = 13.sp, textAlign = TextAlign.Center)
+            Text(error, color = MinItoRed, fontSize = 13.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(12.dp))
             TextButton(onClick = onRetry) {
-                Text("Reintentar", color = TravlyticBlue)
+                Text("Reintentar", color = MinItoBlue)
             }
         }
     }

@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "knowledge_items")
 data class KnowledgeItem(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val type: String,           // "excel" | "url"
+    val type: String,           // "excel"
     val reference: String,      // Label descriptivo: "Precios", "Horarios"
-    val source: String,         // path del .xlsx o URL
+    val source: String,         // path del .xlsx
     val content: String,        // contenido scrapeado / parseado (texto plano)
     val lastUpdated: Long = 0L,
     val isEnabled: Boolean = true

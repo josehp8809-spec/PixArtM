@@ -30,7 +30,7 @@ private const val WHATSAPP_PACKAGE = "com.whatsapp"
 private const val WHATSAPP_BUSINESS_PACKAGE = "com.whatsapp.w4b"
 private const val FB_MESSENGER_PACKAGE = "com.facebook.orca"
 private const val IG_DIRECT_PACKAGE = "com.instagram.android"
-private const val TRAVLYTIC_CHANNEL_ID = "travlytic_service"
+private const val MINITO_CHANNEL_ID = "minito_service"
 
 @AndroidEntryPoint
 class UniversalListenerService : NotificationListenerService() {
@@ -353,8 +353,8 @@ class UniversalListenerService : NotificationListenerService() {
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
-            TRAVLYTIC_CHANNEL_ID,
-            "Travlytic Bot",
+            MINITO_CHANNEL_ID,
+            "MINI-TO Bot",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = "Servicio activo de respuesta automática"
@@ -364,8 +364,8 @@ class UniversalListenerService : NotificationListenerService() {
     }
 
     private fun buildForegroundNotification(): Notification {
-        return NotificationCompat.Builder(this, TRAVLYTIC_CHANNEL_ID)
-            .setContentTitle("Travlytic activo")
+        return NotificationCompat.Builder(this, MINITO_CHANNEL_ID)
+            .setContentTitle("MINI-TO activo")
             .setContentText("Respondiendo mensajes automáticamente")
             .setSmallIcon(R.drawable.ic_bot_active)
             .setPriority(NotificationCompat.PRIORITY_LOW)

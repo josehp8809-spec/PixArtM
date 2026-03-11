@@ -7,7 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "travlytic_prefs")
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "minito_prefs")
 
 class AppPreferences(private val context: Context) {
 
@@ -42,7 +42,7 @@ class AppPreferences(private val context: Context) {
         /** Días activos: Set de ints 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb, 7=Dom */
         val SCHEDULE_DAYS     = stringPreferencesKey("schedule_days")
 
-        const val DEFAULT_SYSTEM_PROMPT = """Eres Travlytic, un asistente de respuesta automática para WhatsApp.
+        const val DEFAULT_SYSTEM_PROMPT = """Eres MINI-TO, un asistente de respuesta automática para WhatsApp.
 Tu misión es responder mensajes de forma natural, precisa y concisa basándote EXCLUSIVAMENTE en la información proporcionada en tu base de conocimiento.
 
 REGLAS:

@@ -45,16 +45,16 @@ fun ProfileScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Perfil de Usuario", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Perfil de Usuario", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         }
     ) { padding ->
@@ -70,7 +70,7 @@ fun ProfileScreen(
             SettingsSection(title = "📝 Datos Generales") {
                 Text(
                     "Estos datos ayudarán a Gemini a personalizar sus respuestas y hablar de ti a los clientes.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp
+                    color = MinItoOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
@@ -118,7 +118,7 @@ fun ProfileScreen(
                             viewModel.saveProfileInfo(nameInput, businessInput, toneInput)
                         },
                         enabled = isChanged,
-                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
                     ) {
                         Icon(Icons.Filled.Save, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))

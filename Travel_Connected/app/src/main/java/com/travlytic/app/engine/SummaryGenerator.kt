@@ -54,7 +54,7 @@ class SummaryGenerator @Inject constructor() {
             }
 
             val prompt = """
-Eres el asistente de análisis de Travlytic. Tu tarea es generar un RESUMEN EJECUTIVO breve, amigable y en español de la actividad del bot de WhatsApp de $periodLabel.
+Eres el asistente de análisis de MINI-TO. Tu tarea es generar un RESUMEN EJECUTIVO breve, amigable y en español de la actividad del bot de WhatsApp de $periodLabel.
 
 DATOS DE ACTIVIDAD:
 - Total de mensajes respondidos automáticamente: ${logs.size}
@@ -120,7 +120,7 @@ INSTRUCCIONES:
 
     /** Resumen básico sin llamar a Gemini (fallback) */
     private fun generateFallbackNarrative(replyCount: Int, escalateCount: Int, contactCount: Int, period: String, topContact: String): String {
-        return "¡Hola! Tu resumen de $period: Travlytic respondió $replyCount mensajes y escaló $escalateCount consultas " +
+        return "¡Hola! Tu resumen de $period: MINI-TO respondió $replyCount mensajes y escaló $escalateCount consultas " +
                "de $contactCount contacto${if (contactCount == 1) "" else "s"} diferentes. " +
                (if (topContact.isNotBlank()) "El contacto más activo fue $topContact. " else "") +
                "El bot estuvo funcionando correctamente durante toda la sesión."

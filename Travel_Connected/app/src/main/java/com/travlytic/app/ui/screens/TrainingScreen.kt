@@ -63,30 +63,30 @@ fun TrainingScreen(
     }
 
     Scaffold(
-        containerColor = TravlyticSurface,
+        containerColor = MinItoSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Entrenamiento IA", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Entrenamiento IA", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
+                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
                 actions = {
                     IconButton(onClick = { importLauncher.launch("application/json") }) {
-                        Icon(Icons.Filled.Download, contentDescription = "Importar", tint = TravlyticBlue)
+                        Icon(Icons.Filled.Download, contentDescription = "Importar", tint = MinItoBlue)
                     }
                     IconButton(onClick = { viewModel.exportConfiguration() }) {
-                        Icon(Icons.Filled.Share, contentDescription = "Exportar", tint = TravlyticBlue)
+                        Icon(Icons.Filled.Share, contentDescription = "Exportar", tint = MinItoBlue)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TravlyticSurface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showAddDialog = true },
-                containerColor = TravlyticBlue,
+                containerColor = MinItoBlue,
                 contentColor = Color.White
             ) {
                 Icon(Icons.Filled.Add, "Agregar")
@@ -100,24 +100,24 @@ fun TrainingScreen(
         ) {
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = TravlyticSurface,
+                containerColor = MinItoSurface,
                 contentColor = TravlyticBlue,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                        color = TravlyticBlue
+                        color = MinItoBlue
                     )
                 }
             ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Reglas Estrictas", color = if (selectedTab == 0) TravlyticBlue else TravlyticOnSurface2) }
+                    text = { Text("Reglas Estrictas", color = if (selectedTab == 0) MinItoBlue else MinItoOnSurface2) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Ejemplos (Few-Shot)", color = if (selectedTab == 1) TravlyticBlue else TravlyticOnSurface2) }
+                    text = { Text("Ejemplos (Few-Shot)", color = if (selectedTab == 1) MinItoBlue else MinItoOnSurface2) }
                 )
             }
 
@@ -131,7 +131,7 @@ fun TrainingScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         if (selectedTab == 0) "No hay reglas definidas." else "No hay ejemplos (Few-Shot).",
-                        color = TravlyticOnSurface2
+                        color = MinItoOnSurface2
                     )
                 }
             } else {
@@ -173,7 +173,7 @@ fun TrainingScreen(
 fun RuleItem(rule: TrainingRule, onToggle: () -> Unit, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -184,28 +184,28 @@ fun RuleItem(rule: TrainingRule, onToggle: () -> Unit, onDelete: () -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 if (rule.type == "RULE") {
-                    Text("Regla", color = TravlyticOrange, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("Regla", color = MinItoOrange, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(4.dp))
-                    Text("« ${rule.input} »", color = TravlyticOnSurface, fontSize = 14.sp)
+                    Text("« ${rule.input} »", color = MinItoOnSurface, fontSize = 14.sp)
                 } else {
-                    Text("Si el cliente dice:", color = TravlyticBlueLight, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    Text(rule.input, color = TravlyticOnSurface, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text("Si el cliente dice:", color = MinItoBlueLight, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(rule.input, color = MinItoOnSurface, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     
                     Spacer(Modifier.height(8.dp))
                     
-                    Text("Responder exactamente:", color = TravlyticGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    Text(rule.output ?: "", color = TravlyticOnSurface, fontSize = 14.sp, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                    Text("Responder exactamente:", color = MinItoGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(rule.output ?: "", color = MinItoOnSurface, fontSize = 14.sp, maxLines = 4, overflow = TextOverflow.Ellipsis)
                 }
             }
             
             Switch(
                 checked = rule.isActive,
                 onCheckedChange = { onToggle() },
-                colors = SwitchDefaults.colors(checkedThumbColor = TravlyticBlue, checkedTrackColor = TravlyticBlue.copy(alpha = 0.3f))
+                colors = SwitchDefaults.colors(checkedThumbColor = MinItoBlue, checkedTrackColor = MinItoBlue.copy(alpha = 0.3f))
             )
             
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, "Eliminar", tint = TravlyticRed)
+                Icon(Icons.Filled.Delete, "Eliminar", tint = MinItoRed)
             }
         }
     }
@@ -223,14 +223,14 @@ fun AddRuleDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = TravlyticSurface2,
+        containerColor = MinItoSurface2,
         title = {
-            Text(if (isRuleMode) "Nueva Regla Estricta" else "Nuevo Ejemplo (Few-Shot)", color = TravlyticOnSurface)
+            Text(if (isRuleMode) "Nueva Regla Estricta" else "Nuevo Ejemplo (Few-Shot)", color = MinItoOnSurface)
         },
         text = {
             Column {
                 if (isRuleMode) {
-                    Text("Define una instrucción que Gemini debe seguir siempre.", color = TravlyticOnSurface2, fontSize = 12.sp)
+                    Text("Define una instrucción que Gemini debe seguir siempre.", color = MinItoOnSurface2, fontSize = 12.sp)
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = input,
@@ -240,7 +240,7 @@ fun AddRuleDialog(
                         colors = settingsTextFieldColors()
                     )
                 } else {
-                    Text("Dale a Gemini un ejemplo exacto de cómo responder.", color = TravlyticOnSurface2, fontSize = 12.sp)
+                    Text("Dale a Gemini un ejemplo exacto de cómo responder.", color = MinItoOnSurface2, fontSize = 12.sp)
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = input,
@@ -266,14 +266,14 @@ fun AddRuleDialog(
             Button(
                 onClick = { onConfirm(input, if (isRuleMode) null else output) },
                 enabled = input.isNotBlank() && (isRuleMode || output.isNotBlank()),
-                colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue)
             ) {
                 Text("Guardar")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = TravlyticOnSurface2)
+                Text("Cancelar", color = MinItoOnSurface2)
             }
         }
     )

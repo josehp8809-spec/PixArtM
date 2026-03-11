@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:name=".TravlyticApp"
+        android:name=".MinitoApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -44,7 +44,7 @@
         -->
         <service
             android:name=".service.UniversalListenerService"
-            android:label="Travlytic Bot"
+            android:label="MINI-TO Bot"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">
             <intent-filter>
