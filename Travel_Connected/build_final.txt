@@ -1,0 +1,147 @@
+﻿> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:kaptGenerateStubsDebugKotlin
+> Task :app:kaptDebugKotlin
+
+> Task :app:compileDebugKotlin FAILED
+.\gradlew : e: file:///
+C:/Users/zyzen%203/PixA
+rtM/Travel_Connected/ap
+p/src/main/java/com/tra
+vlytic/app/engine/Gemin
+iAgent.kt:19:37 
+Unresolved reference: 
+RegisteredSheetDao
+En línea: 1 Carácter: 
+65
++ ... 
+les\Android\Android 
+Studio\jbr"; .\gradlew 
+assembleDebug 2>&1 | 
+Out-F ...
++                      
+                ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (e: file:///C:   
+ /U...isteredSheetD    
+ao:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/GeminiAgent.kt:10
+4:59 Unresolved 
+reference: it
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:226:45 
+Type mismatch: 
+inferred type is androi
+d.app.RemoteInput! but 
+androidx.core.app.Remot
+eInput? was expected
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:39:37 Unresolved 
+reference: 
+DashboardStats
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:330:26 Unresolved 
+reference: 
+DashboardState
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/SettingsScree
+n.kt:369:89 Unresolved 
+reference. None of the 
+following candidates 
+is applicable because 
+of receiver type 
+mismatch: 
+public val 
+Icons.Filled.Person: 
+ImageVector defined in 
+androidx.compose.materi
+al.icons.filled
+
+FAILURE: Build failed 
+with an exception.
+
+* What went wrong:
+Execution failed for 
+task ':app:compileDebug
+Kotlin'.
+> A failure occurred 
+while executing org.jet
+brains.kotlin.compilerR
+unner.GradleCompilerRun
+nerWithWorkers$GradleKo
+tlinCompilerWorkAction
+   > Compilation 
+error. See log for 
+more details
+
+* Try:
+> Run with 
+--stacktrace option to 
+get the stack trace.
+> Run with --info or 
+--debug option to get 
+more log output.
+> Run with --scan to 
+get full insights.
+> Get more help at http
+s://help.gradle.org.
+
+BUILD FAILED in 1m 6s
+28 actionable tasks: 4 executed, 24 up-to-date

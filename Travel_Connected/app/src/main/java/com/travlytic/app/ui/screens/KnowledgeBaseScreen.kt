@@ -1,5 +1,8 @@
 package com.travlytic.app.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,13 +16,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.travlytic.app.data.db.entities.RegisteredSheet
+import com.travlytic.app.data.db.entities.KnowledgeItem
 import com.travlytic.app.ui.theme.*
 import com.travlytic.app.ui.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
@@ -33,7 +38,17 @@ fun KnowledgeBaseScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showAddSheetDialog by remember { mutableStateOf(false) }
+    
+    var showAddUrlDialog by remember { mutableStateOf(false) }
+    var pendingExcelUri by remember { mutableStateOf<Uri?>(null) }
+    
+    val excelPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingExcelUri = uri
+        }
+    }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
@@ -47,7 +62,7 @@ fun KnowledgeBaseScreen(
         containerColor = TravlyticSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Fuente de Conocimiento", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
+                title = { Text("Base de Conocimiento", color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Filled.ArrowBack, "Volver", tint = TravlyticOnSurface)
@@ -64,60 +79,53 @@ fun KnowledgeBaseScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    "📊 Google Sheets Registrados",
+                    "📚 Documentación Local",
                     color = TravlyticOnSurface,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                Row {
-                    if (uiState.registeredSheets.isNotEmpty()) {
-                        IconButton(
-                            onClick = { viewModel.syncAllSheets() },
-                            enabled = !uiState.isLoading
-                        ) {
-                            Icon(Icons.Filled.Sync, "Sincronizar todos",
-                                tint = TravlyticBlue, modifier = Modifier.size(20.dp))
-                        }
-                    }
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
                     FilledTonalButton(
-                        onClick = { showAddSheetDialog = true },
-                        colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = TravlyticSurface3
-                        )
+                        onClick = { excelPickerLauncher.launch(arrayOf("*/*")) },
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = TravlyticGreen.copy(alpha=0.2f), contentColor = TravlyticGreen)
                     ) {
-                        Icon(Icons.Filled.Add, null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Filled.UploadFile, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Agregar", fontSize = 13.sp)
+                        Text("Subir Excel / CSV", fontSize = 13.sp)
                     }
                 }
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                "La IA contestará a los usuarios basándose en la información extraída de los siguientes documentos.",
+                "La IA utilizará esta información para responder a tus clientes.",
                 color = TravlyticOnSurface2, fontSize = 13.sp, lineHeight = 18.sp
             )
             Spacer(Modifier.height(16.dp))
 
+            if (uiState.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = TravlyticBlue)
+                Spacer(Modifier.height(16.dp))
+            }
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (uiState.registeredSheets.isEmpty()) {
-                    item {
-                        EmptySheetPlaceholder()
-                    }
+                if (uiState.knowledgeItems.isEmpty()) {
+                    item { EmptyKnowledgePlaceholder() }
                 } else {
-                    items(uiState.registeredSheets, key = { it.spreadsheetId }) { sheet ->
-                        SheetCard(
-                            sheet = sheet,
-                            isSyncing = uiState.syncingSheetId == sheet.spreadsheetId,
-                            onSync = { viewModel.syncSheet(sheet.spreadsheetId) },
-                            onRemove = { viewModel.removeSheet(sheet.spreadsheetId) }
+                    items(uiState.knowledgeItems, key = { it.id }) { item ->
+                        KnowledgeCard(
+                            item = item,
+                            onToggle = { enabled -> viewModel.toggleKnowledgeItem(item, enabled) },
+                            onDelete = { viewModel.deleteKnowledgeItem(item) }
                         )
                     }
                 }
@@ -126,23 +134,26 @@ fun KnowledgeBaseScreen(
         }
     }
 
-    if (showAddSheetDialog) {
-        AddSheetDialog(
-            onDismiss = { showAddSheetDialog = false },
-            onAdd = { input ->
-                showAddSheetDialog = false
-                viewModel.addSheet(input)
+    if (pendingExcelUri != null) {
+        AddReferenceDialog(
+            title = "Importar Excel Local",
+            label = "Nombre de referencia:",
+            placeholder = "Ej. Inventario",
+            showSourceInput = false,
+            onDismiss = { pendingExcelUri = null },
+            onConfirm = { _, reference ->
+                viewModel.importExcelKnowledge(pendingExcelUri!!, reference)
+                pendingExcelUri = null
             }
         )
     }
 }
 
 @Composable
-fun SheetCard(
-    sheet: RegisteredSheet,
-    isSyncing: Boolean,
-    onSync: () -> Unit,
-    onRemove: () -> Unit
+fun KnowledgeCard(
+    item: KnowledgeItem,
+    onToggle: (Boolean) -> Unit,
+    onDelete: () -> Unit
 ) {
     val dateFormat = remember { SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()) }
 
@@ -157,7 +168,7 @@ fun SheetCard(
         ) {
             Box(
                 modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
-                    .background(Color(0x2200C853)),
+                    .background(TravlyticGreen.copy(0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.TableChart, null,
@@ -165,26 +176,23 @@ fun SheetCard(
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(sheet.title, color = TravlyticOnSurface,
+                Text(item.reference, color = TravlyticOnSurface,
                     fontWeight = FontWeight.Medium, fontSize = 14.sp,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    if (sheet.lastSynced == 0L) "Sin sincronizar"
-                    else "${sheet.rowCount} filas · ${dateFormat.format(Date(sheet.lastSynced))}",
-                    color = TravlyticOnSurface2, fontSize = 11.sp
+                    "Act. ${dateFormat.format(Date(item.lastUpdated))}",
+                    color = TravlyticOnSurface2, fontSize = 11.sp,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }
+            
+            Switch(
+                checked = item.isEnabled,
+                onCheckedChange = onToggle,
+                modifier = Modifier.scale(0.8f)
+            )
 
-            if (isSyncing) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp),
-                    color = TravlyticBlue, strokeWidth = 2.dp)
-            } else {
-                IconButton(onClick = onSync, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Filled.Refresh, "Sincronizar",
-                        tint = TravlyticBlue, modifier = Modifier.size(18.dp))
-                }
-            }
-            IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
+            IconButton(onClick = onDelete, modifier = Modifier.size(36.dp)) {
                 Icon(Icons.Filled.DeleteOutline, "Eliminar",
                     tint = TravlyticRed.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
             }
@@ -193,7 +201,7 @@ fun SheetCard(
 }
 
 @Composable
-fun EmptySheetPlaceholder() {
+fun EmptyKnowledgePlaceholder() {
     Box(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
@@ -202,37 +210,56 @@ fun EmptySheetPlaceholder() {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Outlined.TableChart, null,
+            Icon(Icons.Outlined.Folder, null,
                 tint = TravlyticOnSurface2, modifier = Modifier.size(36.dp))
             Spacer(Modifier.height(8.dp))
-            Text("Agrega un Google Sheet para comenzar",
+            Text("Sube un Excel/CSV para comenzar",
                 color = TravlyticOnSurface2, fontSize = 13.sp)
         }
     }
 }
 
 @Composable
-fun AddSheetDialog(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
-    var input by remember { mutableStateOf("") }
+fun AddReferenceDialog(
+    title: String,
+    label: String,
+    placeholder: String,
+    showSourceInput: Boolean = true,
+    onDismiss: () -> Unit,
+    onConfirm: (String, String) -> Unit
+) {
+    var source by remember { mutableStateOf("") }
+    var reference by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = TravlyticSurface2,
-        title = { Text("Agregar Google Sheet", color = TravlyticOnSurface) },
+        title = { Text(title, color = TravlyticOnSurface) },
         text = {
             Column {
-                Text("Pega el ID o URL del Google Sheet:",
-                    color = TravlyticOnSurface2, fontSize = 13.sp)
+                if (showSourceInput) {
+                    Text(label, color = TravlyticOnSurface2, fontSize = 13.sp)
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = source,
+                        onValueChange = { source = it },
+                        placeholder = { Text(placeholder, fontSize = 12.sp) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TravlyticOnSurface,
+                            unfocusedTextColor = TravlyticOnSurface
+                        )
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+                Text("Nombre de Referencia:", color = TravlyticOnSurface2, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = input,
-                    onValueChange = { input = it },
-                    placeholder = { Text("ID o URL del Sheet...", fontSize = 12.sp) },
-                    singleLine = false,
-                    minLines = 2,
+                    value = reference,
+                    onValueChange = { reference = it },
+                    placeholder = { Text("Ej. Precios 2024", fontSize = 12.sp) },
+                    singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TravlyticBlue,
-                        unfocusedBorderColor = TravlyticSurface3,
                         focusedTextColor = TravlyticOnSurface,
                         unfocusedTextColor = TravlyticOnSurface
                     )
@@ -241,9 +268,9 @@ fun AddSheetDialog(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
         },
         confirmButton = {
             Button(
-                onClick = { if (input.isNotBlank()) onAdd(input) },
+                onClick = { if (reference.isNotBlank() && (!showSourceInput || source.isNotBlank())) onConfirm(source, reference) },
                 colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
-            ) { Text("Agregar") }
+            ) { Text("Guardar") }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancelar", color = TravlyticOnSurface2) }

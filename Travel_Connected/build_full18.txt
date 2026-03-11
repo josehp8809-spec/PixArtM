@@ -1,0 +1,804 @@
+﻿> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:kaptGenerateStubsDebugKotlin
+> Task :app:kaptDebugKotlin
+> Task :app:compileDebugKotlin
+.\gradlew : e: file:///
+C:/Users/zyzen%203/PixA
+rtM/Travel_Connected/ap
+p/src/main/java/com/tra
+vlytic/app/engine/AiCon
+figExport.kt:9:9 
+Conflicting 
+declarations: 
+value-parameter 
+version: Int = ..., 
+value-parameter 
+version: Int = ...
+En línea: 1 Carácter: 
+65
++ ... 
+les\Android\Android 
+Studio\jbr"; .\gradlew 
+assembleDebug 2>&1 | 
+Out-F ...
++                      
+                ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (e: file:///C:   
+ /U...sion: Int = .    
+..:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/AiConfigExport.kt
+:9:9 Conflicting 
+declarations: public 
+final val version: 
+Int, public final val 
+version: Int
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/AiConfigExport.kt
+:10:9 Conflicting 
+declarations: 
+value-parameter 
+version: Int = ..., 
+value-parameter 
+version: Int = ...
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/AiConfigExport.kt
+:10:9 Conflicting 
+declarations: public 
+final val version: 
+Int, public final val 
+version: Int
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/GeminiAgent.kt:19
+:37 Unresolved 
+reference: 
+RegisteredSheetDao
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/e
+ngine/GeminiAgent.kt:10
+4:59 Unresolved 
+reference: it
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:9:19 
+Conflicting import, 
+imported name 'Bundle' 
+is ambiguous
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:10:37 
+Conflicting import, 
+imported name 'Notifica
+tionListenerService' 
+is ambiguous
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:11:19 
+Conflicting import, 
+imported name 'Bundle' 
+is ambiguous
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:12:37 
+Conflicting import, 
+imported name 'Notifica
+tionListenerService' 
+is ambiguous
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:140:21 
+Conflicting 
+declarations: val now: 
+Long, val now: Long
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:148:21 
+Conflicting 
+declarations: val now: 
+Long, val now: Long
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/s
+ervice/UniversalListene
+rService.kt:229:45 
+Type mismatch: 
+inferred type is androi
+d.app.RemoteInput! but 
+androidx.core.app.Remot
+eInput? was expected
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:40:16 Unresolved 
+reference: 
+MainViewModel
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:40:32 Not enough 
+information to infer 
+type variable VM
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:56:44 Unresolved 
+reference: it
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:63:26 Unresolved 
+reference: 
+TravlyticSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:80:64 Unresolved 
+reference: TravlyticRed
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:80:82 Unresolved 
+reference: 
+TravlyticGreen
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:99:37 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:106:36 Unresolved 
+reference: 
+TravlyticBlue
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:109:25 None of the 
+following functions 
+can be called with the 
+arguments supplied: 
+public fun 
+Icon(bitmap: 
+ImageBitmap, 
+contentDescription: 
+String?, modifier: 
+Modifier = ..., tint: 
+Color = ...): Unit 
+defined in androidx.com
+pose.material3
+public fun 
+Icon(painter: Painter, 
+contentDescription: 
+String?, modifier: 
+Modifier = ..., tint: 
+Color = ...): Unit 
+defined in androidx.com
+pose.material3
+public fun 
+Icon(imageVector: 
+ImageVector, 
+contentDescription: 
+String?, modifier: 
+Modifier = ..., tint: 
+Color = ...): Unit 
+defined in androidx.com
+pose.material3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:110:66 Unresolved 
+reference: 
+TravlyticGreen
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:110:86 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:114:36 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:117:77 Unresolved 
+reference: 
+TravlyticSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:154:33 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:161:37 Unresolved 
+reference: 
+TravlyticBlue
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:165:17 Cannot access 
+'AnimatedVisibility': 
+it is private in file
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:167:21 Cannot find a 
+parameter with this 
+name: enter
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:167:29 Unresolved 
+reference: fadeIn
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:167:40 Unresolved 
+reference: 
+expandVertically
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:168:21 Cannot find a 
+parameter with this 
+name: exit
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:168:28 Unresolved 
+reference: fadeOut
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:168:40 Unresolved 
+reference: 
+shrinkVertically
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:188:33 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:194:52 Unresolved 
+reference: TravlyticRed
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:207:37 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:211:63 Unresolved 
+reference: id
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:232:59 Unresolved 
+reference: 
+TravlyticSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:242:52 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:243:21 None of the 
+following functions 
+can be called with the 
+arguments supplied: 
+public fun Text(text: 
+AnnotatedString, 
+modifier: Modifier = 
+..., color: Color = 
+..., fontSize: 
+TextUnit = ..., 
+fontStyle: FontStyle? 
+= ..., fontWeight: 
+FontWeight? = ..., 
+fontFamily: 
+FontFamily? = ..., 
+letterSpacing: 
+TextUnit = ..., 
+textDecoration: 
+TextDecoration? = ..., 
+textAlign: TextAlign? 
+= ..., lineHeight: 
+TextUnit = ..., 
+overflow: TextOverflow 
+= ..., softWrap: 
+Boolean = ..., 
+maxLines: Int = ..., 
+minLines: Int = ..., 
+inlineContent: 
+Map<String, 
+InlineTextContent> = 
+..., onTextLayout: 
+(TextLayoutResult) -> 
+Unit = ..., style: 
+TextStyle = ...): Unit 
+defined in androidx.com
+pose.material3
+public fun Text(text: 
+String, modifier: 
+Modifier = ..., color: 
+Color = ..., fontSize: 
+TextUnit = ..., 
+fontStyle: FontStyle? 
+= ..., fontWeight: 
+FontWeight? = ..., 
+fontFamily: 
+FontFamily? = ..., 
+letterSpacing: 
+TextUnit = ..., 
+textDecoration: 
+TextDecoration? = ..., 
+textAlign: TextAlign? 
+= ..., lineHeight: 
+TextUnit = ..., 
+overflow: TextOverflow 
+= ..., softWrap: 
+Boolean = ..., 
+maxLines: Int = ..., 
+minLines: Int = ..., 
+onTextLayout: 
+((TextLayoutResult) -> 
+Unit)? = ..., style: 
+TextStyle = ...): Unit 
+defined in androidx.com
+pose.material3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:245:55 Unresolved 
+reference: 
+TravlyticGreen
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:245:75 Unresolved 
+reference: TravlyticRed
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:255:45 Unresolved 
+reference: 
+TravlyticGreen
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:256:47 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:257:47 Unresolved 
+reference: 
+TravlyticSurface3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:274:32 Unresolved 
+reference: 
+TravlyticOrange
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:278:33 Unresolved 
+reference: 
+TravlyticOrange
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:289:26 Unresolved 
+reference: ResponseLog
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:294:59 Unresolved 
+reference: 
+TravlyticSurface3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:302:51 Unresolved 
+reference: 
+TravlyticBlueLight
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:305:29 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:308:55 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:311:52 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:320:26 Unresolved 
+reference: 
+DashboardState
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:368:21 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:372:29 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:382:17 Unresolved 
+reference: 
+TravlyticSurface3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:398:59 Unresolved 
+reference: 
+TravlyticSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:404:25 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:418:46 Unresolved 
+reference: 
+TravlyticBlue
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:419:48 Unresolved 
+reference: 
+TravlyticSurface3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:420:44 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:421:46 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:430:26 None of the 
+following functions 
+can be called with the 
+arguments supplied: 
+public fun Modifier.bac
+kground(brush: Brush, 
+shape: Shape = ..., 
+alpha: Float = ...): 
+Modifier defined in and
+roidx.compose.foundatio
+n
+public fun Modifier.bac
+kground(color: Color, 
+shape: Shape = ...): 
+Modifier defined in and
+roidx.compose.foundatio
+n
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:432:33 Unresolved 
+reference: 
+TravlyticBlue
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:432:52 Unresolved 
+reference: 
+TravlyticSurface3
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:462:33 Unresolved 
+reference: 
+TravlyticOnSurface
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:473:45 Unresolved 
+reference: 
+TravlyticOnSurface2
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/HomeScreen.kt
+:480:43 Unresolved 
+reference: TravlyticRed
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/SettingsScree
+n.kt:369:89 Unresolved 
+reference. None of the 
+following candidates 
+is applicable because 
+of receiver type 
+mismatch: 
+public val 
+Icons.Filled.Person: 
+ImageVector defined in 
+androidx.compose.materi
+al.icons.filled
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/SummaryScreen
+.kt:469:31 Unresolved 
+reference: 
+SummarizeRounded
+e: file:///C:/Users/zyz
+en%203/PixArtM/Travel_C
+onnected/app/src/main/j
+ava/com/travlytic/app/u
+i/screens/TrainingScree
+n.kt:106:34 Unresolved 
+reference: 
+tabIndicatorOffset
+
+> Task :app:compileDebugKotlin FAILED
+
+FAILURE: Build failed 
+with an exception.
+
+* What went wrong:
+Execution failed for 
+task ':app:compileDebug
+Kotlin'.
+> A failure occurred 
+while executing org.jet
+brains.kotlin.compilerR
+unner.GradleCompilerRun
+nerWithWorkers$GradleKo
+tlinCompilerWorkAction
+   > Compilation 
+error. See log for 
+more details
+
+* Try:
+> Run with 
+--stacktrace option to 
+get the stack trace.
+> Run with --info or 
+--debug option to get 
+more log output.
+> Run with --scan to 
+get full insights.
+> Get more help at http
+s://help.gradle.org.
+
+BUILD FAILED in 1m 29s
+28 actionable tasks: 4 executed, 24 up-to-date

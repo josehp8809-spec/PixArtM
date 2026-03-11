@@ -16,8 +16,12 @@ class AppPreferences(private val context: Context) {
         val GEMINI_API_KEY        = stringPreferencesKey("gemini_api_key")
         val BOT_ENABLED           = booleanPreferencesKey("bot_enabled")
         val SYSTEM_PROMPT         = stringPreferencesKey("system_prompt")
-        val GOOGLE_ACCOUNT_EMAIL  = stringPreferencesKey("google_account_email")
+        val WELCOME_MESSAGE       = stringPreferencesKey("welcome_message")
+        val ESCALATION_MESSAGE    = stringPreferencesKey("escalation_message")
+        val AUTO_REMINDER_ENABLED = booleanPreferencesKey("auto_reminder_enabled")
+        val AUTO_REMINDER_MESSAGE = stringPreferencesKey("auto_reminder_message")
         val AUTO_REPLY_DELAY_MS   = longPreferencesKey("auto_reply_delay_ms")
+        val INTERNET_SEARCH_ENABLED = booleanPreferencesKey("internet_search_enabled")
 
         // ─── Canales ───────────────────────────────────────────────────
         val CHANNEL_WHATSAPP      = booleanPreferencesKey("channel_whatsapp")
@@ -84,13 +88,26 @@ REGLAS:
     val profileTone: Flow<String> = context.dataStore.data.map { it[PROFILE_TONE] ?: "Profesional y amable" }
     suspend fun setProfileTone(tone: String) = context.dataStore.edit { it[PROFILE_TONE] = tone }
 
-    // ─── Google Account ───────────────────────────────────────────────
-    val googleAccountEmail: Flow<String> = context.dataStore.data.map { it[GOOGLE_ACCOUNT_EMAIL] ?: "" }
-    suspend fun setGoogleAccountEmail(email: String) = context.dataStore.edit { it[GOOGLE_ACCOUNT_EMAIL] = email }
+    // ─── Welcome, Escalation & Reminder Messages ──────────────────────
+    val welcomeMessage: Flow<String> = context.dataStore.data.map { it[WELCOME_MESSAGE] ?: "" }
+    suspend fun setWelcomeMessage(msg: String) = context.dataStore.edit { it[WELCOME_MESSAGE] = msg }
+
+    val escalationMessage: Flow<String> = context.dataStore.data.map { it[ESCALATION_MESSAGE] ?: "En este momento no tengo esa información, pero en breve un colega se pondrá en contacto contigo." }
+    suspend fun setEscalationMessage(msg: String) = context.dataStore.edit { it[ESCALATION_MESSAGE] = msg }
+
+    val autoReminderEnabled: Flow<Boolean> = context.dataStore.data.map { it[AUTO_REMINDER_ENABLED] ?: false }
+    suspend fun setAutoReminderEnabled(enabled: Boolean) = context.dataStore.edit { it[AUTO_REMINDER_ENABLED] = enabled }
+
+    val autoReminderMessage: Flow<String> = context.dataStore.data.map { it[AUTO_REMINDER_MESSAGE] ?: "¿Puedo ayudarte en algo más?" }
+    suspend fun setAutoReminderMessage(msg: String) = context.dataStore.edit { it[AUTO_REMINDER_MESSAGE] = msg }
 
     // ─── Reply delay ──────────────────────────────────────────────────
     val autoReplyDelayMs: Flow<Long> = context.dataStore.data.map { it[AUTO_REPLY_DELAY_MS] ?: 1500L }
     suspend fun setAutoReplyDelayMs(ms: Long) = context.dataStore.edit { it[AUTO_REPLY_DELAY_MS] = ms }
+
+    // ─── Internet Search ───────────────────────────────────────────────
+    val internetSearchEnabled: Flow<Boolean> = context.dataStore.data.map { it[INTERNET_SEARCH_ENABLED] ?: false }
+    suspend fun setInternetSearchEnabled(enabled: Boolean) = context.dataStore.edit { it[INTERNET_SEARCH_ENABLED] = enabled }
 
     // ─── Scheduler ───────────────────────────────────────────────────
 

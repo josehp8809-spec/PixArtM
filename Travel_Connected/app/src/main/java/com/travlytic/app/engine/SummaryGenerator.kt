@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
+import com.travlytic.app.data.db.entities.EscalationLog
 import com.travlytic.app.data.db.entities.ResponseLog
 import java.text.SimpleDateFormat
 import java.util.*
@@ -16,6 +17,7 @@ data class SessionSummary(
     val narrativeText: String,    // Texto narrado por Gemini
     val totalReplies: Int,
     val uniqueContacts: Int,
+    val totalEscalations: Int,
     val topTopics: List<String>,
     val topContacts: List<Pair<String, Int>>,  // contacto → nº de mensajes
     val generatedAt: Long = System.currentTimeMillis()
@@ -31,15 +33,17 @@ class SummaryGenerator @Inject constructor() {
     suspend fun generateSummary(
         apiKey: String,
         logs: List<ResponseLog>,
+        escalations: List<EscalationLog>,
         periodLabel: String = "hoy"  // "hoy", "esta semana", "últimas 24h"
     ): SessionSummary? {
-        if (logs.isEmpty()) return null
+        if (logs.isEmpty() && escalations.isEmpty()) return null
         if (apiKey.isBlank()) return null
 
         return try {
             // ─── Estadísticas base ───────────────────────────────────────
-            val uniqueContacts = logs.map { it.contact }.distinct()
-            val contactCount = logs.groupBy { it.contact }
+            val uniqueContacts = (logs.map { it.contact } + escalations.map { it.contact }).distinct()
+            val contactCount = (logs.map { it.contact } + escalations.map { it.contact })
+                .groupBy { it }
                 .map { Pair(it.key, it.value.size) }
                 .sortedByDescending { it.second }
                 .take(5)
@@ -53,11 +57,12 @@ class SummaryGenerator @Inject constructor() {
 Eres el asistente de análisis de Travlytic. Tu tarea es generar un RESUMEN EJECUTIVO breve, amigable y en español de la actividad del bot de WhatsApp de $periodLabel.
 
 DATOS DE ACTIVIDAD:
-- Total de mensajes respondidos: ${logs.size}
+- Total de mensajes respondidos automáticamente: ${logs.size}
+- Total de mensajes que requirieron escalado a humano: ${escalations.size}
 - Contactos únicos atendidos: ${uniqueContacts.size}
 - Contacto más activo: ${contactCount.firstOrNull()?.first ?: "N/A"} (${contactCount.firstOrNull()?.second ?: 0} mensajes)
 
-MUESTRA DE CONVERSACIONES:
+MUESTRA DE CONVERSACIONES (RESPONDIDAS AUTOMÁTICAMENTE):
 $logsText
 
 INSTRUCCIONES:
@@ -79,7 +84,7 @@ INSTRUCCIONES:
             )
 
             val response = model.generateContent(content { text(prompt) })
-            val narrativeText = response.text?.trim() ?: generateFallbackNarrative(logs, periodLabel)
+            val narrativeText = response.text?.trim() ?: generateFallbackNarrative(logs.size, escalations.size, uniqueContacts.size, periodLabel, contactCount.firstOrNull()?.first ?: "")
 
             // Extraer tópicos (heurística simple: palabras más frecuentes en preguntas)
             val topTopics = extractTopTopics(logs)
@@ -90,31 +95,33 @@ INSTRUCCIONES:
                 narrativeText = narrativeText,
                 totalReplies = logs.size,
                 uniqueContacts = uniqueContacts.size,
+                totalEscalations = escalations.size,
                 topTopics = topTopics,
                 topContacts = contactCount
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error generando resumen", e)
+            val unique = (logs.map { it.contact } + escalations.map { it.contact }).distinct()
+            val contactCountTop = (logs.map { it.contact } + escalations.map { it.contact })
+                .groupBy { it }
+                .map { Pair(it.key, it.value.size) }
+                .sortedByDescending { it.second }.take(5)
             // Fallback sin Gemini
             SessionSummary(
-                narrativeText = generateFallbackNarrative(logs, periodLabel),
+                narrativeText = generateFallbackNarrative(logs.size, escalations.size, unique.size, periodLabel, contactCountTop.firstOrNull()?.first ?: ""),
                 totalReplies = logs.size,
-                uniqueContacts = logs.map { it.contact }.distinct().size,
+                uniqueContacts = unique.size,
+                totalEscalations = escalations.size,
                 topTopics = extractTopTopics(logs),
-                topContacts = logs.groupBy { it.contact }
-                    .map { Pair(it.key, it.value.size) }
-                    .sortedByDescending { it.second }.take(5)
+                topContacts = contactCountTop
             )
         }
     }
 
     /** Resumen básico sin llamar a Gemini (fallback) */
-    private fun generateFallbackNarrative(logs: List<ResponseLog>, period: String): String {
-        val contacts = logs.map { it.contact }.distinct()
-        val topContact = logs.groupBy { it.contact }
-            .maxByOrNull { it.value.size }?.key ?: ""
-        return "¡Hola! Tu resumen de $period: Travlytic respondió ${logs.size} mensajes " +
-               "de ${contacts.size} contacto${if (contacts.size == 1) "" else "s"} diferentes. " +
+    private fun generateFallbackNarrative(replyCount: Int, escalateCount: Int, contactCount: Int, period: String, topContact: String): String {
+        return "¡Hola! Tu resumen de $period: Travlytic respondió $replyCount mensajes y escaló $escalateCount consultas " +
+               "de $contactCount contacto${if (contactCount == 1) "" else "s"} diferentes. " +
                (if (topContact.isNotBlank()) "El contacto más activo fue $topContact. " else "") +
                "El bot estuvo funcionando correctamente durante toda la sesión."
     }

@@ -1,10 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.devtools.ksp'
+    id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
 }
-
 
 
 android {
@@ -91,14 +90,14 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
 
     // Hilt (Dependency Injection)
-    implementation 'com.google.dagger:hilt-android:2.50'
-    ksp 'com.google.dagger:hilt-android-compiler:2.50'
+    implementation 'com.google.dagger:hilt-android:2.51.1'
+    kapt 'com.google.dagger:hilt-android-compiler:2.51.1'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
 
     // Room (SQLite local DB)
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.room:room-ktx:2.6.1'
-    ksp 'androidx.room:room-compiler:2.6.1'
+    kapt 'androidx.room:room-compiler:2.6.1'
 
     // DataStore (API Key y preferencias)
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
@@ -107,28 +106,15 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 
-    // Google Sign-In
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+    // WorkManager para Scraping en background
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
 
-    // Google API Client (Sheets API v4)
-    implementation ('com.google.api-client:google-api-client-android:2.2.0') {
-        exclude group: 'org.apache.httpcomponents'
-        exclude group: 'com.google.guava', module: 'guava-jdk5'
-    }
-    implementation ('com.google.apis:google-api-services-sheets:v4-rev612-1.25.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.36.0'
-    implementation 'com.google.http-client:google-http-client-gson:1.44.1'
-
+    // Apache POI para procesar archivos Excel localmente
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
     // Gemini AI SDK
     implementation 'com.google.ai.client.generativeai:generativeai:0.7.0'
 
     // JSON
     implementation 'com.google.code.gson:gson:2.10.1'
-
-    // Fix for checkDebugAndroidTestAarMetadata mutation error
-    implementation 'com.google.guava:guava:32.1.2-android'
-    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 }
 

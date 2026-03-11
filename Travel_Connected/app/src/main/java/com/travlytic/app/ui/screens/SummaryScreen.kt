@@ -292,6 +292,12 @@ fun StatisticsCard(summary: SessionSummary) {
                     label = "Contactos",
                     color = TravlyticGreen
                 )
+                StatPill(
+                    icon = Icons.Filled.Warning,
+                    value = "${summary.totalEscalations}",
+                    label = "Escalados",
+                    color = TravlyticOrange
+                )
             }
         }
     }
@@ -466,7 +472,7 @@ fun EmptySummaryCard(onGenerate: () -> Unit) {
             modifier = Modifier.fillMaxWidth().padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(Icons.Filled.SummarizeRounded, null,
+            Icon(Icons.Filled.AutoAwesome, null,
                 tint = TravlyticOnSurface2, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(12.dp))
             Text("Sin resumen generado aún",

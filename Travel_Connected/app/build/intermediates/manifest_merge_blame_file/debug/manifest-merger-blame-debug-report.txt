@@ -30,223 +30,382 @@
 22    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 22-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:5-77
 22-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:22-74
-23
-24    <permission
-24-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
-25        android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-25-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
-26        android:protectionLevel="signature" />
-26-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
-27
-28    <uses-permission android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-28-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
-28-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+23    <uses-permission android:name="android.permission.WAKE_LOCK" />
+23-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:5-68
+23-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:22-65
+24    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+24-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
+24-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:22-74
+25
+26    <permission
+26-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+27        android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+27-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+28        android:protectionLevel="signature" />
+28-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
 29
-30    <application
-30-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:17:5-64:19
-31        android:name="com.travlytic.app.TravlyticApp"
-31-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:9-37
-32        android:allowBackup="true"
-32-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:19:9-35
-33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-33-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\982d13a6468225faa8977985a375bde8\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
-34        android:debuggable="true"
-35        android:extractNativeLibs="false"
-36        android:icon="@mipmap/ic_launcher"
-36-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:9-43
-37        android:label="@string/app_name"
-37-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:21:9-41
-38        android:networkSecurityConfig="@xml/network_security_config"
-38-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-69
-39        android:roundIcon="@mipmap/ic_launcher_round"
-39-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:9-54
-40        android:supportsRtl="true"
-40-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-35
-41        android:theme="@style/Theme.Travlytic" >
-41-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-47
-42
-43        <!-- Actividad Principal -->
-44        <activity
-44-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-36:20
-45            android:name="com.travlytic.app.MainActivity"
-45-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:13-41
-46            android:exported="true"
-46-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:13-36
-47            android:theme="@style/Theme.Travlytic" >
-47-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:31:13-51
-48            <intent-filter>
-48-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:32:13-35:29
-49                <action android:name="android.intent.action.MAIN" />
-49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:17-69
-49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:25-66
-50
-51                <category android:name="android.intent.category.LAUNCHER" />
-51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:17-77
-51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:27-74
-52            </intent-filter>
-53        </activity>
-54
-55        <!--
-56            ================================================
-57            NOTIFICATION LISTENER SERVICE
-58            CRÍTICO: Requiere permiso especial del usuario
-59            en Ajustes → Apps → Acceso a notificaciones
-60            ================================================
-61        -->
-62        <service
-62-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:45:9-53:19
-63            android:name="com.travlytic.app.service.UniversalListenerService"
-63-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:46:13-61
-64            android:exported="true"
-64-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:49:13-36
-65            android:label="Travlytic Bot"
-65-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:47:13-42
-66            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
-66-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:48:13-87
-67            <intent-filter>
-67-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:13-52:29
-68                <action android:name="android.service.notification.NotificationListenerService" />
-68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:17-99
-68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:25-96
-69            </intent-filter>
-70        </service>
-71
-72        <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
-73        <receiver
-73-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:9-62:20
-74            android:name="com.travlytic.app.receiver.BootReceiver"
-74-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:13-50
-75            android:exported="true" >
-75-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:58:13-36
-76            <intent-filter>
-76-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:29
-77                <action android:name="android.intent.action.BOOT_COMPLETED" />
-77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-79
-77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:25-76
-78            </intent-filter>
-79        </receiver>
-80
-81        <activity
-81-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:23:9-27:75
-82            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-82-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:24:13-93
-83            android:excludeFromRecents="true"
-83-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:25:13-46
-84            android:exported="false"
-84-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:26:13-37
-85            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-85-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:27:13-72
-86        <!--
-87            Service handling Google Sign-In user revocation. For apps that do not integrate with
-88            Google Sign-In, this service will never be started.
-89        -->
-90        <service
-90-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:33:9-37:51
-91            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-91-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:34:13-89
-92            android:exported="true"
-92-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:35:13-36
-93            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-93-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:36:13-107
-94            android:visibleToInstantApps="true" />
-94-->[com.google.android.gms:play-services-auth:21.0.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\374eb9cdfc1ba41850dfbe058ce72d0f\transformed\play-services-auth-21.0.0\AndroidManifest.xml:37:13-48
-95
-96        <activity
-96-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\fb4f70923737e0f6840adaa4e7ec1bce\transformed\play-services-base-18.0.1\AndroidManifest.xml:20:9-22:45
-97            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-97-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\fb4f70923737e0f6840adaa4e7ec1bce\transformed\play-services-base-18.0.1\AndroidManifest.xml:20:19-85
-98            android:exported="false"
-98-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\fb4f70923737e0f6840adaa4e7ec1bce\transformed\play-services-base-18.0.1\AndroidManifest.xml:22:19-43
-99            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-99-->[com.google.android.gms:play-services-base:18.0.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\fb4f70923737e0f6840adaa4e7ec1bce\transformed\play-services-base-18.0.1\AndroidManifest.xml:21:19-78
-100        <activity
-100-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\e1d8bac079b1f77d6031db8db0d13a7d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-101            android:name="androidx.compose.ui.tooling.PreviewActivity"
-101-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\e1d8bac079b1f77d6031db8db0d13a7d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-102            android:exported="true" />
-102-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\e1d8bac079b1f77d6031db8db0d13a7d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-103
-104        <provider
-104-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-105            android:name="androidx.startup.InitializationProvider"
-105-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-106            android:authorities="com.travlytic.app.androidx-startup"
-106-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-107            android:exported="false" >
-107-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-108            <meta-data
-108-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-109                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-109-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-110                android:value="androidx.startup" />
-110-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4510e53f32a8dc91227b1fff17739d2f\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-111            <meta-data
-111-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4dba0bff3f3813c482c7478d05df8f63\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
-112                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-112-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4dba0bff3f3813c482c7478d05df8f63\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
-113                android:value="androidx.startup" />
-113-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4dba0bff3f3813c482c7478d05df8f63\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
-114            <meta-data
-114-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-115                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-116                android:value="androidx.startup" />
-116-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-117        </provider>
-118
-119        <service
-119-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4669ef4c9470bdcdae080e18bbe39f51\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
-120            android:name="androidx.room.MultiInstanceInvalidationService"
-120-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4669ef4c9470bdcdae080e18bbe39f51\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
-121            android:directBootAware="true"
-121-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4669ef4c9470bdcdae080e18bbe39f51\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+30    <uses-permission android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+30-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+30-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+31
+32    <application
+32-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:17:5-64:19
+33        android:name="com.travlytic.app.TravlyticApp"
+33-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:9-37
+34        android:allowBackup="true"
+34-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:19:9-35
+35        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+35-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+36        android:debuggable="true"
+37        android:extractNativeLibs="false"
+38        android:icon="@mipmap/ic_launcher"
+38-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:9-43
+39        android:label="@string/app_name"
+39-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:21:9-41
+40        android:networkSecurityConfig="@xml/network_security_config"
+40-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-69
+41        android:roundIcon="@mipmap/ic_launcher_round"
+41-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:9-54
+42        android:supportsRtl="true"
+42-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-35
+43        android:theme="@style/Theme.MinIto" >
+43-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-44
+44
+45        <!-- Actividad Principal -->
+46        <activity
+46-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-36:20
+47            android:name="com.travlytic.app.MainActivity"
+47-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:13-41
+48            android:exported="true"
+48-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:13-36
+49            android:theme="@style/Theme.MinIto" >
+49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:31:13-48
+50            <intent-filter>
+50-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:32:13-35:29
+51                <action android:name="android.intent.action.MAIN" />
+51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:17-69
+51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:25-66
+52
+53                <category android:name="android.intent.category.LAUNCHER" />
+53-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:17-77
+53-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:27-74
+54            </intent-filter>
+55        </activity>
+56
+57        <!--
+58            ================================================
+59            NOTIFICATION LISTENER SERVICE
+60            CRÍTICO: Requiere permiso especial del usuario
+61            en Ajustes → Apps → Acceso a notificaciones
+62            ================================================
+63        -->
+64        <service
+64-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:45:9-53:19
+65            android:name="com.travlytic.app.service.UniversalListenerService"
+65-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:46:13-61
+66            android:exported="true"
+66-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:49:13-36
+67            android:label="Travlytic Bot"
+67-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:47:13-42
+68            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:48:13-87
+69            <intent-filter>
+69-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:13-52:29
+70                <action android:name="android.service.notification.NotificationListenerService" />
+70-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:17-99
+70-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:25-96
+71            </intent-filter>
+72        </service>
+73
+74        <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+75        <receiver
+75-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:9-62:20
+76            android:name="com.travlytic.app.receiver.BootReceiver"
+76-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:13-50
+77            android:exported="true" >
+77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:58:13-36
+78            <intent-filter>
+78-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:29
+79                <action android:name="android.intent.action.BOOT_COMPLETED" />
+79-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-79
+79-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:25-76
+80            </intent-filter>
+81        </receiver>
+82
+83        <provider
+83-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:29:9-37:20
+84            android:name="androidx.startup.InitializationProvider"
+84-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:30:13-67
+85            android:authorities="com.travlytic.app.androidx-startup"
+85-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:31:13-68
+86            android:exported="false" >
+86-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:32:13-37
+87            <meta-data
+87-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:34:13-36:52
+88                android:name="androidx.work.WorkManagerInitializer"
+88-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:35:17-68
+89                android:value="androidx.startup" />
+89-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:36:17-49
+90            <meta-data
+90-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+91                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+91-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+92                android:value="androidx.startup" />
+92-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+93            <meta-data
+93-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+94                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+94-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+95                android:value="androidx.startup" />
+95-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+96            <meta-data
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+97                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+97-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+98                android:value="androidx.startup" />
+98-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+99        </provider>
+100
+101        <service
+101-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:39:9-45:35
+102            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+102-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:40:13-88
+103            android:directBootAware="false"
+103-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:41:13-44
+104            android:enabled="@bool/enable_system_alarm_service_default"
+104-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:42:13-72
+105            android:exported="false" />
+105-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:43:13-37
+106        <service
+106-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:46:9-52:35
+107            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+107-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:47:13-84
+108            android:directBootAware="false"
+108-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:48:13-44
+109            android:enabled="@bool/enable_system_job_service_default"
+109-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:49:13-70
+110            android:exported="true"
+110-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:50:13-36
+111            android:permission="android.permission.BIND_JOB_SERVICE" />
+111-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:51:13-69
+112        <service
+112-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:53:9-59:35
+113            android:name="androidx.work.impl.foreground.SystemForegroundService"
+113-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:54:13-81
+114            android:directBootAware="false"
+114-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:55:13-44
+115            android:enabled="@bool/enable_system_foreground_service_default"
+115-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:56:13-77
+116            android:exported="false" />
+116-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:57:13-37
+117
+118        <receiver
+118-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:61:9-66:35
+119            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
+119-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:62:13-88
+120            android:directBootAware="false"
+120-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:63:13-44
+121            android:enabled="true"
+121-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:64:13-35
 122            android:exported="false" />
-122-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\4669ef4c9470bdcdae080e18bbe39f51\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
-123
-124        <receiver
-124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-125            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-125-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-126            android:directBootAware="false"
-126-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-127            android:enabled="true"
-127-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-128            android:exported="true"
-128-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-129            android:permission="android.permission.DUMP" >
-129-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-130            <intent-filter>
-130-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-131                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-132            </intent-filter>
-133            <intent-filter>
-133-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-134                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-134-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-134-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-135            </intent-filter>
-136            <intent-filter>
-136-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-137                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-137-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-137-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-138            </intent-filter>
-139            <intent-filter>
-139-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-140                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-140-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-140-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\b2c7ed9982a1c653368706834760118c\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+122-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:65:13-37
+123        <receiver
+123-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:67:9-77:20
+124            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+124-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:68:13-106
+125            android:directBootAware="false"
+125-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:69:13-44
+126            android:enabled="false"
+126-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:70:13-36
+127            android:exported="false" >
+127-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:71:13-37
+128            <intent-filter>
+128-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:73:13-76:29
+129                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+129-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:17-87
+129-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:25-84
+130                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+130-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:17-90
+130-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:25-87
+131            </intent-filter>
+132        </receiver>
+133        <receiver
+133-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:78:9-88:20
+134            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
+134-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:79:13-104
+135            android:directBootAware="false"
+135-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:80:13-44
+136            android:enabled="false"
+136-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:81:13-36
+137            android:exported="false" >
+137-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:82:13-37
+138            <intent-filter>
+138-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:84:13-87:29
+139                <action android:name="android.intent.action.BATTERY_OKAY" />
+139-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:17-77
+139-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:25-74
+140                <action android:name="android.intent.action.BATTERY_LOW" />
+140-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:17-76
+140-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:25-73
 141            </intent-filter>
 142        </receiver>
-143
-144        <meta-data
-144-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\f2ea424ba4da7da06feb9e8cb52c04b3\transformed\play-services-basement-18.2.0\AndroidManifest.xml:21:9-23:69
-145            android:name="com.google.android.gms.version"
-145-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\f2ea424ba4da7da06feb9e8cb52c04b3\transformed\play-services-basement-18.2.0\AndroidManifest.xml:22:13-58
-146            android:value="@integer/google_play_services_version" />
-146-->[com.google.android.gms:play-services-basement:18.2.0] C:\Users\zyzen 3\.gradle\caches\9.0.0\transforms\f2ea424ba4da7da06feb9e8cb52c04b3\transformed\play-services-basement-18.2.0\AndroidManifest.xml:23:13-66
-147    </application>
-148
-149</manifest>
+143        <receiver
+143-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:89:9-99:20
+144            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
+144-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:90:13-104
+145            android:directBootAware="false"
+145-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:91:13-44
+146            android:enabled="false"
+146-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:92:13-36
+147            android:exported="false" >
+147-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:93:13-37
+148            <intent-filter>
+148-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:95:13-98:29
+149                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
+149-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:17-83
+149-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:25-80
+150                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
+150-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:17-82
+150-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:25-79
+151            </intent-filter>
+152        </receiver>
+153        <receiver
+153-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:100:9-109:20
+154            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
+154-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:101:13-103
+155            android:directBootAware="false"
+155-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:102:13-44
+156            android:enabled="false"
+156-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:103:13-36
+157            android:exported="false" >
+157-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:104:13-37
+158            <intent-filter>
+158-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:106:13-108:29
+159                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+159-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:17-79
+159-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:25-76
+160            </intent-filter>
+161        </receiver>
+162        <receiver
+162-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:110:9-121:20
+163            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+163-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:111:13-88
+164            android:directBootAware="false"
+164-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:112:13-44
+165            android:enabled="false"
+165-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:113:13-36
+166            android:exported="false" >
+166-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:114:13-37
+167            <intent-filter>
+167-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:116:13-120:29
+168                <action android:name="android.intent.action.BOOT_COMPLETED" />
+168-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-79
+168-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:25-76
+169                <action android:name="android.intent.action.TIME_SET" />
+169-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:17-73
+169-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:25-70
+170                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+170-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:17-81
+170-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:25-78
+171            </intent-filter>
+172        </receiver>
+173        <receiver
+173-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:122:9-131:20
+174            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+174-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:123:13-99
+175            android:directBootAware="false"
+175-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:124:13-44
+176            android:enabled="@bool/enable_system_alarm_service_default"
+176-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:125:13-72
+177            android:exported="false" >
+177-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:126:13-37
+178            <intent-filter>
+178-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:128:13-130:29
+179                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+179-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:17-98
+179-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:25-95
+180            </intent-filter>
+181        </receiver>
+182        <receiver
+182-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:132:9-142:20
+183            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+183-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:133:13-78
+184            android:directBootAware="false"
+184-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:134:13-44
+185            android:enabled="true"
+185-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:135:13-35
+186            android:exported="true"
+186-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:136:13-36
+187            android:permission="android.permission.DUMP" >
+187-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:137:13-57
+188            <intent-filter>
+188-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:139:13-141:29
+189                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+189-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:17-88
+189-->[androidx.work:work-runtime:2.9.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\35b5cb3d5113aee2e2e11de7b0d8941d\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:25-85
+190            </intent-filter>
+191        </receiver>
+192
+193        <activity
+193-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+194            android:name="androidx.compose.ui.tooling.PreviewActivity"
+194-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+195            android:exported="true" />
+195-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+196
+197        <service
+197-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+198            android:name="androidx.room.MultiInstanceInvalidationService"
+198-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+199            android:directBootAware="true"
+199-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+200            android:exported="false" />
+200-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+201
+202        <receiver
+202-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+203            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+203-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+204            android:directBootAware="false"
+204-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+205            android:enabled="true"
+205-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+206            android:exported="true"
+206-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+207            android:permission="android.permission.DUMP" >
+207-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+208            <intent-filter>
+208-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+209                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+209-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+209-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+210            </intent-filter>
+211            <intent-filter>
+211-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+212                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+212-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+212-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+213            </intent-filter>
+214            <intent-filter>
+214-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+215                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+215-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+215-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+216            </intent-filter>
+217            <intent-filter>
+217-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+218                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+218-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+218-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+219            </intent-filter>
+220        </receiver>
+221
+222        <meta-data
+222-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:23:9-25:69
+223            android:name="com.google.android.gms.version"
+223-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:24:13-58
+224            android:value="@integer/google_play_services_version" />
+224-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:25:13-66
+225    </application>
+226
+227</manifest>

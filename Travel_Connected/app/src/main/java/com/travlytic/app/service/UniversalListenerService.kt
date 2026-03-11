@@ -8,14 +8,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.service.notification.NotificationListenerService
-import android.os.Bundle
-import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.RemoteInput
+import android.app.RemoteInput
 import com.travlytic.app.R
+import com.travlytic.app.data.db.dao.EscalationLogDao
 import com.travlytic.app.data.db.dao.ResponseLogDao
+import com.travlytic.app.data.db.entities.EscalationLog
 import com.travlytic.app.data.db.entities.ResponseLog
 import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.engine.GeminiAgent
@@ -37,13 +37,14 @@ class UniversalListenerService : NotificationListenerService() {
 
     @Inject lateinit var geminiAgent: GeminiAgent
     @Inject lateinit var responseLogDao: ResponseLogDao
+    @Inject lateinit var escalationLogDao: EscalationLogDao
     @Inject lateinit var appPreferences: AppPreferences
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     // ─── Motor Anti-Bucle ──────────────────────────────────────────────
     private val recentlyReplied = mutableMapOf<String, Long>()
-    private val REPLY_COOLDOWN_MS = 30_000L // 30 segundos de cooldown por contacto
+    private val REPLY_COOLDOWN_MS = 2_000L // 2 segundos de cooldown por contacto para evitar spam iterativo, pero permitir flujo natural
 
     // Caché circular estricto (últimos 15 mensajes) para Anti-Bucle de IA a IA
     private val recentResponseHashes = object : LinkedHashMap<Int, Long>(15, 0.75f, true) {
@@ -52,6 +53,9 @@ class UniversalListenerService : NotificationListenerService() {
         }
     }
     private val ANTI_LOOP_COOLDOWN_MS = 30_000L // 30 segundos IGNORANDO ecos
+
+    // ─── Temporizadores de Auto-Recordatorio ───────────────────────────
+    private val activeReminders = mutableMapOf<String, Job>()
 
     override fun onCreate() {
         super.onCreate()
@@ -116,9 +120,13 @@ class UniversalListenerService : NotificationListenerService() {
                 // 2. Extraer extras
                 val extras = notification.extras ?: return@launch
                 val contactName = extras.getString("android.title") ?: return@launch
-                val messageText = extras.getCharSequence("android.text")?.toString() ?: return@launch
+                val messageText = sbn.notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
 
-                // 3. Checar mensajes vacíos o nulos
+                // Cancelar cualquier recordatorio pendiente porque el usuario acaba de escribir
+                activeReminders[contactName]?.cancel()
+                activeReminders.remove(contactName)
+
+                // Verificaciones Anti-Bucle...s vacíos o nulos
                 if (messageText.isBlank()) return@launch
                 if (contactName.isBlank()) return@launch
 
@@ -145,7 +153,6 @@ class UniversalListenerService : NotificationListenerService() {
                 }
 
                 // Cooldown: evitar spam de respuestas al mismo contacto
-                val now = System.currentTimeMillis()
                 val lastReplied = recentlyReplied[contactName] ?: 0L
                 if (now - lastReplied < REPLY_COOLDOWN_MS) {
                     Log.d(TAG, "Cooldown activo para '$contactName', ignorando mensaje")
@@ -153,6 +160,43 @@ class UniversalListenerService : NotificationListenerService() {
                 }
 
                 Log.d(TAG, "Mensaje de '$contactName': $messageText")
+
+                // Extracción de audio si existe en el MessagingStyle
+                var audioBytes: ByteArray? = null
+                val messagingStyle = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(notification)
+                messagingStyle?.messages?.lastOrNull()?.let { lastMsg ->
+                    if (lastMsg.dataMimeType?.startsWith("audio/") == true) {
+                        lastMsg.dataUri?.let { uri ->
+                            try {
+                                contentResolver.openInputStream(uri)?.use { stream ->
+                                    audioBytes = stream.readBytes()
+                                    Log.d(TAG, "Audio extraído correctamente de Notification")
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error leyendo URI de audio", e)
+                            }
+                        }
+                    }
+                }
+
+                // Lógica de Mensaje de Bienvenida
+                val logCount = responseLogDao.getLogCountForContact(contactName)
+                if (logCount == 0) {
+                    val welcomeMsg = appPreferences.welcomeMessage.first()
+                    if (welcomeMsg.isNotBlank()) {
+                        sendUniversalReply(sbn, welcomeMsg)
+                        responseLogDao.insert(
+                            ResponseLog(
+                                contact = contactName,
+                                incomingMessage = messageText,
+                                sentResponse = welcomeMsg,
+                                timestamp = System.currentTimeMillis()
+                            )
+                        )
+                        recentResponseHashes[welcomeMsg.hashCode()] = System.currentTimeMillis()
+                        delay(2000) // Pequeña pausa
+                    }
+                }
 
                 // Delay configurable (simula que alguien está escribiendo)
                 val delayMs = appPreferences.autoReplyDelayMs.first()
@@ -163,6 +207,7 @@ class UniversalListenerService : NotificationListenerService() {
                 val usrName = appPreferences.profileUserName.first()
                 val busName = appPreferences.profileBusinessName.first()
                 val tne = appPreferences.profileTone.first()
+                val searchEnabled = appPreferences.internetSearchEnabled.first()
 
                 // Generar respuesta con Gemini
                 val response = geminiAgent.generateResponse(
@@ -172,11 +217,30 @@ class UniversalListenerService : NotificationListenerService() {
                     userMessage = messageText,
                     userName = usrName,
                     businessName = busName,
-                    tone = tne
+                    tone = tne,
+                    audioData = audioBytes,
+                    internetSearchEnabled = searchEnabled
                 )
 
                 if (response.isNullOrBlank()) {
                     Log.w(TAG, "Gemini no generó respuesta para '$contactName'")
+                    return@launch
+                }
+
+                if (response.contains("ESCALATE_REQUIRED")) {
+                    Log.w(TAG, "Señal de escalado detectada. Gemini no encontró información en Contexto.")
+                    val escalationMsg = appPreferences.escalationMessage.first()
+                    sendUniversalReply(sbn, escalationMsg)
+                    
+                    escalationLogDao.insert(
+                        EscalationLog(
+                            contact = contactName,
+                            originalMessage = messageText,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                    recentResponseHashes[escalationMsg.hashCode()] = System.currentTimeMillis()
+                    recentlyReplied[contactName] = System.currentTimeMillis()
                     return@launch
                 }
 
@@ -201,6 +265,31 @@ class UniversalListenerService : NotificationListenerService() {
                         )
                     )
                     Log.d(TAG, "Respuesta enviada a '$contactName' [$pkg]: $response")
+
+                    // Programar Auto-Recordatorio (5 minutos de inactividad)
+                    val reminderEnabled = appPreferences.autoReminderEnabled.first()
+                    if (reminderEnabled) {
+                        val reminderMessage = appPreferences.autoReminderMessage.first()
+                        if (reminderMessage.isNotBlank()) {
+                            activeReminders[contactName] = serviceScope.launch {
+                                delay(5 * 60 * 1000L) // 5 minutos
+                                val reminderSent = sendUniversalReply(sbn, reminderMessage)
+                                if (reminderSent) {
+                                    recentResponseHashes[reminderMessage.hashCode()] = System.currentTimeMillis()
+                                    responseLogDao.insert(
+                                        ResponseLog(
+                                            contact = contactName,
+                                            incomingMessage = "[Auto-Recordatorio Sistémico]",
+                                            sentResponse = reminderMessage,
+                                            timestamp = System.currentTimeMillis()
+                                        )
+                                    )
+                                    Log.d(TAG, "Auto-Recordatorio enviado a '$contactName'")
+                                }
+                                activeReminders.remove(contactName)
+                            }
+                        }
+                    }
                 }
 
             } catch (e: Exception) {

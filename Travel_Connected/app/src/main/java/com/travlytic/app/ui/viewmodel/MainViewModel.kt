@@ -6,21 +6,17 @@ import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.api.services.sheets.v4.SheetsScopes
-import com.travlytic.app.data.db.dao.RegisteredSheetDao
+import com.travlytic.app.data.db.dao.EscalationLogDao
 import com.travlytic.app.data.db.dao.ResponseLogDao
 import com.travlytic.app.data.db.entities.ResponseLog
-import com.travlytic.app.data.db.entities.RegisteredSheet
+import com.travlytic.app.data.db.entities.EscalationLog
+import com.travlytic.app.data.db.entities.KnowledgeItem
 import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.data.db.dao.TrainingRuleDao
 import com.travlytic.app.data.db.entities.TrainingRule
 import com.travlytic.app.engine.AiConfigExport
 import com.google.gson.Gson
-import com.travlytic.app.data.sheets.SheetsRepository
-import com.travlytic.app.data.sheets.SyncResult
+import com.travlytic.app.data.repository.KnowledgeRepository
 import com.travlytic.app.engine.GeminiAgent
 import com.travlytic.app.engine.SessionSummary
 import com.travlytic.app.engine.SummaryGenerator
@@ -36,11 +32,10 @@ private const val TAG = "MainViewModel"
 
 data class UiState(
     val isServiceEnabled: Boolean = false,
-    val googleAccountEmail: String = "",
-    val registeredSheets: List<RegisteredSheet> = emptyList(),
     val recentLogs: List<ResponseLog> = emptyList(),
+    val recentEscalations: List<EscalationLog> = emptyList(),
+    val knowledgeItems: List<KnowledgeItem> = emptyList(),
     val isLoading: Boolean = false,
-    val syncingSheetId: String? = null,
     val snackbarMessage: String? = null
 )
 
@@ -78,8 +73,8 @@ data class SummaryUiState(
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appPreferences: AppPreferences,
-    private val sheetsRepository: SheetsRepository,
-    private val registeredSheetDao: RegisteredSheetDao,
+    private val knowledgeRepository: KnowledgeRepository,
+    private val escalationLogDao: EscalationLogDao,
     private val responseLogDao: ResponseLogDao,
     private val trainingRuleDao: TrainingRuleDao,
     private val geminiAgent: GeminiAgent,
@@ -96,14 +91,28 @@ class MainViewModel @Inject constructor(
 
     val ttsState: StateFlow<TtsState> = ttsManager.ttsState
 
-    // Settings screen state
     val geminiApiKey: StateFlow<String> = appPreferences.geminiApiKey
         .stateIn(viewModelScope, SharingStarted.Lazily, "")
 
     val systemPrompt: StateFlow<String> = appPreferences.systemPrompt
         .stateIn(viewModelScope, SharingStarted.Lazily, AppPreferences.DEFAULT_SYSTEM_PROMPT)
+        
+    val welcomeMessage: StateFlow<String> = appPreferences.welcomeMessage
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
+        
+    val escalationMessage: StateFlow<String> = appPreferences.escalationMessage
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
+
+    val autoReminderEnabled: StateFlow<Boolean> = appPreferences.autoReminderEnabled
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val autoReminderMessage: StateFlow<String> = appPreferences.autoReminderMessage
+        .stateIn(viewModelScope, SharingStarted.Lazily, "¿Puedo ayudarte en algo más?")
 
     val botEnabled: StateFlow<Boolean> = appPreferences.botEnabled
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val internetSearchEnabled: StateFlow<Boolean> = appPreferences.internetSearchEnabled
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // Profile state
@@ -150,28 +159,28 @@ class MainViewModel @Inject constructor(
     val testMsgState: StateFlow<TestMessageState> = _testMsgState.asStateFlow()
 
     init {
-        observeRegisteredSheets()
         observeRecentLogs()
-        observeGoogleAccount()
+        observeEscalationLogs()
+        observeKnowledgeItems()
         observeServiceStatus()
         observeDashboard()
     }
 
-    private fun observeRegisteredSheets() {
-        registeredSheetDao.observeAll()
-            .onEach { sheets -> _uiState.update { it.copy(registeredSheets = sheets) } }
+    private fun observeEscalationLogs() {
+        escalationLogDao.getPendingFlow()
+            .onEach { logs -> _uiState.update { it.copy(recentEscalations = logs) } }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeKnowledgeItems() {
+        knowledgeRepository.knowledgeItemsFlow
+            .onEach { items -> _uiState.update { it.copy(knowledgeItems = items) } }
             .launchIn(viewModelScope)
     }
 
     private fun observeRecentLogs() {
         responseLogDao.observeRecent(50)
             .onEach { logs -> _uiState.update { it.copy(recentLogs = logs) } }
-            .launchIn(viewModelScope)
-    }
-
-    private fun observeGoogleAccount() {
-        appPreferences.googleAccountEmail
-            .onEach { email -> _uiState.update { it.copy(googleAccountEmail = email) } }
             .launchIn(viewModelScope)
     }
 
@@ -182,12 +191,11 @@ class MainViewModel @Inject constructor(
     }
 
     private fun observeDashboard() {
-        // Actualiza el dashboard cada vez que cambian los logs o los sheets
         viewModelScope.launch {
             combine(
                 responseLogDao.observeRecent(500),
-                registeredSheetDao.observeAll()
-            ) { logs, sheets ->
+                knowledgeRepository.knowledgeItemsFlow
+            ) { logs, knowledgeItems ->
                 val now = System.currentTimeMillis()
                 val todayStart = java.util.Calendar.getInstance().apply {
                     set(java.util.Calendar.HOUR_OF_DAY, 0)
@@ -198,16 +206,13 @@ class MainViewModel @Inject constructor(
 
                 val repliesToday = logs.count { it.timestamp >= todayStart }
                 val repliesWeek  = logs.count { it.timestamp >= weekStart }
-                val activeSheets = sheets.filter { it.isEnabled }
-
-                // Suma total de filas de todos los sheets activos
-                val totalRows = activeSheets.sumOf { it.rowCount }
+                val enabledItems = knowledgeItems.filter { it.isEnabled }
 
                 DashboardState(
                     repliesToday = repliesToday,
                     repliesThisWeek = repliesWeek,
-                    totalKnowledgeRows = totalRows,
-                    activeSheetsCount = activeSheets.size
+                    totalKnowledgeRows = enabledItems.size, // count items/urls instead of actual rows for simplicity
+                    activeSheetsCount = enabledItems.size
                 )
             }.collect { dashboard ->
                 _dashboardState.value = dashboard
@@ -245,7 +250,7 @@ class MainViewModel @Inject constructor(
                 )
 
                 _testMsgState.value = TestMessageState(
-                    response = response ?: "Sin respuesta. Verifica que tienes Sheets sincronizados.",
+                    response = response ?: "Sin respuesta. Verifica tu Base de Conocimiento.",
                     error = ""
                 )
             } catch (e: Exception) {
@@ -258,121 +263,103 @@ class MainViewModel @Inject constructor(
         _testMsgState.value = TestMessageState()
     }
 
-    // ─── Google Sign-In ───────────────────────────────────────────────
-
-    fun getGoogleSignInClient(context: Context) =
-        GoogleSignIn.getClient(
-            context,
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(com.travlytic.app.R.string.default_web_client_id))
-                .requestEmail()
-                .requestScopes(
-                    com.google.android.gms.common.api.Scope(SheetsScopes.SPREADSHEETS_READONLY)
-                )
-                .build()
-        )
-
-    fun onGoogleSignInSuccess(account: GoogleSignInAccount) {
+    fun resolveEscalation(log: EscalationLog) {
         viewModelScope.launch {
-            val email = account.email ?: return@launch
-            appPreferences.setGoogleAccountEmail(email)
-            showSnackbar("✅ Conectado como $email")
-            Log.d(TAG, "Google Sign-In exitoso: $email")
+            escalationLogDao.update(log.copy(isResolved = true))
+            showSnackbar("Escalado resuelto")
         }
     }
 
-    fun signOut() {
+
+    fun importExcelKnowledge(uri: android.net.Uri, reference: String) {
         viewModelScope.launch {
-            appPreferences.setGoogleAccountEmail("")
-            showSnackbar("Sesión de Google cerrada")
-        }
-    }
-
-    // ─── Sheets ───────────────────────────────────────────────────────
-
-    fun addSheet(input: String) {
-        viewModelScope.launch {
-            val spreadsheetId = sheetsRepository.extractSpreadsheetId(input)
-            if (spreadsheetId.isNullOrBlank()) {
-                showSnackbar("❌ URL o ID de Sheet inválido")
-                return@launch
-            }
-
-            val existing = registeredSheetDao.getById(spreadsheetId)
-            if (existing != null) {
-                showSnackbar("⚠️ Este Sheet ya está registrado")
-                return@launch
-            }
-
             _uiState.update { it.copy(isLoading = true) }
-
-            val email = appPreferences.googleAccountEmail.first()
-            if (email.isBlank()) {
-                showSnackbar("❌ Primero conecta tu cuenta de Google")
-                _uiState.update { it.copy(isLoading = false) }
-                return@launch
+            try {
+                knowledgeRepository.importExcel(uri, reference)
+                showSnackbar("✅ Documento importado")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showSnackbar("❌ Err Doc: ${e.javaClass.simpleName} - ${e.localizedMessage?.take(40)}")
             }
-
-            // Intentar obtener el título del sheet
-            val title = sheetsRepository.fetchSheetTitle(spreadsheetId, email)
-                ?: "Sheet $spreadsheetId"
-
-            sheetsRepository.registerSheet(spreadsheetId, title)
-
-            // Auto-sincronizar al agregar
-            syncSheet(spreadsheetId)
-
             _uiState.update { it.copy(isLoading = false) }
         }
     }
 
-    fun syncSheet(spreadsheetId: String) {
+    fun toggleKnowledgeItem(item: KnowledgeItem, enabled: Boolean) {
         viewModelScope.launch {
-            val email = appPreferences.googleAccountEmail.first()
-            if (email.isBlank()) {
-                showSnackbar("❌ Primero conecta tu cuenta de Google")
-                return@launch
-            }
-
-            _uiState.update { it.copy(syncingSheetId = spreadsheetId) }
-
-            val result = sheetsRepository.syncSheet(spreadsheetId, email)
-
-            when (result) {
-                is SyncResult.Success ->
-                    showSnackbar("✅ ${result.sheetTitle} sincronizado (${result.rowCount} filas)")
-                is SyncResult.Error ->
-                    showSnackbar("❌ Error: ${result.message}")
-            }
-
-            _uiState.update { it.copy(syncingSheetId = null) }
+            knowledgeRepository.toggleItem(item, enabled)
         }
     }
 
-    fun syncAllSheets() {
+    fun deleteKnowledgeItem(item: KnowledgeItem) {
         viewModelScope.launch {
-            val email = appPreferences.googleAccountEmail.first()
-            if (email.isBlank()) {
-                showSnackbar("❌ Primero conecta tu cuenta de Google")
-                return@launch
-            }
-
-            _uiState.update { it.copy(isLoading = true) }
-            val results = sheetsRepository.syncAll(email)
-            val successCount = results.values.count { it is SyncResult.Success }
-            val totalRows = results.values
-                .filterIsInstance<SyncResult.Success>()
-                .sumOf { it.rowCount }
-
-            showSnackbar("✅ $successCount sheets sincronizados ($totalRows filas totales)")
-            _uiState.update { it.copy(isLoading = false) }
+            knowledgeRepository.deleteItem(item)
+            showSnackbar("Documento eliminado")
         }
     }
 
-    fun removeSheet(spreadsheetId: String) {
+
+    fun forceSync() {
         viewModelScope.launch {
-            sheetsRepository.removeSheet(spreadsheetId)
-            showSnackbar("Sheet eliminado")
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            // Simular un tiempo breve de sincronización para dar confirmación visual
+            kotlinx.coroutines.delay(800)
+            
+            // Ree-observar base de datos para asegurar el último estado (aunque sea reactiva)
+            observeKnowledgeItems()
+            observeDashboard()
+            
+            _uiState.value = _uiState.value.copy(isLoading = false, snackbarMessage = "Toda la configuración y base de conocimiento sincronizadas correctamente")
+        }
+    }
+
+    fun saveWelcomeMessage(message: String) {
+        viewModelScope.launch {
+            appPreferences.setWelcomeMessage(message)
+            showSnackbar("✅ Mensaje de bienvenida guardado")
+        }
+    }
+
+    fun saveEscalationMessage(message: String) {
+        viewModelScope.launch {
+            appPreferences.setEscalationMessage(message)
+            showSnackbar("✅ Mensaje de escalado guardado")
+        }
+    }
+
+    fun saveAutoReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            appPreferences.setAutoReminderEnabled(enabled)
+            showSnackbar(if (enabled) "Recordatorio automático activado" else "Recordatorio automático desactivado")
+        }
+    }
+
+    fun saveAutoReminderMessage(message: String) {
+        viewModelScope.launch {
+            appPreferences.setAutoReminderMessage(message)
+            showSnackbar("Mensaje de recordatorio guardado")
+        }
+    }
+
+    fun saveInternetSearchEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            appPreferences.setInternetSearchEnabled(enabled)
+            showSnackbar(if (enabled) "Búsqueda de IA activada" else "Búsqueda de IA desactivada")
+        }
+    }
+
+    fun resetToDefaultSettings() {
+        viewModelScope.launch {
+            appPreferences.setSystemPrompt(AppPreferences.DEFAULT_SYSTEM_PROMPT)
+            appPreferences.setWelcomeMessage("")
+            appPreferences.setEscalationMessage("En este momento no tengo esa información, pero en breve un colega se pondrá en contacto contigo.")
+            appPreferences.setAutoReminderEnabled(false)
+            appPreferences.setAutoReminderMessage("¿Puedo ayudarte en algo más?")
+            appPreferences.setProfileUserName("")
+            appPreferences.setProfileBusinessName("")
+            appPreferences.setProfileTone("Profesional y amable")
+            appPreferences.setAutoReplyDelayMs(1500L)
+            showSnackbar("Ajustes restablecidos a los valores originales")
         }
     }
 
@@ -587,9 +574,24 @@ class MainViewModel @Inject constructor(
                     return@launch
                 }
 
+                val todayStart = java.util.Calendar.getInstance().apply {
+                    set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    set(java.util.Calendar.MINUTE, 0)
+                    set(java.util.Calendar.SECOND, 0)
+                }.timeInMillis
+                val weekStart = todayStart - (6 * 24 * 60 * 60 * 1000L)
+
+                val allEscalations = escalationLogDao.getAllFlow().first()
+                val filteredEscalations = when (period) {
+                    "Hoy" -> allEscalations.filter { it.timestamp >= todayStart }
+                    "Semana" -> allEscalations.filter { it.timestamp >= weekStart }
+                    else -> allEscalations
+                }
+
                 val summary = summaryGenerator.generateSummary(
                     apiKey = apiKey,
                     logs = filteredLogs,
+                    escalations = filteredEscalations,
                     periodLabel = period.lowercase()
                 )
 

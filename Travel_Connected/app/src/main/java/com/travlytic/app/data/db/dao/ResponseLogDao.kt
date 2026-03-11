@@ -21,4 +21,10 @@ interface ResponseLogDao {
 
     @Query("SELECT COUNT(*) FROM response_log")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM response_log WHERE contact = :contactName")
+    suspend fun getLogCountForContact(contactName: String): Int
+
+    @Query("SELECT * FROM response_log WHERE contact = :contactName ORDER BY timestamp DESC LIMIT :limit")
+    suspend fun getRecentForContact(contactName: String, limit: Int = 10): List<ResponseLog>
 }

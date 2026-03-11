@@ -3,12 +3,11 @@ package com.travlytic.app.di
 import android.content.Context
 import androidx.room.Room
 import com.travlytic.app.data.db.AppDatabase
-import com.travlytic.app.data.db.dao.RegisteredSheetDao
+import com.travlytic.app.data.db.dao.EscalationLogDao
+import com.travlytic.app.data.db.dao.KnowledgeItemDao
 import com.travlytic.app.data.db.dao.ResponseLogDao
-import com.travlytic.app.data.db.dao.SheetDataDao
 import com.travlytic.app.data.db.dao.TrainingRuleDao
 import com.travlytic.app.data.prefs.AppPreferences
-import com.travlytic.app.data.sheets.SheetsRepository
 import com.travlytic.app.engine.GeminiAgent
 import com.travlytic.app.engine.SummaryGenerator
 import com.travlytic.app.engine.TtsManager
@@ -34,10 +33,10 @@ object AppModule {
     }
 
     @Provides @Singleton
-    fun provideSheetDataDao(db: AppDatabase): SheetDataDao = db.sheetDataDao()
+    fun provideKnowledgeItemDao(db: AppDatabase): KnowledgeItemDao = db.knowledgeItemDao()
 
     @Provides @Singleton
-    fun provideRegisteredSheetDao(db: AppDatabase): RegisteredSheetDao = db.registeredSheetDao()
+    fun provideEscalationLogDao(db: AppDatabase): EscalationLogDao = db.escalationLogDao()
 
     @Provides @Singleton
     fun provideResponseLogDao(db: AppDatabase): ResponseLogDao = db.responseLogDao()
@@ -48,20 +47,6 @@ object AppModule {
     @Provides @Singleton
     fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences =
         AppPreferences(context)
-
-    @Provides @Singleton
-    fun provideSheetsRepository(
-        @ApplicationContext context: Context,
-        sheetDataDao: SheetDataDao,
-        registeredSheetDao: RegisteredSheetDao
-    ): SheetsRepository = SheetsRepository(context, sheetDataDao, registeredSheetDao)
-
-    @Provides @Singleton
-    fun provideGeminiAgent(
-        sheetDataDao: SheetDataDao,
-        registeredSheetDao: RegisteredSheetDao,
-        trainingRuleDao: TrainingRuleDao
-    ): GeminiAgent = GeminiAgent(sheetDataDao, registeredSheetDao, trainingRuleDao)
 
     @Provides @Singleton
     fun provideSummaryGenerator(): SummaryGenerator = SummaryGenerator()

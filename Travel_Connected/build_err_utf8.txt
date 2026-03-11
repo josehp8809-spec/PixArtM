@@ -1,0 +1,410 @@
+﻿> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :app:kaptDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:compileDebugKotlin
+.\gradlew.bat : e: file:///
+C:/Users/zyzen%203/PixArtM/
+Travel_Connected/app/src/ma
+in/java/com/travlytic/app/e
+ngine/SummaryGenerator.kt:8
+7:84 Type mismatch: 
+inferred type is 
+List<ResponseLog> but Int 
+was expected
+En línea: 1 Carácter: 1
++ .\gradlew.bat 
+assembleDebug > 
+build_err.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (e:   
+  file:///C:/U...nt was    
+ expected:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/engine/SummaryGen
+erator.kt:87:90 Type 
+mismatch: inferred type is 
+String but Int was expected
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/engine/SummaryGen
+erator.kt:87:90 No value 
+passed for parameter 
+'contactCount'
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/engine/SummaryGen
+erator.kt:87:90 No value 
+passed for parameter 
+'period'
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/engine/SummaryGen
+erator.kt:87:90 No value 
+passed for parameter 
+'topContact'
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:50:97 
+Unresolved reference: 
+LaunchedEffect
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:50:112 
+Unresolved reference: 
+uiState
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:51:9 
+Unresolved reference: 
+uiState
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:52:13 
+Unresolved reference: 
+snackbarHostState
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:52:44 
+Unresolved reference: it
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:58:39 
+Unresolved reference: 
+snackbarHostState
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:150:17 
+Overload resolution 
+ambiguity: 
+public fun 
+OutlinedTextField(value: 
+TextFieldValue, 
+onValueChange: 
+(TextFieldValue) -> Unit, 
+modifier: Modifier = ..., 
+enabled: Boolean = ..., 
+readOnly: Boolean = ..., 
+textStyle: TextStyle = 
+..., label: (() -> Unit)? 
+= ..., placeholder: (() -> 
+Unit)? = ..., leadingIcon: 
+(() -> Unit)? = ..., 
+trailingIcon: (() -> 
+Unit)? = ..., prefix: (() 
+-> Unit)? = ..., suffix: 
+(() -> Unit)? = ..., 
+supportingText: (() -> 
+Unit)? = ..., isError: 
+Boolean = ..., 
+visualTransformation: 
+VisualTransformation = 
+..., keyboardOptions: 
+KeyboardOptions = ..., 
+keyboardActions: 
+KeyboardActions = ..., 
+singleLine: Boolean = ..., 
+maxLines: Int = ..., 
+minLines: Int = ..., 
+interactionSource: 
+MutableInteractionSource = 
+..., shape: Shape = ..., 
+colors: TextFieldColors = 
+...): Unit defined in 
+androidx.compose.material3
+public fun 
+OutlinedTextField(value: 
+String, onValueChange: 
+(String) -> Unit, 
+modifier: Modifier = ..., 
+enabled: Boolean = ..., 
+readOnly: Boolean = ..., 
+textStyle: TextStyle = 
+..., label: (() -> Unit)? 
+= ..., placeholder: (() -> 
+Unit)? = ..., leadingIcon: 
+(() -> Unit)? = ..., 
+trailingIcon: (() -> 
+Unit)? = ..., prefix: (() 
+-> Unit)? = ..., suffix: 
+(() -> Unit)? = ..., 
+supportingText: (() -> 
+Unit)? = ..., isError: 
+Boolean = ..., 
+visualTransformation: 
+VisualTransformation = 
+..., keyboardOptions: 
+KeyboardOptions = ..., 
+keyboardActions: 
+KeyboardActions = ..., 
+singleLine: Boolean = ..., 
+maxLines: Int = ..., 
+minLines: Int = ..., 
+interactionSource: 
+MutableInteractionSource = 
+..., shape: Shape = ..., 
+colors: TextFieldColors = 
+...): Unit defined in 
+androidx.compose.material3
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:152:57 
+Unresolved reference: it
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:153:37 
+@Composable invocations 
+can only happen from the 
+context of a @Composable 
+function
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:181:29 
+Unresolved reference: 
+apiKeyInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:182:39 
+Unresolved reference: 
+apiKeyInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:182:53 
+Unresolved reference: it
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:183:31 
+@Composable invocations 
+can only happen from the 
+context of a @Composable 
+function
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:184:37 
+@Composable invocations 
+can only happen from the 
+context of a @Composable 
+function
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:186:25 
+@Composable invocations 
+can only happen from the 
+context of a @Composable 
+function
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:186:48 
+Unresolved reference: 
+showApiKey
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:186:62 
+Unresolved reference: 
+showApiKey
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:188:37 
+Unresolved reference: 
+showApiKey
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:193:48 
+Unresolved reference: 
+showApiKey
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:206:64 
+Unresolved reference: 
+apiKeyInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:207:35 
+Unresolved reference: 
+apiKeyInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:207:63 
+Unresolved reference: 
+apiKeyInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:242:29 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:243:39 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:243:53 
+Unresolved reference: it
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:244:31 
+@Composable invocations 
+can only happen from the 
+context of a @Composable 
+function
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:258:29 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:268:64 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:269:35 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/screens/Settin
+gsScreen.kt:269:66 
+Unresolved reference: 
+promptInput
+e: file:///C:/Users/zyzen%2
+03/PixArtM/Travel_Connected
+/app/src/main/java/com/trav
+lytic/app/ui/viewmodel/Main
+ViewModel.kt:543:21 No 
+value passed for parameter 
+'escalations'
+
+> Task :app:compileDebugKotlin FAILED
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task 
+':app:compileDebugKotlin'.
+> A failure occurred while 
+executing org.jetbrains.kot
+lin.compilerRunner.GradleCo
+mpilerRunnerWithWorkers$Gra
+dleKotlinCompilerWorkAction
+   > Compilation error. 
+See log for more details
+
+* Try:
+> Run with --stacktrace 
+option to get the stack 
+trace.
+> Run with --info or 
+--debug option to get more 
+log output.
+> Run with --scan to get 
+full insights.
+> Get more help at 
+https://help.gradle.org.
+
+BUILD FAILED in 54s
+28 actionable tasks: 2 executed, 26 up-to-date

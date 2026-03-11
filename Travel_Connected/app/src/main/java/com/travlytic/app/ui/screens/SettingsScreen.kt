@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +27,6 @@ import com.travlytic.app.ui.viewmodel.MainViewModel
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.common.api.ApiException
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
@@ -44,28 +43,21 @@ fun SettingsScreen(
 ) {
     val geminiKey by viewModel.geminiApiKey.collectAsState()
     val systemPrompt by viewModel.systemPrompt.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val welcomeMessage by viewModel.welcomeMessage.collectAsState()
+    val escalationMessage by viewModel.escalationMessage.collectAsState()
+    val autoReminderEnabled by viewModel.autoReminderEnabled.collectAsState()
+    val autoReminderMessage by viewModel.autoReminderMessage.collectAsState()
+    val internetSearchEnabled by viewModel.internetSearchEnabled.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
-
+    
     var apiKeyInput by remember(geminiKey) { mutableStateOf(geminiKey) }
     var promptInput by remember(systemPrompt) { mutableStateOf(systemPrompt) }
     var showApiKey by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    // Google Sign-In launcher
-    val signInLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                viewModel.onGoogleSignInSuccess(account)
-            } catch (e: ApiException) {
-                // Error manejado silenciosamente / info via snackbar en viewmodel
-            }
-        }
-    }
+    var welcomeInput by remember(welcomeMessage) { mutableStateOf(welcomeMessage) }
+    var escalationInput by remember(escalationMessage) { mutableStateOf(escalationMessage) }    
+    var autoReminderInput by remember(autoReminderMessage) { mutableStateOf(autoReminderMessage) }    
+    
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
@@ -97,10 +89,10 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ─── Base de Conocimiento (Sheets) ─────────────────────────────
+            // ─── Base de Conocimiento ─────────────────────────────
             SettingsSection(title = "📚 Fuente de Conocimiento") {
                 Text(
-                    "Agrega y sincroniza los Google Sheets de donde Gemini sacará las respuestas.",
+                    "Agrega archivos Excel locales y URLs web de donde Gemini tomará las respuestas.",
                     color = TravlyticOnSurface2, fontSize = 12.sp
                 )
                 Spacer(Modifier.height(12.dp))
@@ -133,16 +125,109 @@ fun SettingsScreen(
                 }
             }
 
-            // ─── Google Account ────────────────────────────────────────────
-            SettingsSection(title = "☁️ Sincronización") {
-                GoogleAccountCard(
-                    email = uiState.googleAccountEmail,
-                    onSignIn = {
-                        val client = viewModel.getGoogleSignInClient(context)
-                        signInLauncher.launch(client.signInIntent)
-                    },
-                    onSignOut = { viewModel.signOut() }
+            // ─── Mensajes Automáticos ──────────────────────────────────────────
+            SettingsSection(title = "💬 Mensajes Automáticos") {
+                Text(
+                    "Mensaje de Bienvenida (Primer contacto)",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
                 )
+                OutlinedTextField(
+                    value = welcomeInput,
+                    onValueChange = { welcomeInput = it },
+                    placeholder = { Text("Ej. ¡Hola! Bienvenido a Travelers.") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
+                    colors = settingsTextFieldColors(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = { viewModel.saveWelcomeMessage(welcomeInput) },
+                        enabled = welcomeInput != welcomeMessage,
+                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                    ) {
+                        Text("Guardar Bienvenida")
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    "Mensaje de Escalado (Cuando el AI no sabe qué responder)",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                OutlinedTextField(
+                    value = escalationInput,
+                    onValueChange = { escalationInput = it },
+                    placeholder = { Text("Ej. Un agente te atenderá en breve.") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
+                    colors = settingsTextFieldColors(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = { viewModel.saveEscalationMessage(escalationInput) },
+                        enabled = escalationInput != escalationMessage,
+                        colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                    ) {
+                        Text("Guardar Escalado")
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Recordatorio de Inactividad (5 min)",
+                            color = TravlyticOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "Enviar si el usuario no responde después de 5 min.",
+                            color = TravlyticOnSurface2, fontSize = 12.sp
+                        )
+                    }
+                    Switch(
+                        checked = autoReminderEnabled,
+                        onCheckedChange = { viewModel.saveAutoReminderEnabled(it) },
+                        colors = SwitchDefaults.colors(checkedThumbColor = TravlyticBlue, checkedTrackColor = TravlyticBlue.copy(alpha = 0.5f))
+                    )
+                }
+
+                if (autoReminderEnabled) {
+                    OutlinedTextField(
+                        value = autoReminderInput,
+                        onValueChange = { autoReminderInput = it },
+                        placeholder = { Text("Ej. ¿Puedo ayudarte en algo más?") },
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
+                        colors = settingsTextFieldColors(),
+                        singleLine = false,
+                        maxLines = 2
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            onClick = { viewModel.saveAutoReminderMessage(autoReminderInput) },
+                            enabled = autoReminderInput != autoReminderMessage,
+                            colors = ButtonDefaults.buttonColors(containerColor = TravlyticBlue)
+                        ) {
+                            Text("Guardar Recordatorio")
+                        }
+                    }
+                }
             }
 
             // ─── Gemini API Key ────────────────────────────────────────
@@ -172,6 +257,30 @@ fun SettingsScreen(
                     colors = settingsTextFieldColors(),
                     singleLine = true
                 )
+                Spacer(Modifier.height(16.dp))
+                
+                // Toggle para búsqueda en internet
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Búsqueda de IA (Internet)",
+                            color = TravlyticOnSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "Permite que el bot use conocimiento general si lo autorizas en tus reglas.",
+                            color = TravlyticOnSurface2, fontSize = 12.sp
+                        )
+                    }
+                    Switch(
+                        checked = internetSearchEnabled,
+                        onCheckedChange = { viewModel.saveInternetSearchEnabled(it) },
+                        colors = SwitchDefaults.colors(checkedThumbColor = TravlyticBlue, checkedTrackColor = TravlyticBlue.copy(alpha = 0.5f))
+                    )
+                }
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -287,15 +396,32 @@ fun SettingsScreen(
                 }
             }
 
+            // ─── Sistema ───────────────────────────────────────────────
+            SettingsSection(title = "⚙️ Sistema") {
+                Text(
+                    "Restaura todas las configuraciones globales, reglas y mensajes a sus valores de fábrica originales.",
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = { viewModel.resetToDefaultSettings() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Icon(Icons.Filled.Warning, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Restablecer a Valores Originales")
+                }
+            }
+
             // ─── Info Section ──────────────────────────────────────────
             SettingsSection(title = "ℹ️ Información") {
                 InfoRow("Versión", "1.0.0")
-                InfoRow("Motor IA", "Gemini 2.0 Flash")
+                InfoRow("Motor IA", "Gemini 2.5 Flash")
                 InfoRow("Base de datos", "Room (SQLite local)")
-                InfoRow("Sheets API", "v4")
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Travlytic responde automáticamente mensajes de WhatsApp usando tu contenido de Google Sheets como fuente de conocimiento.",
+                    "Travlytic responde automáticamente mensajes de WhatsApp usando tu contenido local de Excel como fuente de conocimiento.",
                     color = TravlyticOnSurface2, fontSize = 12.sp, lineHeight = 18.sp
                 )
             }

@@ -1,0 +1,52 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Left large node (deep blue) -->
+    <path
+        android:pathData="M30,75 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0"
+        android:fillColor="#1A52F0"/>
+
+    <!-- Right large node (cyan) -->
+    <path
+        android:pathData="M90,28 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0"
+        android:fillColor="#00D4FF"/>
+
+    <!-- Small node center-left -->
+    <path
+        android:pathData="M52,60 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#1A8DF0"/>
+
+    <!-- Small node center-right -->
+    <path
+        android:pathData="M71,42 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#00BBF0"/>
+
+    <!-- Curves: upper crossing arc from left-node to right-node (going up through center) -->
+    <path
+        android:pathData="M30,75 C30,58 52,52 60,52 C68,52 90,45 90,28"
+        android:strokeColor="#1A72F0"
+        android:strokeWidth="4"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
+    <!-- Curves: lower crossing arc (inverse bow) from left-node up to right-node -->
+    <path
+        android:pathData="M30,75 C35,90 62,86 72,75 C82,64 90,50 90,28"
+        android:strokeColor="#00CCFF"
+        android:strokeWidth="4"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
+    <!-- Diagonal cross: from bottom-right area to top-left area -->
+    <path
+        android:pathData="M52,60 L71,42"
+        android:strokeColor="#1A90F5"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
+</vector>

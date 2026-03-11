@@ -3,6 +3,11 @@ package com.travlytic.app.ui.screens
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,9 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.travlytic.app.R
+import com.travlytic.app.data.db.entities.EscalationLog
+import com.travlytic.app.data.db.entities.ResponseLog
+import com.travlytic.app.ui.theme.*
+import com.travlytic.app.ui.viewmodel.DashboardState
+import com.travlytic.app.ui.viewmodel.MainViewModel
 import com.travlytic.app.ui.viewmodel.TestMessageState
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,8 +56,6 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val dashboardState by viewModel.dashboardState.collectAsState()
-    val testMsgState by viewModel.testMsgState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val testMsgState by viewModel.testMsgState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showTestMessage by remember { mutableStateOf(false) }
@@ -88,21 +97,24 @@ fun HomeScreen(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            painter = painterResource(id = R.drawable.travlytic_logo),
-                            contentDescription = "Travlytic Logo",
+                            painter = painterResource(id = R.drawable.minito_logo),
+                            contentDescription = "MINI-TO Logo",
                             modifier = Modifier
                                 .size(36.dp)
-                                .clip(RoundedCornerShape(8.dp))
                         )
                         Spacer(Modifier.width(10.dp))
-                        Text(
-                            "Travlytic",
+                    Text(
+                            "MINI-TO",
                             fontWeight = FontWeight.Bold,
                             color = TravlyticOnSurface
                         )
                     }
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.forceSync() }) {
+                        Icon(Icons.Filled.Sync, contentDescription = "Sincronizar",
+                            tint = TravlyticBlue)
+                    }
                     IconButton(onClick = onNavigateToSummary) {
                         Icon(Icons.Filled.AutoAwesome, contentDescription = "Resumen",
                             tint = TravlyticBlue)
@@ -141,6 +153,28 @@ fun HomeScreen(
             // ─── Dashboard Card ────────────────────────────────────────────
             item {
                 DashboardCard(dashboardState)
+            }
+
+            // ─── Alertas de Escalado ───────────────────────────────────────────────
+            if (uiState.recentEscalations.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "🚨 Alertas de Escalado",
+                            color = TravlyticOrange,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+                items(uiState.recentEscalations, key = { "esc_${it.id}" }) { log ->
+                    EscalationCard(log, onResolve = { viewModel.resolveEscalation(it) })
+                }
             }
 
             // ─── Test Message Section ─────────────────────────────────────
@@ -217,8 +251,6 @@ fun HomeScreen(
 
             item { Spacer(Modifier.height(24.dp)) }
         }
-    }
-
     }
 }
 
@@ -478,10 +510,46 @@ fun TestMessageCard(
                 }
             }
 
-            // Error
             if (state.error.isNotBlank()) {
                 Spacer(Modifier.height(8.dp))
                 Text(state.error, color = TravlyticRed, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun EscalationCard(log: EscalationLog, onResolve: (EscalationLog) -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = TravlyticSurface3),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(log.contact, color = TravlyticOnSurface, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(
+                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp)),
+                    color = TravlyticOnSurface2, fontSize = 12.sp
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Pregunta: \"${log.originalMessage}\"",
+                color = TravlyticOnSurface2, fontSize = 13.sp,
+                maxLines = 3, overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = { onResolve(log) },
+                colors = ButtonDefaults.buttonColors(containerColor = TravlyticOrange),
+                modifier = Modifier.align(Alignment.End),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Marcar Atendido")
             }
         }
     }

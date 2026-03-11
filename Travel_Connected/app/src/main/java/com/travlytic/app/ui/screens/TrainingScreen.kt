@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +46,7 @@ fun TrainingScreen(
                 putExtra(Intent.EXTRA_TEXT, json)
                 type = "text/plain"
             }
-            val shareIntent = Intent.createChooser(sendIntent, "Exportar Configuración Travlytic")
+            val shareIntent = Intent.createChooser(sendIntent, "Exportar Configuración MINI-TO")
             context.startActivity(shareIntent)
             viewModel.clearExportEvent()
         }

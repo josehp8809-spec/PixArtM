@@ -1,0 +1,22 @@
+﻿
+> Task :app:checkKotlin
+GradlePluginConfigurati
+onErrors
+> Task :app:processDebu
+gResources FAILED
+FAILURE: Build failed 
+with an exception.
+Execution failed for 
+task ':app:processDebug
+Resources'.
+   > Android resource 
+linking failed
+     ERROR: AAPT: 
+error: resource android
+:style/Theme.Material.N
+oTitleBar not found.
+     error: failed 
+linking references.
+BUILD FAILED in 33s
+
+
