@@ -21,6 +21,7 @@ import com.travlytic.app.engine.GeminiAgent
 import com.travlytic.app.engine.SessionSummary
 import com.travlytic.app.engine.SummaryGenerator
 import com.travlytic.app.engine.TtsManager
+import com.travlytic.app.data.model.TimeRange
 import com.travlytic.app.engine.TtsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,7 +32,9 @@ import javax.inject.Inject
 private const val TAG = "MainViewModel"
 
 data class UiState(
-    val isServiceEnabled: Boolean = false,
+    val isServiceEnabled: Boolean = false, // Estado manual
+    val isEffectivelyEnabled: Boolean = false, // Estado real (Manual o Horario)
+    val activationReason: String = "", // "manual", "horario" o ""
     val recentLogs: List<ResponseLog> = emptyList(),
     val recentEscalations: List<EscalationLog> = emptyList(),
     val knowledgeItems: List<KnowledgeItem> = emptyList(),
@@ -41,10 +44,7 @@ data class UiState(
 
 data class ScheduleState(
     val enabled: Boolean = false,
-    val startHour: Int = 8,
-    val startMinute: Int = 0,
-    val endHour: Int = 20,
-    val endMinute: Int = 0,
+    val timeRanges: List<TimeRange> = emptyList(),
     val activeDays: Set<Int> = setOf(1, 2, 3, 4, 5)
 )
 
@@ -134,19 +134,13 @@ class MainViewModel @Inject constructor(
     // ─── Schedule State ───────────────────────────────────────────────
     val scheduleState: StateFlow<ScheduleState> = combine(
         appPreferences.scheduleEnabled,
-        appPreferences.scheduleStartHour,
-        appPreferences.scheduleStartMinute,
-        appPreferences.scheduleEndHour,
-        appPreferences.scheduleEndMinute,
+        appPreferences.scheduleList,
         appPreferences.scheduleDays
-    ) { values ->
+    ) { enabled, list, days ->
         ScheduleState(
-            enabled      = values[0] as Boolean,
-            startHour    = values[1] as Int,
-            startMinute  = values[2] as Int,
-            endHour      = values[3] as Int,
-            endMinute    = values[4] as Int,
-            activeDays   = @Suppress("UNCHECKED_CAST") (values[5] as Set<Int>)
+            enabled     = enabled,
+            timeRanges  = list,
+            activeDays  = days
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, ScheduleState())
 
@@ -185,9 +179,53 @@ class MainViewModel @Inject constructor(
     }
 
     private fun observeServiceStatus() {
-        appPreferences.botEnabled
-            .onEach { enabled -> _uiState.update { it.copy(isServiceEnabled = enabled) } }
-            .launchIn(viewModelScope)
+        val ticker = flow {
+            while (true) {
+                emit(Unit)
+                kotlinx.coroutines.delay(30_000) // Check cada 30 seg
+            }
+        }
+
+        combine(
+            appPreferences.botEnabled,
+            scheduleState,
+            ticker
+        ) { manual, schedule, _ ->
+            val isTimed = isInsideSchedule(schedule)
+            val effective = manual || isTimed
+            val reason = when {
+                manual -> "manual"
+                isTimed -> "horario"
+                else -> ""
+            }
+            Triple(effective, reason, manual)
+        }.onEach { (effective, reason, manual) ->
+            _uiState.update { it.copy(
+                isServiceEnabled = manual,
+                isEffectivelyEnabled = effective,
+                activationReason = reason
+            ) }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun isInsideSchedule(state: ScheduleState): Boolean {
+        if (!state.enabled || state.timeRanges.isEmpty()) return false
+        val now = java.util.Calendar.getInstance()
+        val currentMins = now.get(java.util.Calendar.HOUR_OF_DAY) * 60 + now.get(java.util.Calendar.MINUTE)
+        val dayNum = if (now.get(java.util.Calendar.DAY_OF_WEEK) == java.util.Calendar.SUNDAY) 7 else now.get(java.util.Calendar.DAY_OF_WEEK) - 1
+        
+        if (dayNum !in state.activeDays) return false
+        
+        return state.timeRanges.any { range ->
+            val startMins = range.startHour * 60 + range.startMinute
+            val endMins = range.endHour * 60 + range.endMinute
+            
+            if (endMins > startMins) {
+                currentMins in startMins..endMins
+            } else {
+                currentMins >= startMins || currentMins <= endMins
+            }
+        }
     }
 
     private fun observeDashboard() {
@@ -516,12 +554,26 @@ class MainViewModel @Inject constructor(
         appPreferences.setScheduleEnabled(enabled)
     }
 
-    fun setScheduleStart(hour: Int, minute: Int) = viewModelScope.launch {
-        appPreferences.setScheduleStart(hour, minute)
+    fun addScheduleRange(startH: Int, startM: Int, endH: Int, endM: Int) = viewModelScope.launch {
+        val current = appPreferences.scheduleList.first().toMutableList()
+        current.add(TimeRange(startH, startM, endH, endM))
+        appPreferences.setScheduleList(current)
     }
 
-    fun setScheduleEnd(hour: Int, minute: Int) = viewModelScope.launch {
-        appPreferences.setScheduleEnd(hour, minute)
+    fun removeScheduleRange(index: Int) = viewModelScope.launch {
+        val current = appPreferences.scheduleList.first().toMutableList()
+        if (index in current.indices) {
+            current.removeAt(index)
+            appPreferences.setScheduleList(current)
+        }
+    }
+
+    fun updateScheduleRange(index: Int, range: TimeRange) = viewModelScope.launch {
+        val current = appPreferences.scheduleList.first().toMutableList()
+        if (index in current.indices) {
+            current[index] = range
+            appPreferences.setScheduleList(current)
+        }
     }
 
     fun setScheduleDays(days: Set<Int>) = viewModelScope.launch {

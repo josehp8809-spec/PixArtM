@@ -12,7 +12,7 @@ import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "TtsManager"
+private const val TAG = "MINITO-TTS"
 private const val UTTERANCE_ID = "travlytic_summary"
 
 enum class TtsState { IDLE, SPEAKING, PAUSED, ERROR }

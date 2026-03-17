@@ -11,6 +11,7 @@ import com.travlytic.app.data.prefs.AppPreferences
 import com.travlytic.app.engine.GeminiAgent
 import com.travlytic.app.engine.SummaryGenerator
 import com.travlytic.app.engine.TtsManager
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +29,7 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "travlytic_database"
+            "minito_database"
         ).fallbackToDestructiveMigration().build()
     }
 
@@ -45,8 +46,11 @@ object AppModule {
     fun provideTrainingRuleDao(db: AppDatabase): TrainingRuleDao = db.trainingRuleDao()
 
     @Provides @Singleton
-    fun provideAppPreferences(@ApplicationContext context: Context): AppPreferences =
-        AppPreferences(context)
+    fun provideGson(): Gson = Gson()
+
+    @Provides @Singleton
+    fun provideAppPreferences(@ApplicationContext context: Context, gson: Gson): AppPreferences =
+        AppPreferences(context, gson)
 
     @Provides @Singleton
     fun provideSummaryGenerator(): SummaryGenerator = SummaryGenerator()

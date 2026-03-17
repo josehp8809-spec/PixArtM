@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.travlytic.app-mergeDebugResources-64:/values-sw/values-sw.xml",
+            "outputFile": "com.travlytic.app-mergeDebugResources-61:/values-sw/values-sw.xml",
             "map": [
                 {
                     "source": "C:\\Users\\zyzen 3\\.gradle\\caches\\transforms-4\\b017b098666cd69f2425384ff9ca7c25\\transformed\\material3-release\\res\\values-sw\\values-sw.xml",

@@ -14,8 +14,8 @@ color travlytic_green
 color travlytic_orange
 color travlytic_red
 drawable ic_bot_active
+drawable ic_escalation_alert
 drawable minito_logo
-drawable travlytic_logo
 mipmap ic_launcher
 mipmap ic_launcher_round
 string add_sheet
@@ -25,12 +25,12 @@ string bot_active
 string bot_inactive
 string connect_google
 string default_web_client_id
+string minito_notification_active
+string minito_notification_channel
 string no_logs
 string no_sheets
 string notification_permission_warning
 string settings
 string sync_all
-string travlytic_notification_active
-string travlytic_notification_channel
 style Theme.MinIto
 xml network_security_config

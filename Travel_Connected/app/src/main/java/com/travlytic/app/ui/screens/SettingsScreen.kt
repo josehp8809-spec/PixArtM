@@ -421,8 +421,8 @@ fun SettingsScreen(
                 InfoRow("Base de datos", "Room (SQLite local)")
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Travlytic responde automáticamente mensajes de WhatsApp usando tu contenido local de Excel como fuente de conocimiento.",
-                    color = TravlyticOnSurface2, fontSize = 12.sp, lineHeight = 18.sp
+                    "MINI-TO responde automáticamente mensajes de WhatsApp usando tu contenido local de Excel como fuente de conocimiento.",
+                    color = MinItoOnSurface2, fontSize = 12.sp, lineHeight = 18.sp
                 )
             }
 
@@ -435,11 +435,11 @@ fun SettingsScreen(
 fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = TravlyticSurface2),
+        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(title, color = TravlyticOnSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(title, color = MinItoOnSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             Spacer(Modifier.height(12.dp))
             content()
         }

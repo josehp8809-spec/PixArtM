@@ -2,6 +2,7 @@ package com.travlytic.app.ui.screens
 
 import android.app.TimePickerDialog
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,7 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -52,7 +56,7 @@ fun ScheduleScreen(
                 title = { Text("Horarios", color = MinItoOnSurface, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver", tint = MinItoOnSurface)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MinItoSurface)
@@ -101,48 +105,80 @@ fun ScheduleScreen(
                 }
             }
 
-            // ─── Time Range ───────────────────────────────────────────
+            // ─── Details ─────────────────────────────────────────────
             AnimatedVisibility(scheduleState.enabled) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text("🕐 Rango de horas",
-                                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
-                            Spacer(Modifier.height(16.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TimePickerButton(
-                                    label = "Inicio",
-                                    hour = scheduleState.startHour,
-                                    minute = scheduleState.startMinute,
-                                    context = context
-                                ) { h, m -> viewModel.setScheduleStart(h, m) }
-
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(Icons.Filled.ArrowForward, null,
-                                        tint = MinItoOnSurface2, modifier = Modifier.size(20.dp))
-                                    Text(calculateDuration(
-                                        scheduleState.startHour, scheduleState.startMinute,
-                                        scheduleState.endHour, scheduleState.endMinute
-                                    ),
-                                        color = MinItoOnSurface2, fontSize = 11.sp)
+                    Text("🕐 Horarios de atención", 
+                        color = MinItoOnSurface, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 8.dp))
+                    
+                    scheduleState.timeRanges.forEachIndexed { index, range ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Column(Modifier.padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("Rango ${index + 1}", color = MinItoBlue, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    if (scheduleState.timeRanges.size > 1) {
+                                        IconButton(
+                                            onClick = { viewModel.removeScheduleRange(index) },
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            Icon(Icons.Filled.Delete, "Eliminar", tint = MinItoRed, modifier = Modifier.size(18.dp))
+                                        }
+                                    }
                                 }
-
-                                TimePickerButton(
-                                    label = "Fin",
-                                    hour = scheduleState.endHour,
-                                    minute = scheduleState.endMinute,
-                                    context = context
-                                ) { h, m -> viewModel.setScheduleEnd(h, m) }
+                                Spacer(Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TimePickerButton(
+                                        label = "Inicio",
+                                        hour = range.startHour,
+                                        minute = range.startMinute,
+                                        context = context
+                                    ) { h, m -> 
+                                        viewModel.updateScheduleRange(index, range.copy(startHour = h, startMinute = m)) 
+                                    }
+    
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowForward, null,
+                                            tint = MinItoOnSurface2, modifier = Modifier.size(20.dp))
+                                        Text(calculateDuration(range.startHour, range.startMinute, range.endHour, range.endMinute),
+                                            color = MinItoOnSurface2, fontSize = 11.sp)
+                                    }
+    
+                                    TimePickerButton(
+                                        label = "Fin",
+                                        hour = range.endHour,
+                                        minute = range.endMinute,
+                                        context = context
+                                    ) { h, m -> 
+                                        viewModel.updateScheduleRange(index, range.copy(endHour = h, endMinute = m)) 
+                                    }
+                                }
                             }
+                        }
+                    }
+
+                    if (scheduleState.timeRanges.size < 5) {
+                        OutlinedButton(
+                            onClick = { viewModel.addScheduleRange(9, 0, 18, 0) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, MinItoBlue),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MinItoBlue)
+                        ) {
+                            Icon(Icons.Filled.Add, "Agregar", modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Agregar otro rango")
                         }
                     }
 
@@ -179,8 +215,8 @@ fun ScheduleScreen(
                                     onClick = { viewModel.setScheduleDays(setOf(1,2,3,4,5)) },
                                     label = { Text("Lun–Vie", fontSize = 11.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = TravlyticBlue.copy(alpha = 0.2f),
-                                        selectedLabelColor = TravlyticBlue
+                                        selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
+                                        selectedLabelColor = MinItoBlue
                                     )
                                 )
                                 FilterChip(
@@ -188,14 +224,14 @@ fun ScheduleScreen(
                                     onClick = { viewModel.setScheduleDays(setOf(6,7)) },
                                     label = { Text("Fin de semana", fontSize = 11.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = TravlyticBlue.copy(alpha = 0.2f),
-                                        selectedLabelColor = TravlyticBlue
+                                        selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
+                                        selectedLabelColor = MinItoBlue
                                     )
                                 )
                                 FilterChip(
                                     selected = scheduleState.activeDays == (1..7).toSet(),
                                     onClick = { viewModel.setScheduleDays((1..7).toSet()) },
-                                    label = { Text("Todos", fontSize = 11.sp) },
+                                    label = { Text("Toda la semana", fontSize = 11.sp) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         selectedContainerColor = MinItoGreen.copy(alpha = 0.2f),
                                         selectedLabelColor = MinItoGreen
@@ -309,11 +345,17 @@ private fun calculateDuration(sh: Int, sm: Int, eh: Int, em: Int): String {
 
 private fun buildScheduleSummary(state: com.travlytic.app.ui.viewmodel.ScheduleState): String {
     if (!state.enabled) return "El bot responde las 24 horas, todos los días."
+    if (state.timeRanges.isEmpty()) return "No hay horarios configurados. El bot no responderá automáticamente."
+    
     val days = state.activeDays.sorted().joinToString(", ") {
         listOf("", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom").getOrElse(it) { "?" }
     }
-    return "Activo de ${String.format("%02d:%02d", state.startHour, state.startMinute)}" +
-           " a ${String.format("%02d:%02d", state.endHour, state.endMinute)}\n$days"
+    
+    val ranges = state.timeRanges.joinToString("\n") { r ->
+        "• ${String.format("%02d:%02d", r.startHour, r.startMinute)} a ${String.format("%02d:%02d", r.endHour, r.endMinute)}"
+    }
+    
+    return "Días: $days\nHorarios:\n$ranges"
 }
 
 @Composable

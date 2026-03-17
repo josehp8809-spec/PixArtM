@@ -101,7 +101,7 @@ fun TrainingScreen(
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MinItoSurface,
-                contentColor = TravlyticBlue,
+                contentColor = MinItoBlue,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),

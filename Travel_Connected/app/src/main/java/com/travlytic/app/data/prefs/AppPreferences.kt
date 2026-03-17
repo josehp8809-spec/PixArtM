@@ -6,10 +6,13 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.travlytic.app.data.model.TimeRange
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "minito_prefs")
 
-class AppPreferences(private val context: Context) {
+class AppPreferences(private val context: Context, private val gson: Gson) {
 
     companion object {
         // Básicos
@@ -41,6 +44,7 @@ class AppPreferences(private val context: Context) {
         val SCHEDULE_END_M    = intPreferencesKey("schedule_end_minute")
         /** Días activos: Set de ints 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb, 7=Dom */
         val SCHEDULE_DAYS     = stringPreferencesKey("schedule_days")
+        val SCHEDULE_LIST     = stringPreferencesKey("schedule_list_json")
 
         const val DEFAULT_SYSTEM_PROMPT = """Eres MINI-TO, un asistente de respuesta automática para WhatsApp.
 Tu misión es responder mensajes de forma natural, precisa y concisa basándote EXCLUSIVAMENTE en la información proporcionada en tu base de conocimiento.
@@ -135,5 +139,27 @@ REGLAS:
     }
     suspend fun setScheduleDays(days: Set<Int>) = context.dataStore.edit {
         it[SCHEDULE_DAYS] = days.joinToString(",")
+    }
+
+    val scheduleList: Flow<List<TimeRange>> = context.dataStore.data.map { prefs ->
+        val json = prefs[SCHEDULE_LIST]
+        if (json.isNullOrBlank()) {
+            val sH = prefs[SCHEDULE_START_H] ?: 8
+            val sM = prefs[SCHEDULE_START_M] ?: 0
+            val eH = prefs[SCHEDULE_END_H] ?: 20
+            val eM = prefs[SCHEDULE_END_M] ?: 0
+            listOf(TimeRange(sH, sM, eH, eM))
+        } else {
+            try {
+                val type = object : TypeToken<List<TimeRange>>() {}.type
+                gson.fromJson<List<TimeRange>>(json, type) ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
+    }
+
+    suspend fun setScheduleList(list: List<TimeRange>) = context.dataStore.edit {
+        it[SCHEDULE_LIST] = gson.toJson(list)
     }
 }

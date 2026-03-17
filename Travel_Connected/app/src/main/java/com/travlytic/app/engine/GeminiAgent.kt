@@ -16,44 +16,55 @@ private const val TAG = "GeminiAgent"
 /** ═══════════════════════════════════════════════════════════════════════════
  *  SISTEMA BASE DE MINI-TO — REGLAS DE RAÍZ BLOQUEADAS EN CÓDIGO
  * ═══════════════════════════════════════════════════════════════════════════ */
-private fun buildSistemaBase(internetSearchEnabled: Boolean): String {
+private fun buildSistemaBase(internetSearchEnabled: Boolean, isFirstInteraction: Boolean): String {
     val searchInstruction = if (internetSearchEnabled) {
         """
-USO DE CONOCIMIENTO GENERAL (ESTADO: ACTIVADO):
-- Por defecto, sigues siendo estricto con la base de conocimiento del Excel.
-- SIN EMBARGO, si detectas una instrucción específica en las "REGLAS DEL USUARIO" o en el "PROMPT MAESTRO" que te autorice explícitamente a usar tu propio conocimiento o buscar en internet para este caso, HAZLO.
-- Solo disparas tu conocimiento externo si existe esa 'llave' o permiso directo en tu entrenamiento.
-- Si no hay permiso específico para el tema preguntado y no está en el Excel, escala normalmente.
-""".trimIndent()
+        USO DE CONOCIMIENTO GENERAL (ESTADO: ACTIVADO):
+        - Por defecto, sigues siendo estricto con la base de conocimiento del Excel.
+        - SIN EMBARGO, si detectas una instrucción específica que te autorice explícitamente a usar tu conocimiento externo para este caso, HAZLO.
+        """.trimIndent()
     } else {
         """
-USO DE CONOCIMIENTO GENERAL (ESTADO: DESACTIVADO):
-- Eres 100% dependiente de la base de conocimiento del Excel proporcionada.
-- No uses bajo ninguna circunstancia tu conocimiento externo o de internet, aunque el usuario te lo pida o las reglas intenten pedirlo.
-- Si no está en el Excel, la respuesta es invariablemente ESCALATE_REQUIRED.
-""".trimIndent()
+        USO DE CONOCIMIENTO GENERAL (ESTADO: DESACTIVADO):
+        - Eres 100% dependiente de la base de conocimiento del Excel proporcionada.
+        - No uses bajo ninguna circunstancia tu conocimiento externo o de internet.
+        - Si no está en el Excel, responde ESCALATE_REQUIRED.
+        """.trimIndent()
+    }
+
+    val interactionRule = if (isFirstInteraction) {
+        """
+        PRESENTACIÓN (SOLO PRIMER MENSAJE):
+        - Saluda cordialmente y menciónate como MINI-TO (tu nombre de agente).
+        - Indica que eres el asistente de la empresa.
+        """.trimIndent()
+    } else {
+        """
+        RE-INTERACCIÓN (CHAT EN CURSO):
+        - 🚫 PROHIBIDO: No vuelvas a decir "Hola soy MINI-TO" ni a presentarte formalmente.
+        - Sé directo y amable. Continúa el flujo de la duda actual sin repetir tu identidad.
+        """.trimIndent()
     }
 
     return """
-⚙️ [SISTEMA BASE MINI-TO — RAÍZ INMUTABLE]
-
-COMPRENSIÓN SEMÁNTICA:
-- Interpreta la INTENCIÓN. Usa sinónimos, entiende lenguaje coloquial y errores de ortografía.
-- Si la intención está relacionada a un dato del Excel, úsalo aunque las palabras no coincidan exactamente.
-
-CUÁNDO ESCALAR (usar ESCALATE_REQUIRED):
-- Escala si después de buscar semánticamente NO hay relación con el Excel (y la búsqueda en internet está OFF o no tiene permiso).
-- NUNCA escales por saludos, despedidas o agradecimientos.
-
-$searchInstruction
-
-FLUIDEZ CONVERSACIONAL:
-- Estilo WhatsApp: natural, directo, emojis con moderación.
-- Nunca inventes datos específicos del negocio (precios, contactos) que no estén en el Excel.
-- Tiempo de respuesta: respuestas cortas (2-4 oraciones).
-
-[FIN SISTEMA BASE]
-""".trimIndent()
+    ⚙️ [SISTEMA BASE MINI-TO — RAÍZ INMUTABLE]
+    
+    Tono: Siempre amable, servicial y profesional (Atención al Cliente Premium).
+    
+    $interactionRule
+    
+    CUÁNDO ESCALAR (usar ESCALATE_REQUIRED):
+    - Escala si después de buscar semánticamente NO hay relación con el Excel.
+    - NUNCA escales por saludos, despedidas o agradecimientos.
+    
+    $searchInstruction
+    
+    REGLA DE REPETICIÓN (ANTI-ECO):
+    - Si detectas que el usuario está repitiendo exactamente lo último que tú respondiste (es un eco), responde con extrema cortesía indicando que quizás hubo un error de red y repite la info brevemente preguntando si se recibió bien.
+    
+    FLUIDEZ: Estilo WhatsApp, respuestas cortas (2-4 oraciones). Emojis con moderación.
+    [FIN SISTEMA BASE]
+    """.trimIndent()
 }
 
 @Singleton
@@ -73,7 +84,8 @@ class GeminiAgent @Inject constructor(
         businessName: String = "",
         tone: String = "",
         audioData: ByteArray? = null,
-        internetSearchEnabled: Boolean = false
+        internetSearchEnabled: Boolean = false,
+        isFirstInteraction: Boolean = true
     ): String? {
         if (apiKey.isBlank()) return null
 
@@ -91,7 +103,8 @@ class GeminiAgent @Inject constructor(
                 businessName = businessName,
                 tone = tone,
                 hasAudio = audioData != null,
-                internetSearchEnabled = internetSearchEnabled
+                internetSearchEnabled = internetSearchEnabled,
+                isFirstInteraction = isFirstInteraction
             )
 
             val model = GenerativeModel(
@@ -122,7 +135,7 @@ class GeminiAgent @Inject constructor(
             )
 
             val responseText = response.text?.trim()
-            Log.d(TAG, "Respuesta ganada [$contactName]: $responseText")
+            Log.d(TAG, "Respuesta generada [$contactName]: $responseText")
             responseText
 
         } catch (e: Exception) {
@@ -141,7 +154,8 @@ class GeminiAgent @Inject constructor(
         businessName: String,
         tone: String,
         hasAudio: Boolean,
-        internetSearchEnabled: Boolean
+        internetSearchEnabled: Boolean,
+        isFirstInteraction: Boolean
     ): String {
         val rules = activeRules.filter { it.type == "RULE" }
         val examples = activeRules.filter { it.type == "EXAMPLE" }
@@ -160,19 +174,6 @@ class GeminiAgent @Inject constructor(
         } else "=== BASE DE CONOCIMIENTO === (vacía)\n"
 
         return """
-${buildSistemaBase(internetSearchEnabled)}
-
-=== PERSONALIZACIÓN DEL BOT ===
-${if(userSystemPrompt.isNotBlank()) userSystemPrompt else "(sin prompt maestro)"}
-
-=== PERFIL ===
-Agente: ${if(userName.isNotBlank()) userName else "MINI-TO Bot"}
-Empresa: ${if(businessName.isNotBlank()) businessName else "N/A"}
-Tono: $tone
-
-$rulesText
-$examplesText
-
 $knowledgeSection
 
 === MENSAJE DEL USUARIO ===

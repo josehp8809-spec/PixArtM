@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
+import java.util.Collections
 import javax.inject.Inject
 
 private const val TAG = "UniversalListener"
@@ -31,6 +32,7 @@ private const val WHATSAPP_BUSINESS_PACKAGE = "com.whatsapp.w4b"
 private const val FB_MESSENGER_PACKAGE = "com.facebook.orca"
 private const val IG_DIRECT_PACKAGE = "com.instagram.android"
 private const val MINITO_CHANNEL_ID = "minito_service"
+private const val ALERTS_CHANNEL_ID = "minito_alerts"
 
 @AndroidEntryPoint
 class UniversalListenerService : NotificationListenerService() {
@@ -44,22 +46,31 @@ class UniversalListenerService : NotificationListenerService() {
 
     // ─── Motor Anti-Bucle ──────────────────────────────────────────────
     private val recentlyReplied = mutableMapOf<String, Long>()
-    private val REPLY_COOLDOWN_MS = 2_000L // 2 segundos de cooldown por contacto para evitar spam iterativo, pero permitir flujo natural
+    private val REPLY_COOLDOWN_MS = 2_000L
 
-    // Caché circular estricto (últimos 15 mensajes) para Anti-Bucle de IA a IA
-    private val recentResponseHashes = object : LinkedHashMap<Int, Long>(15, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, Long>?): Boolean {
-            return size > 15
-        }
+    // Semáforos por contacto para evitar carreras en Bienvenida
+    private val welcomeMutexMap = Collections.synchronizedMap(mutableMapOf<String, Any>())
+
+    // Caché circular estricto (últimos 30 mensajes) para Anti-Bucle
+    private val recentResponseHashes = object : LinkedHashMap<Int, Long>(30, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, Long>?): Boolean = size > 30
     }
-    private val ANTI_LOOP_COOLDOWN_MS = 30_000L // 30 segundos IGNORANDO ecos
+    private val ANTI_LOOP_COOLDOWN_MS = 45_000L // 45 segundos de inmunidad a ecos
 
-    // ─── Temporizadores de Auto-Recordatorio ───────────────────────────
     private val activeReminders = mutableMapOf<String, Job>()
+
+    /**
+     * Limpia el texto de prefijos de autoría comunes que generan bucles
+     */
+    private fun normalizeForAntiLoop(text: String): String {
+        return text.lowercase()
+            .replace(Regex("^(yo|tú|tu|me|you|bot|mini-to|minito|trv):\\s*", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("[^\\p{L}\\p{N}]"), "") // Solo letras y números
+            .trim()
+    }
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "UniversalListenerService iniciado")
         createNotificationChannel()
         startForeground(1, buildForegroundNotification())
     }
@@ -67,7 +78,6 @@ class UniversalListenerService : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        Log.d(TAG, "UniversalListenerService detenido")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -75,13 +85,7 @@ class UniversalListenerService : NotificationListenerService() {
 
         serviceScope.launch {
             try {
-                // Verificar que el bot global está habilitado
-                val botEnabled = appPreferences.botEnabled.first()
-                if (!botEnabled) return@launch
-
                 val pkg = sbn.packageName
-                
-                // Verificar qué canales están permitidos
                 val isWhatsappEnabled = appPreferences.channelWhatsApp.first()
                 val isFbEnabled = appPreferences.channelFbMessenger.first()
                 val isIgEnabled = appPreferences.channelIgDirect.first()
@@ -92,320 +96,229 @@ class UniversalListenerService : NotificationListenerService() {
                     IG_DIRECT_PACKAGE -> isIgEnabled
                     else -> false
                 }
-
                 if (!isAllowedPackage) return@launch
-                // Verificar horario programado
-                if (!isWithinSchedule()) {
-                    Log.d(TAG, "Fuera del horario programado, ignorando mensaje")
-                    return@launch
-                }
 
-                // Verificar que tenemos API Key
+                val manualEnabled = appPreferences.botEnabled.first()
+                val scheduleValue = isWithinSchedule()
+                
+                // El bot se activa si: (Manual está ON) O (Programación está ON y es hora activa)
+                if (!manualEnabled && !scheduleValue) return@launch
+
                 val apiKey = appPreferences.geminiApiKey.first()
-                if (apiKey.isBlank()) {
-                    Log.w(TAG, "API Key de Gemini no configurada, omitiendo respuesta")
-                    return@launch
-                }
+                if (apiKey.isBlank()) return@launch
 
                 val notification = sbn.notification ?: return@launch
+                val extras = notification.extras ?: return@launch
                 
-                // ─── Motor Anti-Bucle: Filtros de Seguridad ─────────────────
-                
-                // 1. Descartar sumarios (historias o "Tienes 4 mensajes de 2 chats")
-                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) {
-                    Log.d(TAG, "Ignorando notificación de tipo GROUP_SUMMARY")
+                val contactName = extras.getString("android.title") ?: return@launch
+                val messageText = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
+
+                if (messageText.isBlank() || contactName.isBlank()) return@launch
+
+                // ─── FILTRO 1: Auto-Notificaciones (Detección de Propietario) ───
+                val myName = appPreferences.profileUserName.first()
+                if (contactName.equals(myName, ignoreCase = true) || contactName.lowercase().contains("yo")) {
+                    Log.d(TAG, "Detectada auto-notificación de '$contactName'. Ignorando.")
                     return@launch
                 }
 
-                // 2. Extraer extras
-                val extras = notification.extras ?: return@launch
-                val contactName = extras.getString("android.title") ?: return@launch
-                val messageText = sbn.notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
+                // ─── FILTRO 2: Anti-Bucle con Normalización Inteligente ───
+                val normalizedMsg = normalizeForAntiLoop(messageText)
+                val msgHash = normalizedMsg.hashCode()
+                val lastSeen = recentResponseHashes[msgHash]
+                val now = System.currentTimeMillis()
 
-                // Cancelar cualquier recordatorio pendiente porque el usuario acaba de escribir
+                if (lastSeen != null && (now - lastSeen < ANTI_LOOP_COOLDOWN_MS)) {
+                    Log.w(TAG, "⛔ BLINDAJE: Eco detectado (Hash: $msgHash). Bloqueando bucle.")
+                    return@launch
+                }
+
+                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return@launch
+
+                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
+                val isMessagingStyle = template?.contains("MessagingStyle") == true
+                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) return@launch
+
+                val lastReplied = recentlyReplied[contactName] ?: 0L
+                if (now - lastReplied < REPLY_COOLDOWN_MS) return@launch
+
                 activeReminders[contactName]?.cancel()
                 activeReminders.remove(contactName)
 
-                // Verificaciones Anti-Bucle...s vacíos o nulos
-                if (messageText.isBlank()) return@launch
-                if (contactName.isBlank()) return@launch
+                // ─── LÓGICA DE BIENVENIDA (ATÓMICA) ───
+                val logCount = responseLogDao.getLogCountForContact(contactName)
+                val isFirstInteraction = logCount == 0
 
-                // 4. Asegurarnos que viene como MENSAJE (Evita intentos de historias o estados)
-                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
-                val isMessagingStyle = template == "androidx.core.app.NotificationCompat\$MessagingStyle" || 
-                                       template == "android.app.Notification\$MessagingStyle"
-
-                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) {
-                    // IG no siempre usa MessagingStyle para nuevos mensajes.
-                    // Pero para WP y FB obligamos MessagingStyle
-                    Log.d(TAG, "Ignorando porque NO es un mensaje directo (Template: $template)")
-                    return@launch
+                if (isFirstInteraction) {
+                    val mutex = welcomeMutexMap.getOrPut(contactName) { Any() }
+                    synchronized(mutex) {
+                        // Re-verificar dentro del synchronized
+                        val refreshedCount = runBlocking { responseLogDao.getLogCountForContact(contactName) }
+                        if (refreshedCount == 0) {
+                            val welcomeMsg = runBlocking { appPreferences.welcomeMessage.first() }
+                            if (welcomeMsg.isNotBlank()) {
+                                sendUniversalReply(sbn, welcomeMsg)
+                                val welcomeHash = normalizeForAntiLoop(welcomeMsg).hashCode()
+                                recentResponseHashes[welcomeHash] = System.currentTimeMillis()
+                                
+                                runBlocking {
+                                    responseLogDao.insert(ResponseLog(
+                                        contact = contactName,
+                                        incomingMessage = messageText,
+                                        sentResponse = welcomeMsg,
+                                        timestamp = System.currentTimeMillis()
+                                    ))
+                                }
+                                Thread.sleep(1500)
+                            }
+                        }
+                    }
+                    welcomeMutexMap.remove(contactName)
                 }
 
-                // 5. Anti-Bucle estricto: ¿Este mensaje es uno de nuestros ECOS recientes?
-                val messageHash = messageText.hashCode()
-                val lastTimeSeenRaw = recentResponseHashes[messageHash]
-                val now = System.currentTimeMillis()
-                
-                if (lastTimeSeenRaw != null && (now - lastTimeSeenRaw < ANTI_LOOP_COOLDOWN_MS)) {
-                    Log.w(TAG, "⛔ AUTO-CHECK: Este mensaje coincide con uno que mandamos recientemente. Bloqueando Bucle.")
-                    return@launch
-                }
-
-                // Cooldown: evitar spam de respuestas al mismo contacto
-                val lastReplied = recentlyReplied[contactName] ?: 0L
-                if (now - lastReplied < REPLY_COOLDOWN_MS) {
-                    Log.d(TAG, "Cooldown activo para '$contactName', ignorando mensaje")
-                    return@launch
-                }
-
-                Log.d(TAG, "Mensaje de '$contactName': $messageText")
-
-                // Extracción de audio si existe en el MessagingStyle
+                // Extracción de audio...
                 var audioBytes: ByteArray? = null
                 val messagingStyle = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(notification)
                 messagingStyle?.messages?.lastOrNull()?.let { lastMsg ->
                     if (lastMsg.dataMimeType?.startsWith("audio/") == true) {
                         lastMsg.dataUri?.let { uri ->
                             try {
-                                contentResolver.openInputStream(uri)?.use { stream ->
-                                    audioBytes = stream.readBytes()
-                                    Log.d(TAG, "Audio extraído correctamente de Notification")
-                                }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Error leyendo URI de audio", e)
-                            }
+                                contentResolver.openInputStream(uri)?.use { stream -> audioBytes = stream.readBytes() }
+                            } catch (e: Exception) { Log.e(TAG, "Error audio", e) }
                         }
                     }
                 }
 
-                // Lógica de Mensaje de Bienvenida
-                val logCount = responseLogDao.getLogCountForContact(contactName)
-                if (logCount == 0) {
-                    val welcomeMsg = appPreferences.welcomeMessage.first()
-                    if (welcomeMsg.isNotBlank()) {
-                        sendUniversalReply(sbn, welcomeMsg)
-                        responseLogDao.insert(
-                            ResponseLog(
-                                contact = contactName,
-                                incomingMessage = messageText,
-                                sentResponse = welcomeMsg,
-                                timestamp = System.currentTimeMillis()
-                            )
-                        )
-                        recentResponseHashes[welcomeMsg.hashCode()] = System.currentTimeMillis()
-                        delay(2000) // Pequeña pausa
-                    }
-                }
-
-                // Delay configurable (simula que alguien está escribiendo)
                 val delayMs = appPreferences.autoReplyDelayMs.first()
                 delay(delayMs)
 
-                // Obtener el system prompt y datos de perfil
-                val systemPrompt = appPreferences.systemPrompt.first()
-                val usrName = appPreferences.profileUserName.first()
-                val busName = appPreferences.profileBusinessName.first()
-                val tne = appPreferences.profileTone.first()
-                val searchEnabled = appPreferences.internetSearchEnabled.first()
-
-                // Generar respuesta con Gemini
+                // Generar respuesta con IA Inmutable
                 val response = geminiAgent.generateResponse(
                     apiKey = apiKey,
-                    systemPrompt = systemPrompt,
+                    systemPrompt = appPreferences.systemPrompt.first(),
                     contactName = contactName,
                     userMessage = messageText,
-                    userName = usrName,
-                    businessName = busName,
-                    tone = tne,
+                    userName = appPreferences.profileUserName.first(),
+                    businessName = appPreferences.profileBusinessName.first(),
+                    tone = appPreferences.profileTone.first(),
                     audioData = audioBytes,
-                    internetSearchEnabled = searchEnabled
+                    internetSearchEnabled = appPreferences.internetSearchEnabled.first(),
+                    isFirstInteraction = isFirstInteraction
                 )
 
-                if (response.isNullOrBlank()) {
-                    Log.w(TAG, "Gemini no generó respuesta para '$contactName'")
-                    return@launch
-                }
+                if (response.isNullOrBlank()) return@launch
 
                 if (response.contains("ESCALATE_REQUIRED")) {
-                    Log.w(TAG, "Señal de escalado detectada. Gemini no encontró información en Contexto.")
                     val escalationMsg = appPreferences.escalationMessage.first()
-                    sendUniversalReply(sbn, escalationMsg)
-                    
-                    escalationLogDao.insert(
-                        EscalationLog(
-                            contact = contactName,
-                            originalMessage = messageText,
-                            timestamp = System.currentTimeMillis()
-                        )
-                    )
-                    recentResponseHashes[escalationMsg.hashCode()] = System.currentTimeMillis()
-                    recentlyReplied[contactName] = System.currentTimeMillis()
+                    if (sendUniversalReply(sbn, escalationMsg)) {
+                        escalationLogDao.insert(EscalationLog(contact = contactName, originalMessage = messageText, timestamp = System.currentTimeMillis()))
+                        recentResponseHashes[normalizeForAntiLoop(escalationMsg).hashCode()] = System.currentTimeMillis()
+                        showLocalEscalationNotification(contactName, messageText)
+                    }
                     return@launch
                 }
 
-                // Enviar la respuesta usando RemoteInput (Universal)
                 val sent = sendUniversalReply(sbn, response)
-
                 if (sent) {
-                    // Registrar en la caché Anti-Bucle el HASH de NUESTRA PROPIA RESPUESTA
-                    // Esto evita que si la otra pantalla nos refleja, le re-contestemos.
-                    recentResponseHashes[response.hashCode()] = System.currentTimeMillis()
-
-                    // Marcar cooldown clásico
+                    recentResponseHashes[normalizeForAntiLoop(response).hashCode()] = System.currentTimeMillis()
                     recentlyReplied[contactName] = System.currentTimeMillis()
-
-                    // Guardar en log
-                    responseLogDao.insert(
-                        ResponseLog(
-                            contact = contactName,
-                            incomingMessage = messageText,
-                            sentResponse = response,
-                            timestamp = System.currentTimeMillis()
-                        )
-                    )
-                    Log.d(TAG, "Respuesta enviada a '$contactName' [$pkg]: $response")
-
-                    // Programar Auto-Recordatorio (5 minutos de inactividad)
+                    responseLogDao.insert(ResponseLog(contact = contactName, incomingMessage = messageText, sentResponse = response, timestamp = System.currentTimeMillis()))
+                    
+                    // Auto-Recordatorio (Amable)
                     val reminderEnabled = appPreferences.autoReminderEnabled.first()
                     if (reminderEnabled) {
                         val reminderMessage = appPreferences.autoReminderMessage.first()
                         if (reminderMessage.isNotBlank()) {
                             activeReminders[contactName] = serviceScope.launch {
-                                delay(5 * 60 * 1000L) // 5 minutos
-                                val reminderSent = sendUniversalReply(sbn, reminderMessage)
-                                if (reminderSent) {
-                                    recentResponseHashes[reminderMessage.hashCode()] = System.currentTimeMillis()
-                                    responseLogDao.insert(
-                                        ResponseLog(
-                                            contact = contactName,
-                                            incomingMessage = "[Auto-Recordatorio Sistémico]",
-                                            sentResponse = reminderMessage,
-                                            timestamp = System.currentTimeMillis()
-                                        )
-                                    )
-                                    Log.d(TAG, "Auto-Recordatorio enviado a '$contactName'")
+                                delay(5 * 60 * 1000L)
+                                if (sendUniversalReply(sbn, reminderMessage)) {
+                                    recentResponseHashes[normalizeForAntiLoop(reminderMessage).hashCode()] = System.currentTimeMillis()
+                                    responseLogDao.insert(ResponseLog(contact = contactName, incomingMessage = "[Recordatorio]", sentResponse = reminderMessage, timestamp = System.currentTimeMillis()))
                                 }
-                                activeReminders.remove(contactName)
                             }
                         }
                     }
                 }
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Error procesando notificación", e)
-            }
+            } catch (e: Exception) { Log.e(TAG, "Critical error", e) }
         }
     }
 
-    /**
-     * Envía una respuesta de vuelta buscando RECURSIVAMENTE cualquier RemoteInput válido en las Actions
-     */
     private fun sendUniversalReply(sbn: StatusBarNotification, replyText: String): Boolean {
-        val notification = sbn.notification ?: return false
-        val actions = notification.actions ?: return false
-
-        // 1. Buscar recursivamente el Action con RemoteInput
-        var targetAction: Notification.Action? = null
-        var targetRemoteInput: RemoteInput? = null
-
+        val actions = sbn.notification?.actions ?: return false
         for (action in actions) {
-            val remoteInputs = action.remoteInputs
-            if (remoteInputs != null) {
-                for (remoteInput in remoteInputs) {
-                    if (remoteInput.allowFreeFormInput) {
-                        targetAction = action
-                        targetRemoteInput = remoteInput
-                        break
-                    }
+            action.remoteInputs?.forEach { remoteInput ->
+                if (remoteInput.allowFreeFormInput) {
+                    try {
+                        val intent = Intent().apply {
+                            val bundle = Bundle().apply { putCharSequence(remoteInput.resultKey, replyText) }
+                            RemoteInput.addResultsToIntent(arrayOf(remoteInput), this, bundle)
+                        }
+                        action.actionIntent.send(this, 0, intent)
+                        return true
+                    } catch (e: Exception) { Log.e(TAG, "Reply failed", e) }
                 }
             }
-            if (targetAction != null) break
         }
+        return false
+    }
 
-        if (targetAction == null || targetRemoteInput == null) {
-            Log.w(TAG, "No se encontró ningún RemoteInput (Botón Responder) en la notificación")
-            return false
+    private fun showLocalEscalationNotification(contact: String, message: String) {
+        val intent = Intent(this, com.travlytic.app.MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // 2. Ejecutar la acción
-        return try {
-            val intent = Intent()
-            val bundle = Bundle()
-            bundle.putCharSequence(targetRemoteInput.resultKey, replyText)
-            
-            RemoteInput.addResultsToIntent(
-                arrayOf(targetRemoteInput),
-                intent,
-                bundle
-            )
+        val notification = NotificationCompat.Builder(this, ALERTS_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_escalation_alert)
+            .setContentTitle("⚠️ Intervención Requerida")
+            .setContentText("Escalado: $contact")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
 
-            targetAction.actionIntent.send(this, 0, intent)
-            true
-        } catch (e: PendingIntent.CanceledException) {
-            Log.e(TAG, "PendingIntent cancelado al intentar responder", e)
-            false
-        } catch (e: Exception) {
-            Log.e(TAG, "Error enviando reply", e)
-            false
-        }
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(contact.hashCode(), notification)
     }
 
     private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            MINITO_CHANNEL_ID,
-            "MINI-TO Bot",
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = "Servicio activo de respuesta automática"
-        }
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.createNotificationChannel(channel)
+        manager.createNotificationChannel(NotificationChannel(MINITO_CHANNEL_ID, "MINI-TO Bot", NotificationManager.IMPORTANCE_LOW))
+        manager.createNotificationChannel(NotificationChannel(ALERTS_CHANNEL_ID, "MINI-TO Alertas", NotificationManager.IMPORTANCE_HIGH).apply {
+            enableVibration(true)
+            setShowBadge(true)
+        })
     }
 
     private fun buildForegroundNotification(): Notification {
         return NotificationCompat.Builder(this, MINITO_CHANNEL_ID)
             .setContentTitle("MINI-TO activo")
-            .setContentText("Respondiendo mensajes automáticamente")
+            .setContentText("Asistente listo")
             .setSmallIcon(R.drawable.ic_bot_active)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()
     }
 
-    /**
-     * Verifica si el momento actual está dentro del horario programado.
-     * Si el schedule no está habilitado, siempre retorna true (24/7).
-     */
     private suspend fun isWithinSchedule(): Boolean {
-        val scheduleEnabled = appPreferences.scheduleEnabled.first()
-        if (!scheduleEnabled) return true
-
+        if (!appPreferences.scheduleEnabled.first()) return false
         val now = Calendar.getInstance()
-        val currentHour = now.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = now.get(Calendar.MINUTE)
-        // Calendar.DAY_OF_WEEK: 1=Dom, 2=Lun... Normalizamos a 1=Lun, 7=Dom
-        val calDay = now.get(Calendar.DAY_OF_WEEK)
-        val dayNum = if (calDay == Calendar.SUNDAY) 7 else calDay - 1
-
+        val currentMins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+        val dayNum = if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else now.get(Calendar.DAY_OF_WEEK) - 1
+        
         val activeDays = appPreferences.scheduleDays.first()
         if (dayNum !in activeDays) return false
-
-        val startH = appPreferences.scheduleStartHour.first()
-        val startM = appPreferences.scheduleStartMinute.first()
-        val endH   = appPreferences.scheduleEndHour.first()
-        val endM   = appPreferences.scheduleEndMinute.first()
-
-        val currentMins = currentHour * 60 + currentMinute
-        val startMins   = startH * 60 + startM
-        val endMins     = endH * 60 + endM
-
-        return if (endMins > startMins) {
-            // Rango normal: ej 08:00 → 20:00
-            currentMins in startMins..endMins
-        } else {
-            // Rango nocturno: ej 22:00 → 06:00
-            currentMins >= startMins || currentMins <= endMins
+        
+        val ranges = appPreferences.scheduleList.first()
+        if (ranges.isEmpty()) return false
+        
+        return ranges.any { range ->
+            val startMins = range.startHour * 60 + range.startMinute
+            val endMins = range.endHour * 60 + range.endMinute
+            
+            if (endMins > startMins) {
+                currentMins in startMins..endMins
+            } else {
+                currentMins >= startMins || currentMins <= endMins
+            }
         }
     }
 }

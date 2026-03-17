@@ -144,6 +144,8 @@ fun HomeScreen(
                 Spacer(Modifier.height(4.dp))
                 BotStatusCard(
                     isServiceEnabled = uiState.isServiceEnabled,
+                    isEffectivelyEnabled = uiState.isEffectivelyEnabled,
+                    activationReason = uiState.activationReason,
                     isListenerEnabled = isListenerEnabled,
                     onToggle = { viewModel.toggleBot(it) },
                     onOpenSettings = { viewModel.openNotificationSettings(context) }
@@ -156,22 +158,51 @@ fun HomeScreen(
             }
 
             // ─── Alertas de Escalado ───────────────────────────────────────────────
-            if (uiState.recentEscalations.isNotEmpty()) {
-                item {
-                    Spacer(Modifier.height(4.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+            item {
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "🚨 Alertas de Escalado",
+                        color = MinItoOrange,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                    if (uiState.recentEscalations.isNotEmpty()) {
                         Text(
-                            "🚨 Alertas de Escalado",
-                            color = MinItoOrange,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
+                            "${uiState.recentEscalations.size} pendiente${if (uiState.recentEscalations.size > 1) "s" else ""}",
+                            color = MinItoRed,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
+            }
+
+            if (uiState.recentEscalations.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("✅ ", fontSize = 16.sp)
+                            Text(
+                                "Sin escalados pendientes",
+                                color = MinItoOnSurface2,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+            } else {
                 items(uiState.recentEscalations, key = { "esc_${it.id}" }) { log ->
                     EscalationCard(log, onResolve = { viewModel.resolveEscalation(it) })
                 }
@@ -259,6 +290,8 @@ fun HomeScreen(
 @Composable
 fun BotStatusCard(
     isServiceEnabled: Boolean,
+    isEffectivelyEnabled: Boolean,
+    activationReason: String,
     isListenerEnabled: Boolean,
     onToggle: (Boolean) -> Unit,
     onOpenSettings: () -> Unit
@@ -276,12 +309,37 @@ fun BotStatusCard(
             ) {
                 Column {
                     Text("Estado del Bot", color = MinItoOnSurface2, fontSize = 12.sp)
-                    Text(
-                        if (isServiceEnabled) "🟢 Activo" else "🔴 Inactivo",
-                        color = if (isServiceEnabled) MinItoGreen else MinItoRed,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            if (isEffectivelyEnabled) "🟢 Activo" else "🔴 Inactivo",
+                            color = if (isEffectivelyEnabled) MinItoGreen else MinItoRed,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                        if (isEffectivelyEnabled && activationReason == "horario" && !isServiceEnabled) {
+                            Spacer(Modifier.width(8.dp))
+                            Surface(
+                                color = MinItoBlue.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    "AUTO",
+                                    color = MinItoBlue,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                    if (isEffectivelyEnabled) {
+                        val text = when (activationReason) {
+                            "manual" -> "Activado manualmente"
+                            "horario" -> "Activado por horario"
+                            else -> ""
+                        }
+                        Text(text, color = MinItoOnSurface2, fontSize = 11.sp)
+                    }
                 }
                 Switch(
                     checked = isServiceEnabled,
@@ -401,7 +459,7 @@ private fun DashboardStat(icon: String, value: String, label: String) {
         Spacer(Modifier.height(2.dp))
         Text(
             value,
-            color = TravlyticOnSurface,
+            color = MinItoOnSurface,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )

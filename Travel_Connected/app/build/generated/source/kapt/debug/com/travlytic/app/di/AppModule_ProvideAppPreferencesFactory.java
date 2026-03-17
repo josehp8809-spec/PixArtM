@@ -1,6 +1,7 @@
 package com.travlytic.app.di;
 
 import android.content.Context;
+import com.google.gson.Gson;
 import com.travlytic.app.data.prefs.AppPreferences;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -27,20 +28,25 @@ import javax.inject.Provider;
 public final class AppModule_ProvideAppPreferencesFactory implements Factory<AppPreferences> {
   private final Provider<Context> contextProvider;
 
-  public AppModule_ProvideAppPreferencesFactory(Provider<Context> contextProvider) {
+  private final Provider<Gson> gsonProvider;
+
+  public AppModule_ProvideAppPreferencesFactory(Provider<Context> contextProvider,
+      Provider<Gson> gsonProvider) {
     this.contextProvider = contextProvider;
+    this.gsonProvider = gsonProvider;
   }
 
   @Override
   public AppPreferences get() {
-    return provideAppPreferences(contextProvider.get());
+    return provideAppPreferences(contextProvider.get(), gsonProvider.get());
   }
 
-  public static AppModule_ProvideAppPreferencesFactory create(Provider<Context> contextProvider) {
-    return new AppModule_ProvideAppPreferencesFactory(contextProvider);
+  public static AppModule_ProvideAppPreferencesFactory create(Provider<Context> contextProvider,
+      Provider<Gson> gsonProvider) {
+    return new AppModule_ProvideAppPreferencesFactory(contextProvider, gsonProvider);
   }
 
-  public static AppPreferences provideAppPreferences(Context context) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideAppPreferences(context));
+  public static AppPreferences provideAppPreferences(Context context, Gson gson) {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideAppPreferences(context, gson));
   }
 }

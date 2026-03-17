@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.travlytic.app-mergeDebugResources-64:/values-v16/values-v16.xml",
+            "outputFile": "com.travlytic.app-mergeDebugResources-61:/values-v16/values-v16.xml",
             "map": [
                 {
                     "source": "C:\\Users\\zyzen 3\\.gradle\\caches\\transforms-4\\01c215c6abc281ad1404bfcaebbda4a0\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",

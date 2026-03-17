@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.travlytic.app-mergeDebugResources-64:/values-ne/values-ne.xml",
+            "outputFile": "com.travlytic.app-mergeDebugResources-61:/values-ne/values-ne.xml",
             "map": [
                 {
                     "source": "C:\\Users\\zyzen 3\\.gradle\\caches\\transforms-4\\c674c17d67d1346826309cbb94408cf8\\transformed\\play-services-basement-16.0.1\\res\\values-ne\\values.xml",

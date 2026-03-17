@@ -1,102 +1,62 @@
 [
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xhdpi\\ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-mdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-mdpi\\ic_launcher.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-mdpi\\ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.travlytic.app-merged_res-63:/xml_network_security_config.xml.flat",
+        "source": "com.travlytic.app-main-65:/xml/network_security_config.xml"
     },
     {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xxxhdpi\\ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\drawable_travlytic_logo.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\drawable\\travlytic_logo.png"
+        "merged": "com.travlytic.app-merged_res-63:/drawable_ic_escalation_alert.xml.flat",
+        "source": "com.travlytic.app-main-65:/drawable/ic_escalation_alert.xml"
     },
     {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-anydpi-v26\\ic_launcher.xml"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\xml_network_security_config.xml.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\xml\\network_security_config.xml"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xhdpi\\ic_launcher.png"
+        "merged": "com.travlytic.app-merged_res-63:/drawable_minito_logo.xml.flat",
+        "source": "com.travlytic.app-main-65:/drawable/minito_logo.xml"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xxhdpi\\ic_launcher.png"
+        "merged": "com.travlytic.app-merged_res-63:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.travlytic.app-main-65:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\drawable_minito_logo.xml.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\drawable\\minito_logo.xml"
-    },
-    {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xxhdpi\\ic_launcher_round.png"
-    },
-    {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xhdpi/ic_launcher.png"
-    },
-    {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-hdpi/ic_launcher.png"
-    },
-    {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-xxxhdpi\\ic_launcher.png"
-    },
-    {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-hdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-hdpi\\ic_launcher.png"
-    },
-    {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xhdpi/ic_launcher_round.png"
-    },
-    {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xxhdpi/ic_launcher.png"
-    },
-    {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\mipmap-hdpi\\ic_launcher_round.png"
-    },
-    {
-        "merged": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-merged_res-66:\\drawable_ic_bot_active.xml.flat",
-        "source": "C:\\Users\\zyzen 3\\.gradle\\daemon\\8.7\\com.travlytic.app-main-68:\\drawable\\ic_bot_active.xml"
-    },
-    {
-        "merged": "com.travlytic.app-merged_res-66:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.travlytic.app-main-68:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.travlytic.app-merged_res-63:/drawable_ic_bot_active.xml.flat",
+        "source": "com.travlytic.app-main-65:/drawable/ic_bot_active.xml"
     }
 ]
