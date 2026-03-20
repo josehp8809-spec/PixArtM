@@ -21,6 +21,11 @@
     <!-- POST_NOTIFICATIONS (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
     <permission
         android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
@@ -62,11 +67,16 @@
         <service
             android:name="com.travlytic.app.service.UniversalListenerService"
             android:exported="true"
+            android:foregroundServiceType="specialUse"
             android:label="MINI-TO Bot"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
+
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Notificaciones de WhatsApp para auto-respuesta de atención al cliente" />
         </service>
 
         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->

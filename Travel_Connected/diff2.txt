@@ -1,0 +1,1689 @@
+diff --git a/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_0/graph.bin b/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_0/graph.bin
+index 5de756e..826d4af 100644
+Binary files a/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_0/graph.bin and b/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_0/graph.bin differ
+diff --git a/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_1/graph.bin b/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_1/graph.bin
+index 33e72fd..149ae16 100644
+Binary files a/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_1/graph.bin and b/Travel_Connected/app/build/intermediates/desugar_graph/debug/out/currentProject/dirs_bucket_1/graph.bin differ
+diff --git a/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex b/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex
+index 7a5e102..30f518f 100644
+Binary files a/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex and b/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/8/classes.dex b/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/8/classes.dex
+index ebab332..f2f21fc 100644
+Binary files a/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/8/classes.dex and b/Travel_Connected/app/build/intermediates/dex/debug/mergeProjectDexDebug/8/classes.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt b/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt
+index 1d079b6..116c7f1 100644
+--- a/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt
++++ b/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt
+@@ -1,4 +1,4 @@
+-#Mon Mar 16 22:03:16 CST 2026
++#Wed Mar 18 19:02:04 CST 2026
+ base.0=C\:\\Users\\zyzen 3\\PixArtM\\Travel_Connected\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+ base.1=C\:\\Users\\zyzen 3\\PixArtM\\Travel_Connected\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+ base.10=C\:\\Users\\zyzen 3\\PixArtM\\Travel_Connected\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\6\\classes.dex
+diff --git a/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources b/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources
+index 54fd16d..b86068c 100644
+Binary files a/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources and b/Travel_Connected/app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources differ
+diff --git a/Travel_Connected/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/Travel_Connected/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+index 47aaba8..0ec605f 100644
+--- a/Travel_Connected/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
++++ b/Travel_Connected/app/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+@@ -31,189 +31,207 @@
+ 22-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:5-77
+ 22-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:22-74
+ 23
+-24    <permission
+-24-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+-25        android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+-25-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+-26        android:protectionLevel="signature" />
+-26-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+-27
+-28    <uses-permission android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+-28-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+-28-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+-29
+-30    <application
+-30-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:17:5-64:19
+-31        android:name="com.travlytic.app.MinitoApp"
+-31-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:9-34
+-32        android:allowBackup="true"
+-32-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:19:9-35
+-33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+-33-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+-34        android:debuggable="true"
+-35        android:extractNativeLibs="false"
+-36        android:icon="@mipmap/ic_launcher"
+-36-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:9-43
+-37        android:label="@string/app_name"
+-37-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:21:9-41
+-38        android:networkSecurityConfig="@xml/network_security_config"
+-38-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-69
+-39        android:roundIcon="@mipmap/ic_launcher_round"
+-39-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:9-54
+-40        android:supportsRtl="true"
+-40-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-35
+-41        android:theme="@style/Theme.MinIto" >
+-41-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-44
+-42
+-43        <!-- Actividad Principal -->
+-44        <activity
+-44-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-36:20
+-45            android:name="com.travlytic.app.MainActivity"
+-45-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:13-41
+-46            android:exported="true"
+-46-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:13-36
+-47            android:theme="@style/Theme.MinIto" >
+-47-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:31:13-48
+-48            <intent-filter>
+-48-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:32:13-35:29
+-49                <action android:name="android.intent.action.MAIN" />
+-49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:17-69
+-49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:25-66
+-50
+-51                <category android:name="android.intent.category.LAUNCHER" />
+-51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:17-77
+-51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:27-74
+-52            </intent-filter>
+-53        </activity>
+-54
+-55        <!--
+-56            ================================================
+-57            NOTIFICATION LISTENER SERVICE
+-58            CR??TICO: Requiere permiso especial del usuario
+-59            en Ajustes ??? Apps ??? Acceso a notificaciones
+-60            ================================================
+-61        -->
+-62        <service
+-62-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:45:9-53:19
+-63            android:name="com.travlytic.app.service.UniversalListenerService"
+-63-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:46:13-61
+-64            android:exported="true"
+-64-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:49:13-36
+-65            android:label="MINI-TO Bot"
+-65-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:47:13-40
+-66            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+-66-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:48:13-87
+-67            <intent-filter>
+-67-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:13-52:29
+-68                <action android:name="android.service.notification.NotificationListenerService" />
+-68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:17-99
+-68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:25-96
+-69            </intent-filter>
+-70        </service>
+-71
+-72        <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+-73        <receiver
+-73-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:9-62:20
+-74            android:name="com.travlytic.app.receiver.BootReceiver"
+-74-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:13-50
+-75            android:exported="true" >
+-75-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:58:13-36
+-76            <intent-filter>
+-76-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:29
+-77                <action android:name="android.intent.action.BOOT_COMPLETED" />
+-77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-79
+-77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:25-76
+-78            </intent-filter>
+-79        </receiver>
+-80
+-81        <activity
+-81-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+-82            android:name="androidx.compose.ui.tooling.PreviewActivity"
+-82-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+-83            android:exported="true" />
+-83-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+-84
+-85        <provider
+-85-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+-86            android:name="androidx.startup.InitializationProvider"
+-86-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+-87            android:authorities="com.travlytic.app.androidx-startup"
+-87-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+-88            android:exported="false" >
+-88-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+-89            <meta-data
+-89-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+-90                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+-90-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+-91                android:value="androidx.startup" />
+-91-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+-92            <meta-data
+-92-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+-93                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+-93-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+-94                android:value="androidx.startup" />
+-94-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+-95            <meta-data
+-95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+-96                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+-96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+-97                android:value="androidx.startup" />
+-97-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+-98        </provider>
+-99
+-100        <service
+-100-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+-101            android:name="androidx.room.MultiInstanceInvalidationService"
+-101-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+-102            android:directBootAware="true"
+-102-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+-103            android:exported="false" />
+-103-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+-104
+-105        <receiver
+-105-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+-106            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+-106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+-107            android:directBootAware="false"
+-107-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+-108            android:enabled="true"
+-108-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+-109            android:exported="true"
+-109-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+-110            android:permission="android.permission.DUMP" >
+-110-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+-111            <intent-filter>
+-111-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+-112                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+-112-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+-112-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+-113            </intent-filter>
+-114            <intent-filter>
+-114-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+-115                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+-115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+-115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+-116            </intent-filter>
+-117            <intent-filter>
+-117-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+-118                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+-118-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+-118-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+-119            </intent-filter>
+-120            <intent-filter>
+-120-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+-121                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+-121-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+-121-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+-122            </intent-filter>
+-123        </receiver>
+-124
+-125        <meta-data
+-125-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:23:9-25:69
+-126            android:name="com.google.android.gms.version"
+-126-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:24:13-58
+-127            android:value="@integer/google_play_services_version" />
+-127-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:25:13-66
+-128    </application>
+-129
+-130</manifest>
++24    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++25    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++25-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:5-77
++25-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:22-74
++26    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++27    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++27-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:5-89
++27-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:22-86
++28
++29    <permission
++29-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
++30        android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
++30-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
++31        android:protectionLevel="signature" />
++31-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
++32
++33    <uses-permission android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
++33-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
++33-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
++34
++35    <application
++35-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:5-73:19
++36        android:name="com.travlytic.app.MinitoApp"
++36-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-34
++37        android:allowBackup="true"
++37-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-35
++38        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
++38-->[androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
++39        android:debuggable="true"
++40        android:extractNativeLibs="false"
++41        android:icon="@mipmap/ic_launcher"
++41-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-43
++42        android:label="@string/app_name"
++42-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:26:9-41
++43        android:networkSecurityConfig="@xml/network_security_config"
++43-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:9-69
++44        android:roundIcon="@mipmap/ic_launcher_round"
++44-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:27:9-54
++45        android:supportsRtl="true"
++45-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-35
++46        android:theme="@style/Theme.MinIto" >
++46-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:9-44
++47
++48        <!-- Actividad Principal -->
++49        <activity
++49-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:9-41:20
++50            android:name="com.travlytic.app.MainActivity"
++50-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:13-41
++51            android:exported="true"
++51-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:35:13-36
++52            android:theme="@style/Theme.MinIto" >
++52-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:36:13-48
++53            <intent-filter>
++53-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:37:13-40:29
++54                <action android:name="android.intent.action.MAIN" />
++54-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:38:17-69
++54-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:38:25-66
++55
++56                <category android:name="android.intent.category.LAUNCHER" />
++56-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:39:17-77
++56-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:39:27-74
++57            </intent-filter>
++58        </activity>
++59
++60        <!--
++61            ================================================
++62            NOTIFICATION LISTENER SERVICE
++63            CR??TICO: Requiere permiso especial del usuario
++64            en Ajustes ??? Apps ??? Acceso a notificaciones
++65            ================================================
++66        -->
++67        <service
++67-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:9-62:19
++68            android:name="com.travlytic.app.service.UniversalListenerService"
++68-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:13-61
++69            android:exported="true"
++69-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:55:13-36
++70            android:foregroundServiceType="specialUse"
++70-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:54:13-55
++71            android:label="MINI-TO Bot"
++71-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:52:13-40
++72            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
++72-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:53:13-87
++73            <intent-filter>
++73-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:13-58:29
++74                <action android:name="android.service.notification.NotificationListenerService" />
++74-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:17-99
++74-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:25-96
++75            </intent-filter>
++76
++77            <property
++77-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:105
++78                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++78-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-76
++79                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
++79-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:61:17-102
++80        </service>
++81
++82        <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
++83        <receiver
++83-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:65:9-71:20
++84            android:name="com.travlytic.app.receiver.BootReceiver"
++84-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:66:13-50
++85            android:exported="true" >
++85-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:67:13-36
++86            <intent-filter>
++86-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:68:13-70:29
++87                <action android:name="android.intent.action.BOOT_COMPLETED" />
++87-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:69:17-79
++87-->C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:69:25-76
++88            </intent-filter>
++89        </receiver>
++90
++91        <activity
++91-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
++92            android:name="androidx.compose.ui.tooling.PreviewActivity"
++92-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
++93            android:exported="true" />
++93-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
++94
++95        <provider
++95-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
++96            android:name="androidx.startup.InitializationProvider"
++96-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
++97            android:authorities="com.travlytic.app.androidx-startup"
++97-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
++98            android:exported="false" >
++98-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
++99            <meta-data
++99-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
++100                android:name="androidx.emoji2.text.EmojiCompatInitializer"
++100-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
++101                android:value="androidx.startup" />
++101-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
++102            <meta-data
++102-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
++103                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
++103-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
++104                android:value="androidx.startup" />
++104-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\72f7c837e1e297931ab600ea11266429\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
++105            <meta-data
++105-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
++106                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
++106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
++107                android:value="androidx.startup" />
++107-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
++108        </provider>
++109
++110        <service
++110-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
++111            android:name="androidx.room.MultiInstanceInvalidationService"
++111-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
++112            android:directBootAware="true"
++112-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
++113            android:exported="false" />
++113-->[androidx.room:room-runtime:2.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\58e71e53fd0e302577575131e2cc3c98\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
++114
++115        <receiver
++115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
++116            android:name="androidx.profileinstaller.ProfileInstallReceiver"
++116-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
++117            android:directBootAware="false"
++117-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
++118            android:enabled="true"
++118-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
++119            android:exported="true"
++119-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
++120            android:permission="android.permission.DUMP" >
++120-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
++121            <intent-filter>
++121-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
++122                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
++122-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
++122-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
++123            </intent-filter>
++124            <intent-filter>
++124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
++125                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
++125-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
++125-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
++126            </intent-filter>
++127            <intent-filter>
++127-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
++128                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
++128-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
++128-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
++129            </intent-filter>
++130            <intent-filter>
++130-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
++131                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
++131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
++131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a4350462503fb35a2e281e70673bbea1\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
++132            </intent-filter>
++133        </receiver>
++134
++135        <meta-data
++135-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:23:9-25:69
++136            android:name="com.google.android.gms.version"
++136-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:24:13-58
++137            android:value="@integer/google_play_services_version" />
++137-->[com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\c674c17d67d1346826309cbb94408cf8\transformed\play-services-basement-16.0.1\AndroidManifest.xml:25:13-66
++138    </application>
++139
++140</manifest>
+diff --git a/Travel_Connected/app/build/intermediates/merged_manifest/debug/AndroidManifest.xml b/Travel_Connected/app/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+index f3233c1..e194fa0 100644
+--- a/Travel_Connected/app/build/intermediates/merged_manifest/debug/AndroidManifest.xml
++++ b/Travel_Connected/app/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+@@ -21,6 +21,11 @@
+     <!-- POST_NOTIFICATIONS (Android 13+) -->
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++
+     <permission
+         android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+         android:protectionLevel="signature" />
+@@ -62,11 +67,16 @@
+         <service
+             android:name="com.travlytic.app.service.UniversalListenerService"
+             android:exported="true"
++            android:foregroundServiceType="specialUse"
+             android:label="MINI-TO Bot"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
++
++            <property
++                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
+         </service>
+ 
+         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+diff --git a/Travel_Connected/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml b/Travel_Connected/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml
+index f3233c1..e194fa0 100644
+--- a/Travel_Connected/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml
++++ b/Travel_Connected/app/build/intermediates/merged_manifests/debug/AndroidManifest.xml
+@@ -21,6 +21,11 @@
+     <!-- POST_NOTIFICATIONS (Android 13+) -->
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++
+     <permission
+         android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+         android:protectionLevel="signature" />
+@@ -62,11 +67,16 @@
+         <service
+             android:name="com.travlytic.app.service.UniversalListenerService"
+             android:exported="true"
++            android:foregroundServiceType="specialUse"
+             android:label="MINI-TO Bot"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
++
++            <property
++                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
+         </service>
+ 
+         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+diff --git a/Travel_Connected/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml b/Travel_Connected/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml
+index f3233c1..e194fa0 100644
+--- a/Travel_Connected/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml
++++ b/Travel_Connected/app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml
+@@ -21,6 +21,11 @@
+     <!-- POST_NOTIFICATIONS (Android 13+) -->
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++
+     <permission
+         android:name="com.travlytic.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+         android:protectionLevel="signature" />
+@@ -62,11 +67,16 @@
+         <service
+             android:name="com.travlytic.app.service.UniversalListenerService"
+             android:exported="true"
++            android:foregroundServiceType="specialUse"
+             android:label="MINI-TO Bot"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
++
++            <property
++                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
+         </service>
+ 
+         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+diff --git a/Travel_Connected/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ b/Travel_Connected/app/build/intermediates/processed_res/debug/out/resources-debug.ap_
+index ac28f82..200b084 100644
+Binary files a/Travel_Connected/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ and b/Travel_Connected/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-1$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-1$1.dex
+index adb5586..7fb5645 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-1$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-1$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-2$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-2$1.dex
+index 2482ff9..a47e716 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-2$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-2$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-3$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-3$1.dex
+index ea485c9..b2bf969 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-3$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt$lambda-3$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt.dex
+index 7631e8c..b2a596f 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/ComposableSingletons$MainActivityKt.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivity.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivity.dex
+index 77edd9f..15008be 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivity.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivity.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1$1.dex
+index 01fe9de..49876b0 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1.dex
+index 27b84eb..a749810 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2$1.dex
+index d44d60b..afe1738 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2.dex
+index 8709218..61dc162 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$2.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3$1.dex
+index 4fe3043..528bef2 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3.dex
+index 7139a50..08a3cbe 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$3.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4$1.dex
+index 31380a6..6f2a39e 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4.dex
+index 7ad061e..0384010 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$4.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$1.dex
+index b0fa192..11e52a3 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$2.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$2.dex
+index 7e2635f..b0f4887 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$2.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$2.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$3.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$3.dex
+index ec04c25..e37cba9 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$3.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1$3.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1.dex
+index b45cb97..6b1df27 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$1.dex
+index 2d5eb6b..a495285 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$2.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$2.dex
+index 5710509..dfc5fe9 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$2.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$2.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$3.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$3.dex
+index 20e33f2..748211a 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$3.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$3.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$4.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$4.dex
+index 62fd1c6..5a7d910 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$4.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$4.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$5.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$5.dex
+index 6323061..4aa5201 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$5.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2$5.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2.dex
+index 04c8df3..a30b26c 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$2.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3$1.dex
+index 5c0c596..2e8be9c 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3.dex
+index 3649922..9395632 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$3.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4$1.dex
+index 0084890..8dbff0c 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4.dex
+index fc8b10c..243c72e 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$4.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5$1.dex
+index a4a7c85..4e5fbac 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5.dex
+index ade8be1..ccdeef8 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$5.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6$1.dex
+index 4204227..22258f2 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6.dex
+index 1f264e3..1622549 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$6.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7$1.dex
+index bc2f03b..49c986d 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7.dex
+index 8b7ec94..466c27a 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$7.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8$1.dex
+index 08efc3f..644e97b 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8.dex
+index c47db08..b2198dd 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5$8.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5.dex
+index 399fe9f..52e0221 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt$MinItoNavHost$5.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt.dex
+index 1f691ab..30c601e 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/MainActivityKt.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$isWithinSchedule$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$isWithinSchedule$1.dex
+index 7a6713a..5638c14 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$isWithinSchedule$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$isWithinSchedule$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$1.dex
+index 2034540..8091c8a 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$refreshedCount$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$refreshedCount$1.dex
+index b9b78dd..b64a08e 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$refreshedCount$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$refreshedCount$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$welcomeMsg$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$welcomeMsg$1.dex
+index 3db1f8c..85522a5 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$welcomeMsg$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$1$welcomeMsg$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$3.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$3.dex
+index e935e6a..5ab1d16 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$3.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1$3.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1.dex
+index 582a1d8..ce206fc 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService$onNotificationPosted$1.dex differ
+diff --git a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService.dex b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService.dex
+index dc7cd27..a9e1585 100644
+Binary files a/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService.dex and b/Travel_Connected/app/build/intermediates/project_dex_archive/debug/out/com/travlytic/app/service/UniversalListenerService.dex differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+index 01160e2..193aad6 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values
+index ba9e975..39461eb 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+index e44ce73..9806340 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.s b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.s
+index f272f2e..d5007b3 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.s
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.s
+@@ -1 +1 @@
+-?;?1?5
+\ No newline at end of file
++?;?1?5?4?4
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+index 33c9ec1..ccadb28 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+index 8c3ea4d..28f3216 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+index e11142b..4003a76 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+index 71d50e2..bc39033 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+index 1d8c28d..8f4c2cc 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values
+index 0ef211a..1396fdf 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+index 54d2e1a..d8481da 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.s b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.s
+index 7fcb7c1..87b0eee 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.s
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.s
+@@ -1 +1 @@
+-??
+\ No newline at end of file
++???
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab
+index ec833b7..7fbd962 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at
+index 51e025f..dee9057 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+index 3f39f54..5f0fca9 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values
+index 178163b..692ea56 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+index 2dd888d..7a0b631 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.s b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.s
+index af4b063..a242f29 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.s
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.s
+@@ -1 +1 @@
+-??????
+\ No newline at end of file
++????????????
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+index 404e2e1..48edb0f 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values
+index 63eddea..48d6aed 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+index 0753f26..e37d2fa 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.s b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.s
+index 09a4271..7a4bd9f 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.s
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.s
+@@ -1 +1 @@
+-?J?:
+\ No newline at end of file
++?J?:?:
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+index 04a4766..de3688e 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+index 56b8a45..531b57e 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+index 88c7a4b..9f00f05 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+index 719abb2..cfefc5e 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+index 4de2600..c583cc1 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -1,2 +1,2 @@
+-47
++53
+ 0
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+index f4ff95d..0a051c7 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+index 4a0d339..eb2ff1b 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+index 6f7a471..908ea0b 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+index 84abca6..d7e6bc5 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+index 8107e24..508fc67 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+index d8e0f3d..bff9925 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+index f3c4036..b579612 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i
+index b9c060e..bc675e7 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+index 17c3af9..6822252 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+index 1ccd24b..bcad6e9 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+index fcc1420..7045880 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+index 63dde50..2a0f7ed 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values
+index a5510f7..9ef77c7 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+index 06a1fdd..5e77a3a 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.s b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.s
+index 371cb16..08aafdc 100644
+--- a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.s
++++ b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.s
+@@ -1 +1 @@
+-?{?\?????????????E?C??????
+\ No newline at end of file
++?{?\?????????????E?C?????????1???/???0???????=?!
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+index e32a866..33956ff 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
+index 0df546d..30c127a 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/last-build.bin and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/cacheable/last-build.bin differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/Travel_Connected/app/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
+index e5f317a..10ed48f 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin differ
+diff --git a/Travel_Connected/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin b/Travel_Connected/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin
+index 873aaa4..45ecfc5 100644
+Binary files a/Travel_Connected/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin and b/Travel_Connected/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab
+index 13f1993..2a6d6ba 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at
+index 2c2200f..a9eb856 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab
+index 4c3e10b..34da902 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at
+index dea47f0..415c4b9 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab
+index 0a38cc1..7ca4665 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at
+index f0f0af2..8b4b5a6 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab
+index 46a7a45..4532d14 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at
+index a029504..320736f 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab
+index 4900489..bce3197 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at
+index 41f8dfd..81c405d 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab
+index d1a8d08..cd130bc 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at
+index d1eafd7..8d72d89 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab
+index 9182dd9..30f35e7 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at
+index d943d5b..605e4a8 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab
+index 3020379..eec47d8 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at
+index caa9516..e4e3db2 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab
+index f05111a..96fbc75 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at
+index d6ce087..f7d1297 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/counters.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+index 5007100..104aff1 100644
+--- a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
++++ b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/counters.tab
+@@ -1,2 +1,2 @@
+-31
++38
+ 0
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab
+index 195187e..3dd92d8 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at
+index ca46eca..12a2667 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab
+index e8390bb..1e29bce 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream
+index 31a0c7e..f0c2da4 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len
+index b01f22d..6645728 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len
+index 3085af4..b67c227 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at
+index 09438df..687894c 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i
+index aa13d7e..81b4c67 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab
+index 8515bb8..583761e 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream
+index 2afd51f..fc858f2 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len
+index 39316b6..e6d1719 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len
+index 4894074..17710d1 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.len differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at
+index cad637f..7c54b0d 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i
+index d76fd7e..97448a9 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/last-build.bin b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/last-build.bin
+index 2bd8896..97522fe 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/last-build.bin and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/cacheable/last-build.bin differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
+index 1339420..b034a24 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin differ
+diff --git a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/local-state/build-history.bin b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/local-state/build-history.bin
+index cc0cfd3..5dca4ed 100644
+Binary files a/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/local-state/build-history.bin and b/Travel_Connected/app/build/kotlin/kaptGenerateStubsDebugKotlin/local-state/build-history.bin differ
+diff --git a/Travel_Connected/app/build/outputs/apk/debug/app-debug.apk b/Travel_Connected/app/build/outputs/apk/debug/app-debug.apk
+index 05c61f4..01a7124 100644
+Binary files a/Travel_Connected/app/build/outputs/apk/debug/app-debug.apk and b/Travel_Connected/app/build/outputs/apk/debug/app-debug.apk differ
+diff --git a/Travel_Connected/app/build/outputs/logs/manifest-merger-debug-report.txt b/Travel_Connected/app/build/outputs/logs/manifest-merger-debug-report.txt
+index 2cdcd0a..b17f9e3 100644
+--- a/Travel_Connected/app/build/outputs/logs/manifest-merger-debug-report.txt
++++ b/Travel_Connected/app/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -1,9 +1,9 @@
+ -- Merging decision tree log ---
+ manifest
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-66:12
+-INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-66:12
+-INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-66:12
+-INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-66:12
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-75:12
++INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-75:12
++INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-75:12
++INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:2:1-75:12
+ MERGED from [com.google.ai.client.generativeai:generativeai:0.7.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\93c14ae5cc49fb03e8b30dd8e2f05391\transformed\generativeai-0.7.0\AndroidManifest.xml:17:1-24:12
+ MERGED from [androidx.hilt:hilt-navigation-compose:1.1.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\b81179071f4b1b356175b5e0b394227b\transformed\hilt-navigation-compose-1.1.0\AndroidManifest.xml:2:1-7:12
+ MERGED from [androidx.hilt:hilt-navigation:1.1.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\a095600f0f1e1ae94b56253d11ad0bdf\transformed\hilt-navigation-1.1.0\AndroidManifest.xml:2:1-7:12
+@@ -107,9 +107,17 @@ uses-permission#android.permission.POST_NOTIFICATIONS
+ ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:5-77
+ 	android:name
+ 		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:15:22-74
++uses-permission#android.permission.FOREGROUND_SERVICE
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:5-77
++	android:name
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:22-74
++uses-permission#android.permission.FOREGROUND_SERVICE_SPECIAL_USE
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:5-89
++	android:name
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:22-86
+ application
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:17:5-64:19
+-INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:17:5-64:19
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:5-73:19
++INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:5-73:19
+ MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
+ MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\zyzen 3\.gradle\caches\transforms-4\3897af583ec0d2a4b2ea7a795789ed2d\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
+ MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\33c211ee025ec53321fe0ba51cbf6236\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
+@@ -135,67 +143,75 @@ MERGED from [com.google.android.gms:play-services-basement:16.0.1] C:\Users\zyze
+ 	android:appComponentFactory
+ 		ADDED from [androidx.core:core:1.12.0] C:\Users\zyzen 3\.gradle\caches\transforms-4\01c215c6abc281ad1404bfcaebbda4a0\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+ 	android:supportsRtl
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-35
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-35
+ 	android:label
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:21:9-41
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:26:9-41
+ 	android:roundIcon
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:22:9-54
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:27:9-54
+ 	android:icon
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:20:9-43
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-43
+ 	android:allowBackup
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:19:9-35
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-35
+ 	android:theme
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:24:9-44
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:9-44
+ 	android:networkSecurityConfig
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:25:9-69
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:9-69
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:18:9-34
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:23:9-34
+ activity#com.travlytic.app.MainActivity
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:28:9-36:20
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:9-41:20
+ 	android:exported
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:30:13-36
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:35:13-36
+ 	android:theme
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:31:13-48
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:36:13-48
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:29:13-41
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:13-41
+ intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:32:13-35:29
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:37:13-40:29
+ action#android.intent.action.MAIN
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:17-69
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:38:17-69
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:33:25-66
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:38:25-66
+ category#android.intent.category.LAUNCHER
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:17-77
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:39:17-77
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:34:27-74
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:39:27-74
+ service#com.travlytic.app.service.UniversalListenerService
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:45:9-53:19
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:9-62:19
+ 	android:label
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:47:13-40
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:52:13-40
+ 	android:exported
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:49:13-36
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:55:13-36
+ 	android:permission
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:48:13-87
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:53:13-87
++	android:foregroundServiceType
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:54:13-55
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:46:13-61
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:13-61
+ intent-filter#action:name:android.service.notification.NotificationListenerService
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:50:13-52:29
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:13-58:29
+ action#android.service.notification.NotificationListenerService
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:17-99
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:17-99
++	android:name
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:25-96
++property
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:105
++	android:value
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:61:17-102
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:51:25-96
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-76
+ receiver#com.travlytic.app.receiver.BootReceiver
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:56:9-62:20
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:65:9-71:20
+ 	android:exported
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:58:13-36
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:67:13-36
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:57:13-50
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:66:13-50
+ intent-filter#action:name:android.intent.action.BOOT_COMPLETED
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:59:13-61:29
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:68:13-70:29
+ action#android.intent.action.BOOT_COMPLETED
+-ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:17-79
++ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:69:17-79
+ 	android:name
+-		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:60:25-76
++		ADDED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml:69:25-76
+ uses-sdk
+ INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+ INJECTED from C:\Users\zyzen 3\PixArtM\Travel_Connected\app\src\main\AndroidManifest.xml
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppDatabaseFactory.class.uniqueId9 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppDatabaseFactory.class.uniqueId9
+deleted file mode 100644
+index b3d6b9b..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppDatabaseFactory.class.uniqueId9 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppPreferencesFactory.class.uniqueId4 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppPreferencesFactory.class.uniqueId4
+deleted file mode 100644
+index c011e91..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideAppPreferencesFactory.class.uniqueId4 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideEscalationLogDaoFactory.class.uniqueId2 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideEscalationLogDaoFactory.class.uniqueId2
+deleted file mode 100644
+index 8b03c4c..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideEscalationLogDaoFactory.class.uniqueId2 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideKnowledgeItemDaoFactory.class.uniqueId3 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideKnowledgeItemDaoFactory.class.uniqueId3
+deleted file mode 100644
+index 799714e..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideKnowledgeItemDaoFactory.class.uniqueId3 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideResponseLogDaoFactory.class.uniqueId1 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideResponseLogDaoFactory.class.uniqueId1
+deleted file mode 100644
+index 2c90d3b..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideResponseLogDaoFactory.class.uniqueId1 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory$InstanceHolder.class.uniqueId16 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory$InstanceHolder.class.uniqueId16
+deleted file mode 100644
+index 6038516..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory$InstanceHolder.class.uniqueId16 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory.class.uniqueId14 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory.class.uniqueId14
+deleted file mode 100644
+index a835438..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideSummaryGeneratorFactory.class.uniqueId14 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTrainingRuleDaoFactory.class.uniqueId0 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTrainingRuleDaoFactory.class.uniqueId0
+deleted file mode 100644
+index 87ead9a..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTrainingRuleDaoFactory.class.uniqueId0 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTtsManagerFactory.class.uniqueId6 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTtsManagerFactory.class.uniqueId6
+deleted file mode 100644
+index ab88209..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/AppModule_ProvideTtsManagerFactory.class.uniqueId6 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/Hilt_UniversalListenerService.class.uniqueId11 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/Hilt_UniversalListenerService.class.uniqueId11
+deleted file mode 100644
+index 8326f8f..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/Hilt_UniversalListenerService.class.uniqueId11 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_Factory.class.uniqueId7 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_Factory.class.uniqueId7
+deleted file mode 100644
+index 9780920..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_Factory.class.uniqueId7 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$BindsModule.class.uniqueId8 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$BindsModule.class.uniqueId8
+deleted file mode 100644
+index 24c4d97..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$BindsModule.class.uniqueId8 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$KeyModule.class.uniqueId10 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$KeyModule.class.uniqueId10
+deleted file mode 100644
+index 1d8add5..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules$KeyModule.class.uniqueId10 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules.class.uniqueId15 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules.class.uniqueId15
+deleted file mode 100644
+index 7b0adca..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules.class.uniqueId15 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory$InstanceHolder.class.uniqueId12 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory$InstanceHolder.class.uniqueId12
+deleted file mode 100644
+index ebd058e..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory$InstanceHolder.class.uniqueId12 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory.class.uniqueId13 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory.class.uniqueId13
+deleted file mode 100644
+index b880f0f..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MainViewModel_HiltModules_KeyModule_ProvideFactory.class.uniqueId13 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_GeneratedInjector.class.uniqueId17 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_GeneratedInjector.class.uniqueId17
+deleted file mode 100644
+index 76693e8..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_GeneratedInjector.class.uniqueId17 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_MembersInjector.class.uniqueId5 b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_MembersInjector.class.uniqueId5
+deleted file mode 100644
+index 3989b30..0000000
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/UniversalListenerService_MembersInjector.class.uniqueId5 and /dev/null differ
+diff --git a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+index 9e63d16..8d6d53a 100644
+Binary files a/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin and b/Travel_Connected/app/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCBuilder.class.uniqueId40 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCBuilder.class.uniqueId40
+index 5f8101f..5574af2 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCBuilder.class.uniqueId40 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCBuilder.class.uniqueId40 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl$LazyClassKeyProvider.class.uniqueId6 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl$LazyClassKeyProvider.class.uniqueId6
+index 1ff5e94..6ea3e0f 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl$LazyClassKeyProvider.class.uniqueId6 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl$LazyClassKeyProvider.class.uniqueId6 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl.class.uniqueId22 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl.class.uniqueId22
+index 7001c47..f404c5a 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl.class.uniqueId22 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityCImpl.class.uniqueId22 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCBuilder.class.uniqueId41 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCBuilder.class.uniqueId41
+index eaf6680..690800e 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCBuilder.class.uniqueId41 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCBuilder.class.uniqueId41 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl$SwitchingProvider.class.uniqueId44 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl$SwitchingProvider.class.uniqueId44
+index c98f36e..13e1304 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl$SwitchingProvider.class.uniqueId44 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl$SwitchingProvider.class.uniqueId44 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl.class.uniqueId15 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl.class.uniqueId15
+index c43840c..e469f9b 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl.class.uniqueId15 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ActivityRetainedCImpl.class.uniqueId15 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$Builder.class.uniqueId3 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$Builder.class.uniqueId3
+index be99c5b..b6db44c 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$Builder.class.uniqueId3 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$Builder.class.uniqueId3 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCBuilder.class.uniqueId17 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCBuilder.class.uniqueId17
+index 6171e72..2d71c24 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCBuilder.class.uniqueId17 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCBuilder.class.uniqueId17 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCImpl.class.uniqueId4 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCImpl.class.uniqueId4
+index 356db2f..4ccdd91 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCImpl.class.uniqueId4 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$FragmentCImpl.class.uniqueId4 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCBuilder.class.uniqueId19 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCBuilder.class.uniqueId19
+index 771b41f..e644066 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCBuilder.class.uniqueId19 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCBuilder.class.uniqueId19 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCImpl.class.uniqueId37 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCImpl.class.uniqueId37
+index 494740e..2851a2c 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCImpl.class.uniqueId37 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ServiceCImpl.class.uniqueId37 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl$SwitchingProvider.class.uniqueId31 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl$SwitchingProvider.class.uniqueId31
+index 810549f..562bebc 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl$SwitchingProvider.class.uniqueId31 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl$SwitchingProvider.class.uniqueId31 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl.class.uniqueId24 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl.class.uniqueId24
+index 39df345..cef8365 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl.class.uniqueId24 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$SingletonCImpl.class.uniqueId24 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCBuilder.class.uniqueId28 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCBuilder.class.uniqueId28
+index 1c8e43b..f8ff37a 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCBuilder.class.uniqueId28 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCBuilder.class.uniqueId28 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCImpl.class.uniqueId38 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCImpl.class.uniqueId38
+index 1413d99..b55d8f4 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCImpl.class.uniqueId38 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewCImpl.class.uniqueId38 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCBuilder.class.uniqueId11 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCBuilder.class.uniqueId11
+index df9dcc4..d3d41df 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCBuilder.class.uniqueId11 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCBuilder.class.uniqueId11 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$LazyClassKeyProvider.class.uniqueId33 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$LazyClassKeyProvider.class.uniqueId33
+index 07a5067..d99f5d1 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$LazyClassKeyProvider.class.uniqueId33 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$LazyClassKeyProvider.class.uniqueId33 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$SwitchingProvider.class.uniqueId42 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$SwitchingProvider.class.uniqueId42
+index 78264ba..fe47670 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$SwitchingProvider.class.uniqueId42 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl$SwitchingProvider.class.uniqueId42 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl.class.uniqueId23 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl.class.uniqueId23
+index 0dc5054..8813803 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl.class.uniqueId23 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewModelCImpl.class.uniqueId23 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCBuilder.class.uniqueId36 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCBuilder.class.uniqueId36
+index 88528ce..396c29f 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCBuilder.class.uniqueId36 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCBuilder.class.uniqueId36 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCImpl.class.uniqueId46 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCImpl.class.uniqueId46
+index 9cc850a..1e6318b 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCImpl.class.uniqueId46 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC$ViewWithFragmentCImpl.class.uniqueId46 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.class.uniqueId2 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.class.uniqueId2
+index 2fd87ad..2c5b064 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.class.uniqueId2 and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.class.uniqueId2 differ
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.java.uniqueId13 b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.java.uniqueId13
+index a420c68..859032e 100644
+--- a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.java.uniqueId13
++++ b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/compileTransaction/stash-dir/DaggerMinitoApp_HiltComponents_SingletonC.java.uniqueId13
+@@ -6,6 +6,7 @@ import android.view.View;
+ import androidx.fragment.app.Fragment;
+ import androidx.lifecycle.SavedStateHandle;
+ import androidx.lifecycle.ViewModel;
++import com.google.gson.Gson;
+ import com.travlytic.app.data.db.AppDatabase;
+ import com.travlytic.app.data.db.dao.EscalationLogDao;
+ import com.travlytic.app.data.db.dao.KnowledgeItemDao;
+@@ -16,6 +17,7 @@ import com.travlytic.app.data.repository.KnowledgeRepository;
+ import com.travlytic.app.di.AppModule_ProvideAppDatabaseFactory;
+ import com.travlytic.app.di.AppModule_ProvideAppPreferencesFactory;
+ import com.travlytic.app.di.AppModule_ProvideEscalationLogDaoFactory;
++import com.travlytic.app.di.AppModule_ProvideGsonFactory;
+ import com.travlytic.app.di.AppModule_ProvideKnowledgeItemDaoFactory;
+ import com.travlytic.app.di.AppModule_ProvideResponseLogDaoFactory;
+ import com.travlytic.app.di.AppModule_ProvideSummaryGeneratorFactory;
+@@ -575,6 +577,8 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
+ 
+     private final SingletonCImpl singletonCImpl = this;
+ 
++    private Provider<Gson> provideGsonProvider;
++
+     private Provider<AppPreferences> provideAppPreferencesProvider;
+ 
+     private Provider<AppDatabase> provideAppDatabaseProvider;
+@@ -603,16 +607,17 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
+ 
+     @SuppressWarnings("unchecked")
+     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
++      this.provideGsonProvider = DoubleCheck.provider(new SwitchingProvider<Gson>(singletonCImpl, 1));
+       this.provideAppPreferencesProvider = DoubleCheck.provider(new SwitchingProvider<AppPreferences>(singletonCImpl, 0));
+-      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 3));
+-      this.provideKnowledgeItemDaoProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeItemDao>(singletonCImpl, 2));
+-      this.knowledgeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeRepository>(singletonCImpl, 1));
+-      this.provideEscalationLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<EscalationLogDao>(singletonCImpl, 4));
+-      this.provideResponseLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<ResponseLogDao>(singletonCImpl, 5));
+-      this.provideTrainingRuleDaoProvider = DoubleCheck.provider(new SwitchingProvider<TrainingRuleDao>(singletonCImpl, 6));
+-      this.geminiAgentProvider = DoubleCheck.provider(new SwitchingProvider<GeminiAgent>(singletonCImpl, 7));
+-      this.provideSummaryGeneratorProvider = DoubleCheck.provider(new SwitchingProvider<SummaryGenerator>(singletonCImpl, 8));
+-      this.provideTtsManagerProvider = DoubleCheck.provider(new SwitchingProvider<TtsManager>(singletonCImpl, 9));
++      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 4));
++      this.provideKnowledgeItemDaoProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeItemDao>(singletonCImpl, 3));
++      this.knowledgeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeRepository>(singletonCImpl, 2));
++      this.provideEscalationLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<EscalationLogDao>(singletonCImpl, 5));
++      this.provideResponseLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<ResponseLogDao>(singletonCImpl, 6));
++      this.provideTrainingRuleDaoProvider = DoubleCheck.provider(new SwitchingProvider<TrainingRuleDao>(singletonCImpl, 7));
++      this.geminiAgentProvider = DoubleCheck.provider(new SwitchingProvider<GeminiAgent>(singletonCImpl, 8));
++      this.provideSummaryGeneratorProvider = DoubleCheck.provider(new SwitchingProvider<SummaryGenerator>(singletonCImpl, 9));
++      this.provideTtsManagerProvider = DoubleCheck.provider(new SwitchingProvider<TtsManager>(singletonCImpl, 10));
+     }
+ 
+     @Override
+@@ -649,33 +654,36 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
+       public T get() {
+         switch (id) {
+           case 0: // com.travlytic.app.data.prefs.AppPreferences 
+-          return (T) AppModule_ProvideAppPreferencesFactory.provideAppPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
++          return (T) AppModule_ProvideAppPreferencesFactory.provideAppPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideGsonProvider.get());
++
++          case 1: // com.google.gson.Gson 
++          return (T) AppModule_ProvideGsonFactory.provideGson();
+ 
+-          case 1: // com.travlytic.app.data.repository.KnowledgeRepository 
++          case 2: // com.travlytic.app.data.repository.KnowledgeRepository 
+           return (T) new KnowledgeRepository(singletonCImpl.provideKnowledgeItemDaoProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+ 
+-          case 2: // com.travlytic.app.data.db.dao.KnowledgeItemDao 
++          case 3: // com.travlytic.app.data.db.dao.KnowledgeItemDao 
+           return (T) AppModule_ProvideKnowledgeItemDaoFactory.provideKnowledgeItemDao(singletonCImpl.provideAppDatabaseProvider.get());
+ 
+-          case 3: // com.travlytic.app.data.db.AppDatabase 
++          case 4: // com.travlytic.app.data.db.AppDatabase 
+           return (T) AppModule_ProvideAppDatabaseFactory.provideAppDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+ 
+-          case 4: // com.travlytic.app.data.db.dao.EscalationLogDao 
++          case 5: // com.travlytic.app.data.db.dao.EscalationLogDao 
+           return (T) AppModule_ProvideEscalationLogDaoFactory.provideEscalationLogDao(singletonCImpl.provideAppDatabaseProvider.get());
+ 
+-          case 5: // com.travlytic.app.data.db.dao.ResponseLogDao 
++          case 6: // com.travlytic.app.data.db.dao.ResponseLogDao 
+           return (T) AppModule_ProvideResponseLogDaoFactory.provideResponseLogDao(singletonCImpl.provideAppDatabaseProvider.get());
+ 
+-          case 6: // com.travlytic.app.data.db.dao.TrainingRuleDao 
++          case 7: // com.travlytic.app.data.db.dao.TrainingRuleDao 
+           return (T) AppModule_ProvideTrainingRuleDaoFactory.provideTrainingRuleDao(singletonCImpl.provideAppDatabaseProvider.get());
+ 
+-          case 7: // com.travlytic.app.engine.GeminiAgent 
++          case 8: // com.travlytic.app.engine.GeminiAgent 
+           return (T) new GeminiAgent(singletonCImpl.knowledgeRepositoryProvider.get(), singletonCImpl.provideTrainingRuleDaoProvider.get(), singletonCImpl.provideResponseLogDaoProvider.get());
+ 
+-          case 8: // com.travlytic.app.engine.SummaryGenerator 
++          case 9: // com.travlytic.app.engine.SummaryGenerator 
+           return (T) AppModule_ProvideSummaryGeneratorFactory.provideSummaryGenerator();
+ 
+-          case 9: // com.travlytic.app.engine.TtsManager 
++          case 10: // com.travlytic.app.engine.TtsManager 
+           return (T) AppModule_ProvideTtsManagerFactory.provideTtsManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+ 
+           default: throw new AssertionError(id);
+diff --git a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/previous-compilation-data.bin b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/previous-compilation-data.bin
+index 4d8e3e7..e147633 100644
+Binary files a/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/previous-compilation-data.bin and b/Travel_Connected/app/build/tmp/hiltJavaCompileDebug/previous-compilation-data.bin differ
+diff --git a/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/apt-cache.bin b/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/apt-cache.bin
+index 3d18921..d7eb3bf 100644
+Binary files a/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/apt-cache.bin and b/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/apt-cache.bin differ
+diff --git a/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/java-cache.bin b/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/java-cache.bin
+index 85d71c4..76215f6 100644
+Binary files a/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/java-cache.bin and b/Travel_Connected/app/build/tmp/kapt3/incApCache/debug/java-cache.bin differ
+diff --git a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.java b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.java
+index 9b51d66..a56068e 100644
+--- a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.java
++++ b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.java
+@@ -1,7 +1,7 @@
+ package com.travlytic.app;
+ 
+ @dagger.hilt.android.AndroidEntryPoint()
+-@kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000\u0018\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\b\u0007\u0018\u00002\u00020\u0001B\u0005\u00a2\u0006\u0002\u0010\u0002J\u0012\u0010\u0003\u001a\u00020\u00042\b\u0010\u0005\u001a\u0004\u0018\u00010\u0006H\u0014\u00a8\u0006\u0007"}, d2 = {"Lcom/travlytic/app/MainActivity;", "Landroidx/activity/ComponentActivity;", "()V", "onCreate", "", "savedInstanceState", "Landroid/os/Bundle;", "app_debug"})
++@kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000\u001a\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\b\u0007\u0018\u00002\u00020\u0001B\u0005\u00a2\u0006\u0002\u0010\u0002J\b\u0010\u0003\u001a\u00020\u0004H\u0002J\u0012\u0010\u0005\u001a\u00020\u00042\b\u0010\u0006\u001a\u0004\u0018\u00010\u0007H\u0014\u00a8\u0006\b"}, d2 = {"Lcom/travlytic/app/MainActivity;", "Landroidx/activity/ComponentActivity;", "()V", "forceRebindNotificationListener", "", "onCreate", "savedInstanceState", "Landroid/os/Bundle;", "app_debug"})
+ public final class MainActivity extends androidx.activity.ComponentActivity {
+     
+     public MainActivity() {
+@@ -12,4 +12,12 @@ public final class MainActivity extends androidx.activity.ComponentActivity {
+     protected void onCreate(@org.jetbrains.annotations.Nullable()
+     android.os.Bundle savedInstanceState) {
+     }
++    
++    /**
++     * Fuerza a Android a restablecer la conexi??n con el NotificationListenerService.
++     * T??cnica: deshabilitar y re-habilitar el componente brevemente.
++     * Esto hace que Android rebindee el servicio sin perder los permisos del usuario.
++     */
++    private final void forceRebindNotificationListener() {
++    }
+ }
+\ No newline at end of file
+diff --git a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.kapt_metadata b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.kapt_metadata
+index ed7bdf9..616075f 100644
+Binary files a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.kapt_metadata and b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivity.kapt_metadata differ
+diff --git a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.java b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.java
+index 97f95b2..5d87011 100644
+--- a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.java
++++ b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.java
+@@ -1,7 +1,9 @@
+ package com.travlytic.app;
+ 
+-@kotlin.Metadata(mv = {1, 9, 0}, k = 2, xi = 48, d1 = {"\u0000\b\n\u0000\n\u0002\u0010\u0002\n\u0000\u001a\b\u0010\u0000\u001a\u00020\u0001H\u0007\u00a8\u0006\u0002"}, d2 = {"MinItoNavHost", "", "app_debug"})
++@kotlin.Metadata(mv = {1, 9, 0}, k = 2, xi = 48, d1 = {"\u0000\u000e\n\u0000\n\u0002\u0010\u000e\n\u0000\n\u0002\u0010\u0002\n\u0000\u001a\b\u0010\u0002\u001a\u00020\u0003H\u0007\"\u000e\u0010\u0000\u001a\u00020\u0001X\u0082T\u00a2\u0006\u0002\n\u0000\u00a8\u0006\u0004"}, d2 = {"TAG", "", "MinItoNavHost", "", "app_debug"})
+ public final class MainActivityKt {
++    @org.jetbrains.annotations.NotNull()
++    private static final java.lang.String TAG = "MainActivity";
+     
+     @androidx.compose.runtime.Composable()
+     public static final void MinItoNavHost() {
+diff --git a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.kapt_metadata b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.kapt_metadata
+index a7fae85..d8dfd2c 100644
+Binary files a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.kapt_metadata and b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/MainActivityKt.kapt_metadata differ
+diff --git a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/service/UniversalListenerService.kapt_metadata b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/service/UniversalListenerService.kapt_metadata
+index abeedea..5ecdb94 100644
+Binary files a/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/service/UniversalListenerService.kapt_metadata and b/Travel_Connected/app/build/tmp/kapt3/stubs/debug/com/travlytic/app/service/UniversalListenerService.kapt_metadata differ
+diff --git a/Travel_Connected/app/src/main/AndroidManifest.xml b/Travel_Connected/app/src/main/AndroidManifest.xml
+index 8b8c456..02ff688 100644
+--- a/Travel_Connected/app/src/main/AndroidManifest.xml
++++ b/Travel_Connected/app/src/main/AndroidManifest.xml
+@@ -14,6 +14,11 @@
+     <!-- POST_NOTIFICATIONS (Android 13+) -->
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++
+     <application
+         android:name=".MinitoApp"
+         android:allowBackup="true"
+@@ -46,10 +51,14 @@
+             android:name=".service.UniversalListenerService"
+             android:label="MINI-TO Bot"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
++            android:foregroundServiceType="specialUse"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
++            <property
++                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
+         </service>
+ 
+         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+diff --git a/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt b/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
+index cc97a2c..8816c8f 100644
+--- a/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
++++ b/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
+@@ -1,6 +1,9 @@
+ package com.travlytic.app
+ 
++import android.content.ComponentName
++import android.content.pm.PackageManager
+ import android.os.Bundle
++import android.util.Log
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.compose.animation.*
+@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
+ import androidx.navigation.compose.NavHost
+ import androidx.navigation.compose.composable
+ import androidx.navigation.compose.rememberNavController
++import com.travlytic.app.service.UniversalListenerService
+ import com.travlytic.app.ui.screens.HomeScreen
+ import com.travlytic.app.ui.screens.ScheduleScreen
+ import com.travlytic.app.ui.screens.SettingsScreen
+@@ -23,11 +27,27 @@ import com.travlytic.app.ui.theme.MinItoTheme
+ import com.travlytic.app.ui.theme.MinItoSurface
+ import dagger.hilt.android.AndroidEntryPoint
+ 
++private const val TAG = "MainActivity"
++
+ @AndroidEntryPoint
+ class MainActivity : ComponentActivity() {
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
++
++        // ?????? Forzar re-vinculaci??n del NotificationListenerService ??????????????????????????????????????????
++        // Cuando se reinstala un APK, Android puede dejar el servicio en estado
++        // desconectado aunque los permisos est??n activos. Este truco lo fuerza
++        // a reconectarse sin que el usuario tenga que ir a Ajustes.
++        forceRebindNotificationListener()
++
++        // ?????? Solicitar permisos de notificaci??n (Android 13+) ?????????????????????????????????????????????????????????
++        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
++            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
++                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
++            }
++        }
++
+         setContent {
+             MinItoTheme {
+                 Surface(
+@@ -39,6 +59,32 @@ class MainActivity : ComponentActivity() {
+             }
+         }
+     }
++
++    /**
++     * Fuerza a Android a restablecer la conexi??n con el NotificationListenerService.
++     * T??cnica: deshabilitar y re-habilitar el componente brevemente.
++     * Esto hace que Android rebindee el servicio sin perder los permisos del usuario.
++     */
++    private fun forceRebindNotificationListener() {
++        try {
++            val componentName = ComponentName(this, UniversalListenerService::class.java)
++            val pm = packageManager
++
++            pm.setComponentEnabledSetting(
++                componentName,
++                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
++                PackageManager.DONT_KILL_APP
++            )
++            pm.setComponentEnabledSetting(
++                componentName,
++                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
++                PackageManager.DONT_KILL_APP
++            )
++            Log.d(TAG, "??? NotificationListenerService rebindeado exitosamente.")
++        } catch (e: Exception) {
++            Log.e(TAG, "?????? Error al hacer rebind del servicio: ${e.message}")
++        }
++    }
+ }
+ 
+ @Composable
+diff --git a/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt b/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
+index 9961ed4..3048337 100644
+--- a/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
++++ b/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
+@@ -73,6 +73,7 @@ class UniversalListenerService : NotificationListenerService() {
+         super.onCreate()
+         createNotificationChannel()
+         startForeground(1, buildForegroundNotification())
++        Log.d(TAG, "???? UniversalListenerService iniciado.")
+     }
+ 
+     override fun onDestroy() {
+@@ -86,6 +87,8 @@ class UniversalListenerService : NotificationListenerService() {
+         serviceScope.launch {
+             try {
+                 val pkg = sbn.packageName
++                Log.d(TAG, "???? Notificaci??n recibida de: $pkg")
++
+                 val isWhatsappEnabled = appPreferences.channelWhatsApp.first()
+                 val isFbEnabled = appPreferences.channelFbMessenger.first()
+                 val isIgEnabled = appPreferences.channelIgDirect.first()
+@@ -96,29 +99,52 @@ class UniversalListenerService : NotificationListenerService() {
+                     IG_DIRECT_PACKAGE -> isIgEnabled
+                     else -> false
+                 }
+-                if (!isAllowedPackage) return@launch
++                if (!isAllowedPackage) {
++                    Log.d(TAG, "??? Paquete '$pkg' no permitido o canal desactivado. Ignorando.")
++                    return@launch
++                }
++
++                // ????????? Descartar res??menes de grupo ANTES de procesar ???????????????????????????????????????????????????
++                val notif = sbn.notification ?: return@launch
++                if ((notif.flags and Notification.FLAG_GROUP_SUMMARY) != 0) {
++                    return@launch
++                }
+ 
+                 val manualEnabled = appPreferences.botEnabled.first()
+                 val scheduleValue = isWithinSchedule()
++                Log.d(TAG, "???? Estado -> Manual: $manualEnabled | Horario: $scheduleValue")
+                 
+                 // El bot se activa si: (Manual est?? ON) O (Programaci??n est?? ON y es hora activa)
+-                if (!manualEnabled && !scheduleValue) return@launch
++                if (!manualEnabled && !scheduleValue) {
++                    Log.w(TAG, "??? Bot inactivo (manual=false, horario=false). Ignorando.")
++                    return@launch
++                }
+ 
+                 val apiKey = appPreferences.geminiApiKey.first()
+-                if (apiKey.isBlank()) return@launch
++                if (apiKey.isBlank()) {
++                    Log.e(TAG, "??? API Key vac??a. No se puede responder.")
++                    return@launch
++                }
+ 
+-                val notification = sbn.notification ?: return@launch
++                val notification = notif // reutilizamos la notificaci??n ya extra??da
+                 val extras = notification.extras ?: return@launch
+                 
+-                val contactName = extras.getString("android.title") ?: return@launch
++                val contactName = extras.getString("android.title") ?: run {
++                    Log.d(TAG, "??? Notificaci??n sin t??tulo/contacto. Ignorando.")
++                    return@launch
++                }
+                 val messageText = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
++                Log.d(TAG, "???? Mensaje de '$contactName': ${messageText.take(50)}")
+ 
+-                if (messageText.isBlank() || contactName.isBlank()) return@launch
++                if (messageText.isBlank() || contactName.isBlank()) {
++                    Log.d(TAG, "??? Mensaje o contacto en blanco. Ignorando.")
++                    return@launch
++                }
+ 
+                 // ????????? FILTRO 1: Auto-Notificaciones (Detecci??n de Propietario) ?????????
+-                val myName = appPreferences.profileUserName.first()
+-                if (contactName.equals(myName, ignoreCase = true) || contactName.lowercase().contains("yo")) {
+-                    Log.d(TAG, "Detectada auto-notificaci??n de '$contactName'. Ignorando.")
++                val myName = appPreferences.profileUserName.first().trim()
++                if (myName.isNotBlank() && contactName.trim().equals(myName, ignoreCase = true)) {
++                    Log.d(TAG, "??? Auto-notificaci??n del propietario '$contactName'. Ignorando.")
+                     return@launch
+                 }
+ 
+@@ -133,11 +159,17 @@ class UniversalListenerService : NotificationListenerService() {
+                     return@launch
+                 }
+ 
+-                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return@launch
+-
+-                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
+-                val isMessagingStyle = template?.contains("MessagingStyle") == true
+-                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) return@launch
++                // Filtros de app espec??fica
++                val isWhatsAppPkg = pkg == WHATSAPP_PACKAGE || pkg == WHATSAPP_BUSINESS_PACKAGE
++                if (!isWhatsAppPkg) {
++                    val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
++                    val isMessagingStyle = template?.contains("MessagingStyle") == true
++                    if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) {
++                        Log.d(TAG, "??? Template no soportado ($template). Ignorando.")
++                        return@launch
++                    }
++                }
++                Log.d(TAG, "??? Mensaje aprobado para '$contactName' | WA=$isWhatsAppPkg")
+ 
+                 val lastReplied = recentlyReplied[contactName] ?: 0L
+                 if (now - lastReplied < REPLY_COOLDOWN_MS) return@launch
+@@ -152,7 +184,6 @@ class UniversalListenerService : NotificationListenerService() {
+                 if (isFirstInteraction) {
+                     val mutex = welcomeMutexMap.getOrPut(contactName) { Any() }
+                     synchronized(mutex) {
+-                        // Re-verificar dentro del synchronized
+                         val refreshedCount = runBlocking { responseLogDao.getLogCountForContact(contactName) }
+                         if (refreshedCount == 0) {
+                             val welcomeMsg = runBlocking { appPreferences.welcomeMessage.first() }
+@@ -192,7 +223,7 @@ class UniversalListenerService : NotificationListenerService() {
+                 val delayMs = appPreferences.autoReplyDelayMs.first()
+                 delay(delayMs)
+ 
+-                // Generar respuesta con IA Inmutable
++                // Generar respuesta con IA
+                 val response = geminiAgent.generateResponse(
+                     apiKey = apiKey,
+                     systemPrompt = appPreferences.systemPrompt.first(),
+@@ -224,7 +255,7 @@ class UniversalListenerService : NotificationListenerService() {
+                     recentlyReplied[contactName] = System.currentTimeMillis()
+                     responseLogDao.insert(ResponseLog(contact = contactName, incomingMessage = messageText, sentResponse = response, timestamp = System.currentTimeMillis()))
+                     
+-                    // Auto-Recordatorio (Amable)
++                    // Auto-Recordatorio
+                     val reminderEnabled = appPreferences.autoReminderEnabled.first()
+                     if (reminderEnabled) {
+                         val reminderMessage = appPreferences.autoReminderMessage.first()
+@@ -299,26 +330,40 @@ class UniversalListenerService : NotificationListenerService() {
+     }
+ 
+     private suspend fun isWithinSchedule(): Boolean {
+-        if (!appPreferences.scheduleEnabled.first()) return false
++        if (!appPreferences.scheduleEnabled.first()) {
++            Log.d(TAG, "???? [Horario] Desactivado en ajustes.")
++            return false
++        }
+         val now = Calendar.getInstance()
+         val currentMins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+         val dayNum = if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else now.get(Calendar.DAY_OF_WEEK) - 1
+         
+         val activeDays = appPreferences.scheduleDays.first()
+-        if (dayNum !in activeDays) return false
++        if (dayNum !in activeDays) {
++            Log.d(TAG, "???? [Horario] Hoy ($dayNum) no est?? en d??as permitidos: $activeDays")
++            return false
++        }
+         
+         val ranges = appPreferences.scheduleList.first()
+-        if (ranges.isEmpty()) return false
++        if (ranges.isEmpty()) {
++            Log.d(TAG, "???? [Horario] Lista de rangos vac??a.")
++            return false
++        }
+         
+-        return ranges.any { range ->
++        val matched = ranges.any { range ->
+             val startMins = range.startHour * 60 + range.startMinute
+             val endMins = range.endHour * 60 + range.endMinute
+             
+-            if (endMins > startMins) {
++            val isInside = if (endMins > startMins) {
+                 currentMins in startMins..endMins
+             } else {
+                 currentMins >= startMins || currentMins <= endMins
+             }
++            if (isInside) Log.d(TAG, "???? [Horario] Match! Hora actual=$currentMins est?? en rango ${startMins}-${endMins}")
++            isInside
+         }
++
++        if (!matched) Log.d(TAG, "???? [Horario] Fuera de rango. Hora=${currentMins} mins. Rangos=${ranges.size}")
++        return matched
+     }
+ }

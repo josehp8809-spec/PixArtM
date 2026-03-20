@@ -73,6 +73,7 @@ class UniversalListenerService : NotificationListenerService() {
         super.onCreate()
         createNotificationChannel()
         startForeground(1, buildForegroundNotification())
+        Log.d(TAG, "🚀 UniversalListenerService iniciado.")
     }
 
     override fun onDestroy() {
@@ -86,6 +87,8 @@ class UniversalListenerService : NotificationListenerService() {
         serviceScope.launch {
             try {
                 val pkg = sbn.packageName
+                Log.d(TAG, "📳 Notificación recibida de: $pkg")
+
                 val isWhatsappEnabled = appPreferences.channelWhatsApp.first()
                 val isFbEnabled = appPreferences.channelFbMessenger.first()
                 val isIgEnabled = appPreferences.channelIgDirect.first()
@@ -96,29 +99,52 @@ class UniversalListenerService : NotificationListenerService() {
                     IG_DIRECT_PACKAGE -> isIgEnabled
                     else -> false
                 }
-                if (!isAllowedPackage) return@launch
+                if (!isAllowedPackage) {
+                    Log.d(TAG, "⛔ Paquete '$pkg' no permitido o canal desactivado. Ignorando.")
+                    return@launch
+                }
+
+                // ─── Descartar resúmenes de grupo ANTES de procesar ─────────────────
+                val notif = sbn.notification ?: return@launch
+                if ((notif.flags and Notification.FLAG_GROUP_SUMMARY) != 0) {
+                    return@launch
+                }
 
                 val manualEnabled = appPreferences.botEnabled.first()
                 val scheduleValue = isWithinSchedule()
+                Log.d(TAG, "🤖 Estado -> Manual: $manualEnabled | Horario: $scheduleValue")
                 
                 // El bot se activa si: (Manual está ON) O (Programación está ON y es hora activa)
-                if (!manualEnabled && !scheduleValue) return@launch
+                if (!manualEnabled && !scheduleValue) {
+                    Log.w(TAG, "⛔ Bot inactivo (manual=false, horario=false). Ignorando.")
+                    return@launch
+                }
 
                 val apiKey = appPreferences.geminiApiKey.first()
-                if (apiKey.isBlank()) return@launch
+                if (apiKey.isBlank()) {
+                    Log.e(TAG, "⛔ API Key vacía. No se puede responder.")
+                    return@launch
+                }
 
-                val notification = sbn.notification ?: return@launch
+                val notification = notif // reutilizamos la notificación ya extraída
                 val extras = notification.extras ?: return@launch
                 
-                val contactName = extras.getString("android.title") ?: return@launch
+                val contactName = extras.getString("android.title") ?: run {
+                    Log.d(TAG, "⛔ Notificación sin título/contacto. Ignorando.")
+                    return@launch
+                }
                 val messageText = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
+                Log.d(TAG, "📨 Mensaje de '$contactName': ${messageText.take(50)}")
 
-                if (messageText.isBlank() || contactName.isBlank()) return@launch
+                if (messageText.isBlank() || contactName.isBlank()) {
+                    Log.d(TAG, "⛔ Mensaje o contacto en blanco. Ignorando.")
+                    return@launch
+                }
 
                 // ─── FILTRO 1: Auto-Notificaciones (Detección de Propietario) ───
-                val myName = appPreferences.profileUserName.first()
-                if (contactName.equals(myName, ignoreCase = true) || contactName.lowercase().contains("yo")) {
-                    Log.d(TAG, "Detectada auto-notificación de '$contactName'. Ignorando.")
+                val myName = appPreferences.profileUserName.first().trim()
+                if (myName.isNotBlank() && contactName.trim().equals(myName, ignoreCase = true)) {
+                    Log.d(TAG, "⛔ Auto-notificación del propietario '$contactName'. Ignorando.")
                     return@launch
                 }
 
@@ -133,11 +159,17 @@ class UniversalListenerService : NotificationListenerService() {
                     return@launch
                 }
 
-                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return@launch
-
-                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
-                val isMessagingStyle = template?.contains("MessagingStyle") == true
-                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) return@launch
+                // Filtros de app específica
+                val isWhatsAppPkg = pkg == WHATSAPP_PACKAGE || pkg == WHATSAPP_BUSINESS_PACKAGE
+                if (!isWhatsAppPkg) {
+                    val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
+                    val isMessagingStyle = template?.contains("MessagingStyle") == true
+                    if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) {
+                        Log.d(TAG, "⛔ Template no soportado ($template). Ignorando.")
+                        return@launch
+                    }
+                }
+                Log.d(TAG, "✅ Mensaje aprobado para '$contactName' | WA=$isWhatsAppPkg")
 
                 val lastReplied = recentlyReplied[contactName] ?: 0L
                 if (now - lastReplied < REPLY_COOLDOWN_MS) return@launch
@@ -152,7 +184,6 @@ class UniversalListenerService : NotificationListenerService() {
                 if (isFirstInteraction) {
                     val mutex = welcomeMutexMap.getOrPut(contactName) { Any() }
                     synchronized(mutex) {
-                        // Re-verificar dentro del synchronized
                         val refreshedCount = runBlocking { responseLogDao.getLogCountForContact(contactName) }
                         if (refreshedCount == 0) {
                             val welcomeMsg = runBlocking { appPreferences.welcomeMessage.first() }
@@ -192,7 +223,7 @@ class UniversalListenerService : NotificationListenerService() {
                 val delayMs = appPreferences.autoReplyDelayMs.first()
                 delay(delayMs)
 
-                // Generar respuesta con IA Inmutable
+                // Generar respuesta con IA
                 val response = geminiAgent.generateResponse(
                     apiKey = apiKey,
                     systemPrompt = appPreferences.systemPrompt.first(),
@@ -224,7 +255,7 @@ class UniversalListenerService : NotificationListenerService() {
                     recentlyReplied[contactName] = System.currentTimeMillis()
                     responseLogDao.insert(ResponseLog(contact = contactName, incomingMessage = messageText, sentResponse = response, timestamp = System.currentTimeMillis()))
                     
-                    // Auto-Recordatorio (Amable)
+                    // Auto-Recordatorio
                     val reminderEnabled = appPreferences.autoReminderEnabled.first()
                     if (reminderEnabled) {
                         val reminderMessage = appPreferences.autoReminderMessage.first()
@@ -299,26 +330,40 @@ class UniversalListenerService : NotificationListenerService() {
     }
 
     private suspend fun isWithinSchedule(): Boolean {
-        if (!appPreferences.scheduleEnabled.first()) return false
+        if (!appPreferences.scheduleEnabled.first()) {
+            Log.d(TAG, "📅 [Horario] Desactivado en ajustes.")
+            return false
+        }
         val now = Calendar.getInstance()
         val currentMins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
         val dayNum = if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else now.get(Calendar.DAY_OF_WEEK) - 1
         
         val activeDays = appPreferences.scheduleDays.first()
-        if (dayNum !in activeDays) return false
+        if (dayNum !in activeDays) {
+            Log.d(TAG, "📅 [Horario] Hoy ($dayNum) no está en días permitidos: $activeDays")
+            return false
+        }
         
         val ranges = appPreferences.scheduleList.first()
-        if (ranges.isEmpty()) return false
+        if (ranges.isEmpty()) {
+            Log.d(TAG, "📅 [Horario] Lista de rangos vacía.")
+            return false
+        }
         
-        return ranges.any { range ->
+        val matched = ranges.any { range ->
             val startMins = range.startHour * 60 + range.startMinute
             val endMins = range.endHour * 60 + range.endMinute
             
-            if (endMins > startMins) {
+            val isInside = if (endMins > startMins) {
                 currentMins in startMins..endMins
             } else {
                 currentMins >= startMins || currentMins <= endMins
             }
+            if (isInside) Log.d(TAG, "📅 [Horario] Match! Hora actual=$currentMins está en rango ${startMins}-${endMins}")
+            isInside
         }
+
+        if (!matched) Log.d(TAG, "📅 [Horario] Fuera de rango. Hora=${currentMins} mins. Rangos=${ranges.size}")
+        return matched
     }
 }

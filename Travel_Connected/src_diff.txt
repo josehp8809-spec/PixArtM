@@ -1,0 +1,292 @@
+diff --git a/Travel_Connected/app/src/main/AndroidManifest.xml b/Travel_Connected/app/src/main/AndroidManifest.xml
+index 8b8c456..02ff688 100644
+--- a/Travel_Connected/app/src/main/AndroidManifest.xml
++++ b/Travel_Connected/app/src/main/AndroidManifest.xml
+@@ -14,6 +14,11 @@
+     <!-- POST_NOTIFICATIONS (Android 13+) -->
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+ 
++    <!-- FOREGROUND_SERVICE: requerido para llamar startForeground() en el servicio (Android 9+) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
++    <!-- FOREGROUND_SERVICE_SPECIAL_USE: requerido para Android 14+ (Notification Listener Services) -->
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
++
+     <application
+         android:name=".MinitoApp"
+         android:allowBackup="true"
+@@ -46,10 +51,14 @@
+             android:name=".service.UniversalListenerService"
+             android:label="MINI-TO Bot"
+             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
++            android:foregroundServiceType="specialUse"
+             android:exported="true">
+             <intent-filter>
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
++            <property
++                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
++                android:value="Notificaciones de WhatsApp para auto-respuesta de atenci??n al cliente" />
+         </service>
+ 
+         <!-- Boot Receiver (reinicia el servicio al iniciar el dispositivo) -->
+diff --git a/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt b/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
+index cc97a2c..8816c8f 100644
+--- a/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
++++ b/Travel_Connected/app/src/main/java/com/travlytic/app/MainActivity.kt
+@@ -1,6 +1,9 @@
+ package com.travlytic.app
+ 
++import android.content.ComponentName
++import android.content.pm.PackageManager
+ import android.os.Bundle
++import android.util.Log
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.compose.animation.*
+@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
+ import androidx.navigation.compose.NavHost
+ import androidx.navigation.compose.composable
+ import androidx.navigation.compose.rememberNavController
++import com.travlytic.app.service.UniversalListenerService
+ import com.travlytic.app.ui.screens.HomeScreen
+ import com.travlytic.app.ui.screens.ScheduleScreen
+ import com.travlytic.app.ui.screens.SettingsScreen
+@@ -23,11 +27,27 @@ import com.travlytic.app.ui.theme.MinItoTheme
+ import com.travlytic.app.ui.theme.MinItoSurface
+ import dagger.hilt.android.AndroidEntryPoint
+ 
++private const val TAG = "MainActivity"
++
+ @AndroidEntryPoint
+ class MainActivity : ComponentActivity() {
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
++
++        // ?????? Forzar re-vinculaci??n del NotificationListenerService ??????????????????????????????????????????
++        // Cuando se reinstala un APK, Android puede dejar el servicio en estado
++        // desconectado aunque los permisos est??n activos. Este truco lo fuerza
++        // a reconectarse sin que el usuario tenga que ir a Ajustes.
++        forceRebindNotificationListener()
++
++        // ?????? Solicitar permisos de notificaci??n (Android 13+) ?????????????????????????????????????????????????????????
++        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
++            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
++                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
++            }
++        }
++
+         setContent {
+             MinItoTheme {
+                 Surface(
+@@ -39,6 +59,32 @@ class MainActivity : ComponentActivity() {
+             }
+         }
+     }
++
++    /**
++     * Fuerza a Android a restablecer la conexi??n con el NotificationListenerService.
++     * T??cnica: deshabilitar y re-habilitar el componente brevemente.
++     * Esto hace que Android rebindee el servicio sin perder los permisos del usuario.
++     */
++    private fun forceRebindNotificationListener() {
++        try {
++            val componentName = ComponentName(this, UniversalListenerService::class.java)
++            val pm = packageManager
++
++            pm.setComponentEnabledSetting(
++                componentName,
++                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
++                PackageManager.DONT_KILL_APP
++            )
++            pm.setComponentEnabledSetting(
++                componentName,
++                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
++                PackageManager.DONT_KILL_APP
++            )
++            Log.d(TAG, "??? NotificationListenerService rebindeado exitosamente.")
++        } catch (e: Exception) {
++            Log.e(TAG, "?????? Error al hacer rebind del servicio: ${e.message}")
++        }
++    }
+ }
+ 
+ @Composable
+diff --git a/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt b/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
+index 9961ed4..3048337 100644
+--- a/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
++++ b/Travel_Connected/app/src/main/java/com/travlytic/app/service/UniversalListenerService.kt
+@@ -73,6 +73,7 @@ class UniversalListenerService : NotificationListenerService() {
+         super.onCreate()
+         createNotificationChannel()
+         startForeground(1, buildForegroundNotification())
++        Log.d(TAG, "???? UniversalListenerService iniciado.")
+     }
+ 
+     override fun onDestroy() {
+@@ -86,6 +87,8 @@ class UniversalListenerService : NotificationListenerService() {
+         serviceScope.launch {
+             try {
+                 val pkg = sbn.packageName
++                Log.d(TAG, "???? Notificaci??n recibida de: $pkg")
++
+                 val isWhatsappEnabled = appPreferences.channelWhatsApp.first()
+                 val isFbEnabled = appPreferences.channelFbMessenger.first()
+                 val isIgEnabled = appPreferences.channelIgDirect.first()
+@@ -96,29 +99,52 @@ class UniversalListenerService : NotificationListenerService() {
+                     IG_DIRECT_PACKAGE -> isIgEnabled
+                     else -> false
+                 }
+-                if (!isAllowedPackage) return@launch
++                if (!isAllowedPackage) {
++                    Log.d(TAG, "??? Paquete '$pkg' no permitido o canal desactivado. Ignorando.")
++                    return@launch
++                }
++
++                // ????????? Descartar res??menes de grupo ANTES de procesar ???????????????????????????????????????????????????
++                val notif = sbn.notification ?: return@launch
++                if ((notif.flags and Notification.FLAG_GROUP_SUMMARY) != 0) {
++                    return@launch
++                }
+ 
+                 val manualEnabled = appPreferences.botEnabled.first()
+                 val scheduleValue = isWithinSchedule()
++                Log.d(TAG, "???? Estado -> Manual: $manualEnabled | Horario: $scheduleValue")
+                 
+                 // El bot se activa si: (Manual est?? ON) O (Programaci??n est?? ON y es hora activa)
+-                if (!manualEnabled && !scheduleValue) return@launch
++                if (!manualEnabled && !scheduleValue) {
++                    Log.w(TAG, "??? Bot inactivo (manual=false, horario=false). Ignorando.")
++                    return@launch
++                }
+ 
+                 val apiKey = appPreferences.geminiApiKey.first()
+-                if (apiKey.isBlank()) return@launch
++                if (apiKey.isBlank()) {
++                    Log.e(TAG, "??? API Key vac??a. No se puede responder.")
++                    return@launch
++                }
+ 
+-                val notification = sbn.notification ?: return@launch
++                val notification = notif // reutilizamos la notificaci??n ya extra??da
+                 val extras = notification.extras ?: return@launch
+                 
+-                val contactName = extras.getString("android.title") ?: return@launch
++                val contactName = extras.getString("android.title") ?: run {
++                    Log.d(TAG, "??? Notificaci??n sin t??tulo/contacto. Ignorando.")
++                    return@launch
++                }
+                 val messageText = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
++                Log.d(TAG, "???? Mensaje de '$contactName': ${messageText.take(50)}")
+ 
+-                if (messageText.isBlank() || contactName.isBlank()) return@launch
++                if (messageText.isBlank() || contactName.isBlank()) {
++                    Log.d(TAG, "??? Mensaje o contacto en blanco. Ignorando.")
++                    return@launch
++                }
+ 
+                 // ????????? FILTRO 1: Auto-Notificaciones (Detecci??n de Propietario) ?????????
+-                val myName = appPreferences.profileUserName.first()
+-                if (contactName.equals(myName, ignoreCase = true) || contactName.lowercase().contains("yo")) {
+-                    Log.d(TAG, "Detectada auto-notificaci??n de '$contactName'. Ignorando.")
++                val myName = appPreferences.profileUserName.first().trim()
++                if (myName.isNotBlank() && contactName.trim().equals(myName, ignoreCase = true)) {
++                    Log.d(TAG, "??? Auto-notificaci??n del propietario '$contactName'. Ignorando.")
+                     return@launch
+                 }
+ 
+@@ -133,11 +159,17 @@ class UniversalListenerService : NotificationListenerService() {
+                     return@launch
+                 }
+ 
+-                if ((notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0) return@launch
+-
+-                val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
+-                val isMessagingStyle = template?.contains("MessagingStyle") == true
+-                if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) return@launch
++                // Filtros de app espec??fica
++                val isWhatsAppPkg = pkg == WHATSAPP_PACKAGE || pkg == WHATSAPP_BUSINESS_PACKAGE
++                if (!isWhatsAppPkg) {
++                    val template = extras.getString(NotificationCompat.EXTRA_TEMPLATE)
++                    val isMessagingStyle = template?.contains("MessagingStyle") == true
++                    if (!isMessagingStyle && pkg != IG_DIRECT_PACKAGE) {
++                        Log.d(TAG, "??? Template no soportado ($template). Ignorando.")
++                        return@launch
++                    }
++                }
++                Log.d(TAG, "??? Mensaje aprobado para '$contactName' | WA=$isWhatsAppPkg")
+ 
+                 val lastReplied = recentlyReplied[contactName] ?: 0L
+                 if (now - lastReplied < REPLY_COOLDOWN_MS) return@launch
+@@ -152,7 +184,6 @@ class UniversalListenerService : NotificationListenerService() {
+                 if (isFirstInteraction) {
+                     val mutex = welcomeMutexMap.getOrPut(contactName) { Any() }
+                     synchronized(mutex) {
+-                        // Re-verificar dentro del synchronized
+                         val refreshedCount = runBlocking { responseLogDao.getLogCountForContact(contactName) }
+                         if (refreshedCount == 0) {
+                             val welcomeMsg = runBlocking { appPreferences.welcomeMessage.first() }
+@@ -192,7 +223,7 @@ class UniversalListenerService : NotificationListenerService() {
+                 val delayMs = appPreferences.autoReplyDelayMs.first()
+                 delay(delayMs)
+ 
+-                // Generar respuesta con IA Inmutable
++                // Generar respuesta con IA
+                 val response = geminiAgent.generateResponse(
+                     apiKey = apiKey,
+                     systemPrompt = appPreferences.systemPrompt.first(),
+@@ -224,7 +255,7 @@ class UniversalListenerService : NotificationListenerService() {
+                     recentlyReplied[contactName] = System.currentTimeMillis()
+                     responseLogDao.insert(ResponseLog(contact = contactName, incomingMessage = messageText, sentResponse = response, timestamp = System.currentTimeMillis()))
+                     
+-                    // Auto-Recordatorio (Amable)
++                    // Auto-Recordatorio
+                     val reminderEnabled = appPreferences.autoReminderEnabled.first()
+                     if (reminderEnabled) {
+                         val reminderMessage = appPreferences.autoReminderMessage.first()
+@@ -299,26 +330,40 @@ class UniversalListenerService : NotificationListenerService() {
+     }
+ 
+     private suspend fun isWithinSchedule(): Boolean {
+-        if (!appPreferences.scheduleEnabled.first()) return false
++        if (!appPreferences.scheduleEnabled.first()) {
++            Log.d(TAG, "???? [Horario] Desactivado en ajustes.")
++            return false
++        }
+         val now = Calendar.getInstance()
+         val currentMins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+         val dayNum = if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else now.get(Calendar.DAY_OF_WEEK) - 1
+         
+         val activeDays = appPreferences.scheduleDays.first()
+-        if (dayNum !in activeDays) return false
++        if (dayNum !in activeDays) {
++            Log.d(TAG, "???? [Horario] Hoy ($dayNum) no est?? en d??as permitidos: $activeDays")
++            return false
++        }
+         
+         val ranges = appPreferences.scheduleList.first()
+-        if (ranges.isEmpty()) return false
++        if (ranges.isEmpty()) {
++            Log.d(TAG, "???? [Horario] Lista de rangos vac??a.")
++            return false
++        }
+         
+-        return ranges.any { range ->
++        val matched = ranges.any { range ->
+             val startMins = range.startHour * 60 + range.startMinute
+             val endMins = range.endHour * 60 + range.endMinute
+             
+-            if (endMins > startMins) {
++            val isInside = if (endMins > startMins) {
+                 currentMins in startMins..endMins
+             } else {
+                 currentMins >= startMins || currentMins <= endMins
+             }
++            if (isInside) Log.d(TAG, "???? [Horario] Match! Hora actual=$currentMins est?? en rango ${startMins}-${endMins}")
++            isInside
+         }
++
++        if (!matched) Log.d(TAG, "???? [Horario] Fuera de rango. Hora=${currentMins} mins. Rangos=${ranges.size}")
++        return matched
+     }
+ }

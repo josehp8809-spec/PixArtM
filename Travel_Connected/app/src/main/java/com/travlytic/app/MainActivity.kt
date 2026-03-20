@@ -1,6 +1,9 @@
 package com.travlytic.app
 
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.travlytic.app.service.UniversalListenerService
 import com.travlytic.app.ui.screens.HomeScreen
 import com.travlytic.app.ui.screens.ScheduleScreen
 import com.travlytic.app.ui.screens.SettingsScreen
@@ -23,11 +27,27 @@ import com.travlytic.app.ui.theme.MinItoTheme
 import com.travlytic.app.ui.theme.MinItoSurface
 import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "MainActivity"
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // ── Forzar re-vinculación del NotificationListenerService ──────────────
+        // Cuando se reinstala un APK, Android puede dejar el servicio en estado
+        // desconectado aunque los permisos estén activos. Este truco lo fuerza
+        // a reconectarse sin que el usuario tenga que ir a Ajustes.
+        forceRebindNotificationListener()
+
+        // ── Solicitar permisos de notificación (Android 13+) ───────────────────
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+
         setContent {
             MinItoTheme {
                 Surface(
@@ -37,6 +57,32 @@ class MainActivity : ComponentActivity() {
                     MinItoNavHost()
                 }
             }
+        }
+    }
+
+    /**
+     * Fuerza a Android a restablecer la conexión con el NotificationListenerService.
+     * Técnica: deshabilitar y re-habilitar el componente brevemente.
+     * Esto hace que Android rebindee el servicio sin perder los permisos del usuario.
+     */
+    private fun forceRebindNotificationListener() {
+        try {
+            val componentName = ComponentName(this, UniversalListenerService::class.java)
+            val pm = packageManager
+
+            pm.setComponentEnabledSetting(
+                componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+            )
+            pm.setComponentEnabledSetting(
+                componentName,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP
+            )
+            Log.d(TAG, "✅ NotificationListenerService rebindeado exitosamente.")
+        } catch (e: Exception) {
+            Log.e(TAG, "⚠️ Error al hacer rebind del servicio: ${e.message}")
         }
     }
 }

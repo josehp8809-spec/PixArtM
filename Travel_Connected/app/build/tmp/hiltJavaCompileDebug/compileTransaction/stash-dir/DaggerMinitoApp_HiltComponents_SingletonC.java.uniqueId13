@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
+import com.google.gson.Gson;
 import com.travlytic.app.data.db.AppDatabase;
 import com.travlytic.app.data.db.dao.EscalationLogDao;
 import com.travlytic.app.data.db.dao.KnowledgeItemDao;
@@ -16,6 +17,7 @@ import com.travlytic.app.data.repository.KnowledgeRepository;
 import com.travlytic.app.di.AppModule_ProvideAppDatabaseFactory;
 import com.travlytic.app.di.AppModule_ProvideAppPreferencesFactory;
 import com.travlytic.app.di.AppModule_ProvideEscalationLogDaoFactory;
+import com.travlytic.app.di.AppModule_ProvideGsonFactory;
 import com.travlytic.app.di.AppModule_ProvideKnowledgeItemDaoFactory;
 import com.travlytic.app.di.AppModule_ProvideResponseLogDaoFactory;
 import com.travlytic.app.di.AppModule_ProvideSummaryGeneratorFactory;
@@ -575,6 +577,8 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
 
     private final SingletonCImpl singletonCImpl = this;
 
+    private Provider<Gson> provideGsonProvider;
+
     private Provider<AppPreferences> provideAppPreferencesProvider;
 
     private Provider<AppDatabase> provideAppDatabaseProvider;
@@ -603,16 +607,17 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
 
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
+      this.provideGsonProvider = DoubleCheck.provider(new SwitchingProvider<Gson>(singletonCImpl, 1));
       this.provideAppPreferencesProvider = DoubleCheck.provider(new SwitchingProvider<AppPreferences>(singletonCImpl, 0));
-      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 3));
-      this.provideKnowledgeItemDaoProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeItemDao>(singletonCImpl, 2));
-      this.knowledgeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeRepository>(singletonCImpl, 1));
-      this.provideEscalationLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<EscalationLogDao>(singletonCImpl, 4));
-      this.provideResponseLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<ResponseLogDao>(singletonCImpl, 5));
-      this.provideTrainingRuleDaoProvider = DoubleCheck.provider(new SwitchingProvider<TrainingRuleDao>(singletonCImpl, 6));
-      this.geminiAgentProvider = DoubleCheck.provider(new SwitchingProvider<GeminiAgent>(singletonCImpl, 7));
-      this.provideSummaryGeneratorProvider = DoubleCheck.provider(new SwitchingProvider<SummaryGenerator>(singletonCImpl, 8));
-      this.provideTtsManagerProvider = DoubleCheck.provider(new SwitchingProvider<TtsManager>(singletonCImpl, 9));
+      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 4));
+      this.provideKnowledgeItemDaoProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeItemDao>(singletonCImpl, 3));
+      this.knowledgeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<KnowledgeRepository>(singletonCImpl, 2));
+      this.provideEscalationLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<EscalationLogDao>(singletonCImpl, 5));
+      this.provideResponseLogDaoProvider = DoubleCheck.provider(new SwitchingProvider<ResponseLogDao>(singletonCImpl, 6));
+      this.provideTrainingRuleDaoProvider = DoubleCheck.provider(new SwitchingProvider<TrainingRuleDao>(singletonCImpl, 7));
+      this.geminiAgentProvider = DoubleCheck.provider(new SwitchingProvider<GeminiAgent>(singletonCImpl, 8));
+      this.provideSummaryGeneratorProvider = DoubleCheck.provider(new SwitchingProvider<SummaryGenerator>(singletonCImpl, 9));
+      this.provideTtsManagerProvider = DoubleCheck.provider(new SwitchingProvider<TtsManager>(singletonCImpl, 10));
     }
 
     @Override
@@ -649,33 +654,36 @@ public final class DaggerMinitoApp_HiltComponents_SingletonC {
       public T get() {
         switch (id) {
           case 0: // com.travlytic.app.data.prefs.AppPreferences 
-          return (T) AppModule_ProvideAppPreferencesFactory.provideAppPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          return (T) AppModule_ProvideAppPreferencesFactory.provideAppPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideGsonProvider.get());
 
-          case 1: // com.travlytic.app.data.repository.KnowledgeRepository 
+          case 1: // com.google.gson.Gson 
+          return (T) AppModule_ProvideGsonFactory.provideGson();
+
+          case 2: // com.travlytic.app.data.repository.KnowledgeRepository 
           return (T) new KnowledgeRepository(singletonCImpl.provideKnowledgeItemDaoProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 2: // com.travlytic.app.data.db.dao.KnowledgeItemDao 
+          case 3: // com.travlytic.app.data.db.dao.KnowledgeItemDao 
           return (T) AppModule_ProvideKnowledgeItemDaoFactory.provideKnowledgeItemDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 3: // com.travlytic.app.data.db.AppDatabase 
+          case 4: // com.travlytic.app.data.db.AppDatabase 
           return (T) AppModule_ProvideAppDatabaseFactory.provideAppDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 4: // com.travlytic.app.data.db.dao.EscalationLogDao 
+          case 5: // com.travlytic.app.data.db.dao.EscalationLogDao 
           return (T) AppModule_ProvideEscalationLogDaoFactory.provideEscalationLogDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 5: // com.travlytic.app.data.db.dao.ResponseLogDao 
+          case 6: // com.travlytic.app.data.db.dao.ResponseLogDao 
           return (T) AppModule_ProvideResponseLogDaoFactory.provideResponseLogDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 6: // com.travlytic.app.data.db.dao.TrainingRuleDao 
+          case 7: // com.travlytic.app.data.db.dao.TrainingRuleDao 
           return (T) AppModule_ProvideTrainingRuleDaoFactory.provideTrainingRuleDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 7: // com.travlytic.app.engine.GeminiAgent 
+          case 8: // com.travlytic.app.engine.GeminiAgent 
           return (T) new GeminiAgent(singletonCImpl.knowledgeRepositoryProvider.get(), singletonCImpl.provideTrainingRuleDaoProvider.get(), singletonCImpl.provideResponseLogDaoProvider.get());
 
-          case 8: // com.travlytic.app.engine.SummaryGenerator 
+          case 9: // com.travlytic.app.engine.SummaryGenerator 
           return (T) AppModule_ProvideSummaryGeneratorFactory.provideSummaryGenerator();
 
-          case 9: // com.travlytic.app.engine.TtsManager 
+          case 10: // com.travlytic.app.engine.TtsManager 
           return (T) AppModule_ProvideTtsManagerFactory.provideTtsManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);

@@ -1,0 +1,29 @@
+commit 96e5d54ec4b9c7847c48b82ef6836f762069fe46
+Author: josehp8809-spec <mxjhurtado@maxillc.com>
+Date:   Mon Mar 16 22:21:43 2026 -0600
+
+    MinitoApp
+
+commit f823461af9fb1db41fba4dd5c760ea9e60830e70
+Author: josehp8809-spec <mxjhurtado@maxillc.com>
+Date:   Wed Mar 11 11:56:11 2026 -0600
+
+    Minito
+
+commit d0cd42e9d90d79fff86075a045ab57fc96eebbf3
+Author: josehp8809-spec <mxjhurtado@maxillc.com>
+Date:   Wed Mar 11 09:17:53 2026 -0600
+
+    Mini-to
+
+commit 161b4c77f8da8bdced6c950c030e3d6aba3b0128
+Author: josehp8809-spec <mxjhurtado@maxillc.com>
+Date:   Sun Mar 8 11:27:58 2026 -0600
+
+    fix: explicit guava dependencies to fix metadata mutation
+
+commit a5c0100b241ad96313dc0c0ea34b60da9fe580f6
+Author: josehp8809-spec <mxjhurtado@maxillc.com>
+Date:   Sun Mar 8 11:16:35 2026 -0600
+
+    fix: restore dependencies excludes in build.gradle

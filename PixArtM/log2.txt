@@ -1,0 +1,5 @@
+96e5d54 MinitoApp
+f823461 Minito
+d0cd42e Mini-to
+161b4c7 fix: explicit guava dependencies to fix metadata mutation
+a5c0100 fix: restore dependencies excludes in build.gradle
