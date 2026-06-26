@@ -1,0 +1,6 @@
+{
+  "appId": "com.lizzytv.app",
+  "appName": "LizzyTV",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

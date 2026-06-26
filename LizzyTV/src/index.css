@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --color-brand-purple: #a855f7;
+  --color-brand-purple-dark: #7e22ce;
+  --color-brand-neon: #d8b4fe;
+  --color-bg-obsidian: #08080c;
+  --color-bg-card: #12121a;
+  --color-text-muted: #9ca3af;
+  
+  --animate-pulse-glow: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    opacity: .8;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.8);
+  }
+}
+
+/* Reset y estilos base */
+body {
+  background-color: #08080c;
+  color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Evitamos scroll vertical general en la TV */
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ocultar barra de scroll de los carruseles manteniendo funcionalidad */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Efecto Glassmorphism */
+.glass-panel {
+  background: rgba(18, 18, 26, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto Hover & Focus para TV D-pad */
+.tv-focusable {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.tv-focusable:focus,
+.tv-focusable.focused {
+  transform: scale(1.08);
+  border-color: #c084fc;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+  z-index: 10;
+}
+
+/* Degradado estilo Netflix para overlays de banners */
+.banner-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 8, 12, 0) 0%,
+    rgba(8, 8, 12, 0.4) 50%,
+    rgba(8, 8, 12, 0.85) 80%,
+    rgba(8, 8, 12, 1) 100%
+  );
+}
+
+.banner-overlay-side {
+  background: linear-gradient(
+    to right,
+    rgba(8, 8, 12, 0.9) 0%,
+    rgba(8, 8, 12, 0.5) 40%,
+    rgba(8, 8, 12, 0) 100%
+  );
+}
