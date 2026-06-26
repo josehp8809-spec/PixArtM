@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:tizen="http://tizen.org/ns/widgets" 
+        id="http://com.lizzytv.app/LizzyTV" 
+        version="1.0.0" 
+        viewmodes="fullscreen">
+    <name>LizzyTV</name>
+    <content src="index.html"/>
+    <icon src="lizzytv_logo.png"/>
+    <tizen:application id="com.lizzytv.app.LizzyTV" package="com.lizzytv.app" required_version="3.0"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.window"/>
+    <tizen:profile name="tv-samsung"/>
+    <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable"/>
+    <access origin="*" subdomains="true"/>
+</widget>
