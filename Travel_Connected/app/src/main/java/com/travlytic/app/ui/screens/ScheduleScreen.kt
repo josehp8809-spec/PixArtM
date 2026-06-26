@@ -164,6 +164,55 @@ fun ScheduleScreen(
                                         viewModel.updateScheduleRange(index, range.copy(endHour = h, endMinute = m)) 
                                     }
                                 }
+                                
+                                Spacer(Modifier.height(16.dp))
+                                // ─── Days of week por rango ───────────────────────
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    val dayLabels = listOf("L","M","X","J","V","S","D")
+                                    dayLabels.forEachIndexed { i, label ->
+                                        val dayNum = i + 1
+                                        val isSelected = dayNum in range.getSafeDays()
+                                        DayChip(
+                                            label = label,
+                                            isSelected = isSelected,
+                                            onClick = { viewModel.toggleScheduleDayForRange(index, dayNum) }
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.height(12.dp))
+                                // Botones rápidos de días
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    FilterChip(
+                                        selected = range.getSafeDays() == setOf(1,2,3,4,5),
+                                        onClick = { viewModel.setScheduleDaysForRange(index, setOf(1,2,3,4,5)) },
+                                        label = { Text("Lun–Vie", fontSize = 11.sp) },
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
+                                            selectedLabelColor = MinItoBlue
+                                        )
+                                    )
+                                    FilterChip(
+                                        selected = range.getSafeDays() == setOf(6,7),
+                                        onClick = { viewModel.setScheduleDaysForRange(index, setOf(6,7)) },
+                                        label = { Text("Fin de semana", fontSize = 11.sp) },
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
+                                            selectedLabelColor = MinItoBlue
+                                        )
+                                    )
+                                    FilterChip(
+                                        selected = range.getSafeDays() == (1..7).toSet(),
+                                        onClick = { viewModel.setScheduleDaysForRange(index, (1..7).toSet()) },
+                                        label = { Text("Toda la semana", fontSize = 11.sp) },
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = MinItoGreen.copy(alpha = 0.2f),
+                                            selectedLabelColor = MinItoGreen
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -182,64 +231,7 @@ fun ScheduleScreen(
                         }
                     }
 
-                    // ─── Days of week ─────────────────────────────────
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MinItoSurface2),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text("📅 Días activos",
-                                color = MinItoOnSurface, fontWeight = FontWeight.SemiBold)
-                            Spacer(Modifier.height(12.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                val dayLabels = listOf("L","M","X","J","V","S","D")
-                                dayLabels.forEachIndexed { i, label ->
-                                    val dayNum = i + 1
-                                    val isSelected = dayNum in scheduleState.activeDays
-                                    DayChip(
-                                        label = label,
-                                        isSelected = isSelected,
-                                        onClick = { viewModel.toggleScheduleDay(dayNum) }
-                                    )
-                                }
-                            }
-                            Spacer(Modifier.height(8.dp))
-                            // Botones rápidos
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                FilterChip(
-                                    selected = scheduleState.activeDays == setOf(1,2,3,4,5),
-                                    onClick = { viewModel.setScheduleDays(setOf(1,2,3,4,5)) },
-                                    label = { Text("Lun–Vie", fontSize = 11.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
-                                        selectedLabelColor = MinItoBlue
-                                    )
-                                )
-                                FilterChip(
-                                    selected = scheduleState.activeDays == setOf(6,7),
-                                    onClick = { viewModel.setScheduleDays(setOf(6,7)) },
-                                    label = { Text("Fin de semana", fontSize = 11.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MinItoBlue.copy(alpha = 0.2f),
-                                        selectedLabelColor = MinItoBlue
-                                    )
-                                )
-                                FilterChip(
-                                    selected = scheduleState.activeDays == (1..7).toSet(),
-                                    onClick = { viewModel.setScheduleDays((1..7).toSet()) },
-                                    label = { Text("Toda la semana", fontSize = 11.sp) },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MinItoGreen.copy(alpha = 0.2f),
-                                        selectedLabelColor = MinItoGreen
-                                    )
-                                )
-                            }
-                        }
-                    }
+                    // Eliminado: Selección global de días 
 
                     // ─── Resumen activo ───────────────────────────────
                     Card(
@@ -346,16 +338,15 @@ private fun calculateDuration(sh: Int, sm: Int, eh: Int, em: Int): String {
 private fun buildScheduleSummary(state: com.travlytic.app.ui.viewmodel.ScheduleState): String {
     if (!state.enabled) return "El bot responde las 24 horas, todos los días."
     if (state.timeRanges.isEmpty()) return "No hay horarios configurados. El bot no responderá automáticamente."
-    
-    val days = state.activeDays.sorted().joinToString(", ") {
-        listOf("", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom").getOrElse(it) { "?" }
+
+    val listText = state.timeRanges.joinToString("\n") { r ->
+        val days = r.getSafeDays().sorted().joinToString(",") {
+            listOf("", "L", "M", "X", "J", "V", "S", "D").getOrElse(it) { "?" }
+        }
+        "• ($days) de ${String.format("%02d:%02d", r.startHour, r.startMinute)} a ${String.format("%02d:%02d", r.endHour, r.endMinute)}"
     }
     
-    val ranges = state.timeRanges.joinToString("\n") { r ->
-        "• ${String.format("%02d:%02d", r.startHour, r.startMinute)} a ${String.format("%02d:%02d", r.endHour, r.endMinute)}"
-    }
-    
-    return "Días: $days\nHorarios:\n$ranges"
+    return "Horarios activos:\n$listText"
 }
 
 @Composable

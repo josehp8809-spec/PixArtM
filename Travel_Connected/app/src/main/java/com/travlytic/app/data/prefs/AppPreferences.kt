@@ -42,9 +42,8 @@ class AppPreferences(private val context: Context, private val gson: Gson) {
         val SCHEDULE_START_M  = intPreferencesKey("schedule_start_minute")
         val SCHEDULE_END_H    = intPreferencesKey("schedule_end_hour")
         val SCHEDULE_END_M    = intPreferencesKey("schedule_end_minute")
-        /** Días activos: Set de ints 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb, 7=Dom */
-        val SCHEDULE_DAYS     = stringPreferencesKey("schedule_days")
         val SCHEDULE_LIST     = stringPreferencesKey("schedule_list_json")
+        val EXCLUDED_CONTACTS = stringPreferencesKey("excluded_contacts_json")
 
         const val DEFAULT_SYSTEM_PROMPT = """Eres MINI-TO, un asistente de respuesta automática para WhatsApp.
 Tu misión es responder mensajes de forma natural, precisa y concisa basándote EXCLUSIVAMENTE en la información proporcionada en tu base de conocimiento.
@@ -55,9 +54,6 @@ REGLAS:
 3. Si la información no está en la base de conocimiento, responde: "No tengo información sobre eso en este momento."
 4. No inventes información. Usa solo lo que está en el contexto.
 5. Sé amable y profesional."""
-
-        /** Días activos por defecto: Lun–Vie */
-        const val DEFAULT_DAYS = "1,2,3,4,5"
     }
 
     // ─── Gemini API Key ───────────────────────────────────────────────
@@ -130,17 +126,6 @@ REGLAS:
         it[SCHEDULE_END_H] = hour; it[SCHEDULE_END_M] = minute
     }
 
-    /** Días activos: string separado por comas ej. "1,2,3,4,5" */
-    val scheduleDays: Flow<Set<Int>> = context.dataStore.data.map { prefs ->
-        (prefs[SCHEDULE_DAYS] ?: DEFAULT_DAYS)
-            .split(",")
-            .mapNotNull { it.trim().toIntOrNull() }
-            .toSet()
-    }
-    suspend fun setScheduleDays(days: Set<Int>) = context.dataStore.edit {
-        it[SCHEDULE_DAYS] = days.joinToString(",")
-    }
-
     val scheduleList: Flow<List<TimeRange>> = context.dataStore.data.map { prefs ->
         val json = prefs[SCHEDULE_LIST]
         if (json.isNullOrBlank()) {
@@ -152,7 +137,8 @@ REGLAS:
         } else {
             try {
                 val type = object : TypeToken<List<TimeRange>>() {}.type
-                gson.fromJson<List<TimeRange>>(json, type) ?: emptyList()
+                val parsedList = gson.fromJson<List<TimeRange>>(json, type) ?: emptyList()
+                parsedList.map { it.copy(activeDays = it.getSafeDays()) }
             } catch (e: Exception) {
                 emptyList()
             }
@@ -161,5 +147,24 @@ REGLAS:
 
     suspend fun setScheduleList(list: List<TimeRange>) = context.dataStore.edit {
         it[SCHEDULE_LIST] = gson.toJson(list)
+    }
+
+    // ─── Exclusiones ──────────────────────────────────────────────────────
+
+    val excludedContacts: Flow<Set<String>> = context.dataStore.data.map { prefs ->
+        val json = prefs[EXCLUDED_CONTACTS]
+        if (json.isNullOrBlank()) emptySet()
+        else {
+            try {
+                val type = object : TypeToken<Set<String>>() {}.type
+                gson.fromJson(json, type) ?: emptySet()
+            } catch (e: Exception) {
+                emptySet()
+            }
+        }
+    }
+
+    suspend fun setExcludedContacts(contacts: Set<String>) = context.dataStore.edit {
+        it[EXCLUDED_CONTACTS] = gson.toJson(contacts)
     }
 }

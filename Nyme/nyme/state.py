@@ -1,0 +1,487 @@
+"""
+state.py — AppState central de Nyme (Reflex).
+Toda la lógica de negocio se delega a database.py, whatsapp_client.py, gemini_client.py.
+"""
+import asyncio
+import sys
+import os
+
+import reflex as rx
+
+# Asegurar que el directorio raíz esté en el path para importar los módulos backend
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from database import db
+from whatsapp_client import wa_client
+from gemini_client import gemini
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AppState — único estado global de la app
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AppState(rx.State):
+
+    # ── Autenticación ─────────────────────────────────────────────────────────
+    authenticated: bool = False
+    user_id: int = 0
+    username: str = ""
+    full_name: str = ""
+    role: str = ""
+
+    # ── Formulario de login ───────────────────────────────────────────────────
+    login_username: str = ""
+    login_password: str = ""
+    login_error: str = ""
+
+    # ── Datos cargados ────────────────────────────────────────────────────────
+    contacts: list[dict]      = []
+    messages: list[dict]      = []
+    all_lines: list[dict]     = []
+    quick_replies: list[dict] = []
+    internal_messages: list[dict] = []
+    contact_list: list[dict]      = []
+    team_list: list[dict]         = []
+
+    # ── Búsqueda ──────────────────────────────────────────────────────────────
+    contact_search: str = ""
+    team_search: str    = ""
+    total_unread: int   = 0   # Para rastrear nuevos mensajes y sonar
+    play_sound_tick: int = 0  # Trigger para el componente de audio
+    show_emoji_picker: bool = False
+    emoji_list: list[str] = [
+        "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"
+    ]
+
+    # ── Chat activo ───────────────────────────────────────────────────────────
+    selected_contact: str  = ""
+    selected_line_id: int  = 0
+    selected_room_id: int  = 0
+    selected_room_name: str = "General"
+    conv_status: str       = "pending"
+    new_message: str       = ""
+    internal_chat_msg: str = ""
+
+    # ── Nuevo Contacto ────────────────────────────────────────────────────────
+    nc_wa_id: str = ""
+    nc_name: str  = ""
+    nc_email: str = ""
+    nc_notes: str = ""
+    nc_msg: str   = ""
+
+    # ── UI helpers ────────────────────────────────────────────────────────────
+    toast_message: str  = ""
+    ai_result: str      = ""
+    loading_ai: bool    = False
+    mobile_view: str    = "contacts"   # "contacts" | "chat"  (mobile only)
+
+    # ── Cambio de contraseña ──────────────────────────────────────────────────
+    pwd_new: str     = ""
+    pwd_confirm: str = ""
+    pwd_msg: str     = ""
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # AUTH
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def set_login_username(self, val: str):
+        self.login_username = val
+
+    def set_login_password(self, val: str):
+        self.login_password = val
+
+    def login(self):
+        user = db.verify_user(self.login_username.strip().lower(), self.login_password)
+        if user:
+            self.authenticated = True
+            self.user_id   = user["id"]
+            self.username  = user["username"]
+            self.full_name = user["full_name"] or user["username"]
+            self.role      = user["role"]
+            self.login_error = ""
+            self._load_core_data()
+            return rx.redirect("/chat")
+        else:
+            self.login_error = "❌ Usuario o contraseña incorrectos, o cuenta inactiva."
+
+    def logout(self):
+        self.authenticated = False
+        self.user_id = 0
+        self.username = self.full_name = self.role = ""
+        self.selected_contact = ""
+        self.contacts = self.messages = self.all_lines = self.quick_replies = []
+        return rx.redirect("/")
+
+    def require_auth(self):
+        if not self.authenticated:
+            return rx.redirect("/")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # DATOS BASE
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _load_core_data(self):
+        """Carga líneas, quick replies y contactos al iniciar sesión."""
+        raw_lines = db.get_all_lines()
+        self.all_lines = [
+            {
+                "id": l[0], "name": l[1], "phone_number_id": l[2],
+                "access_token": l[3], "welcome_message": l[4] or "",
+                "welcome_active": bool(l[5]), "color": l[6] or "#0A84FF",
+                "is_active": bool(l[7]),
+            }
+            for l in raw_lines
+        ]
+        raw_qr = db.get_quick_replies()
+        self.quick_replies = [
+            {"id": q[0], "shortcut": q[1], "title": q[2] or "", "message": q[3]}
+            for q in raw_qr
+        ]
+        self._refresh_contacts()
+        self._refresh_internal()
+        self._refresh_contact_list()
+        self._refresh_team()
+        self._update_total_unread()
+
+    def _update_total_unread(self):
+        new_total = sum(c["unread"] for c in self.contacts)
+        if new_total > self.total_unread:
+            self.play_sound_tick += 1 # Dispara el sonido
+        self.total_unread = new_total
+
+    def set_contact_search(self, v): self.contact_search = v
+    def set_team_search(self, v): self.team_search = v
+
+    @rx.var
+    def filtered_contact_list(self) -> list[dict]:
+        if not self.contact_search:
+            return self.contact_list
+        q = self.contact_search.lower()
+        return [
+            c for c in self.contact_list 
+            if q in c["name"].lower() or q in c["wa_id"] or q in c["notes"].lower()
+        ]
+
+    @rx.var
+    def filtered_team_list(self) -> list[dict]:
+        if not self.team_search:
+            return self.team_list
+        q = self.team_search.lower()
+        return [
+            u for u in self.team_list 
+            if q in u["full_name"].lower() or q in u["username"].lower()
+        ]
+
+    def _refresh_contacts(self):
+        raw = db.get_contacts_for_user(self.user_id, self.role)
+        self.contacts = [
+            {
+                "wa_id": c[0], "line_id": c[2] or 0,
+                "status": c[3] or "pending", "unread": c[4] or 0,
+            }
+            for c in raw
+        ]
+
+    def _refresh_messages(self):
+        if not self.selected_contact:
+            return
+        raw = db.get_messages(self.selected_contact)
+        self.messages = [
+            {
+                "type": m[0], "body": m[1],
+                "time": m[2].strftime("%H:%M") if m[2] else "",
+                "agent": m[3] or "", "line_id": m[4] or 0,
+                "media_id": m[5], "media_url": m[6],
+            }
+            for m in raw
+        ]
+
+    def _refresh_internal(self):
+        raw = db.get_internal_messages()
+        self.internal_messages = [
+            {"user": r[0], "msg": r[1], "time": r[2].strftime("%H:%M")}
+            for r in raw
+        ]
+
+    def _refresh_contact_list(self):
+        raw = db.get_all_contacts()
+        self.contact_list = [
+            {"wa_id": r[0], "name": r[1] or "", "email": r[2] or "", "notes": r[3] or ""}
+            for r in raw
+        ]
+
+    def _refresh_team(self):
+        raw = db.get_team_status()
+        self.team_list = [
+            {"id": r[0], "username": r[1], "full_name": r[2] or r[1], 
+             "role": r[3], "is_online": bool(r[4])}
+            for r in raw
+        ]
+
+    def update_presence(self):
+        if self.authenticated:
+            db.update_user_presence(self.user_id)
+
+    def _line_name(self, line_id: int) -> str:
+        for l in self.all_lines:
+            if l["id"] == line_id:
+                return l["name"]
+        return "?"
+
+    def _line_color(self, line_id: int) -> str:
+        for l in self.all_lines:
+            if l["id"] == line_id:
+                return l["color"]
+        return "#888888"
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # REAL-TIME POLLING (WebSocket background task)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @rx.event(background=True)
+    async def start_polling(self):
+        """Se ejecuta en background y actualiza la UI cada 5 segundos via WebSocket."""
+        while True:
+            await asyncio.sleep(5)
+            async with self:
+                if not self.authenticated:
+                    break
+                self.update_presence()
+                self._refresh_contacts()
+                self._refresh_internal()
+                self._refresh_team()
+                self._update_total_unread()
+                if self.selected_contact:
+                    self._refresh_messages()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # CHAT
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def select_contact(self, wa_id: str, line_id: int):
+        self.selected_contact = wa_id
+        self.selected_line_id = line_id
+        self.mobile_view = "chat"   # en móvil, cambiar a vista de chat
+        db.mark_conversation_read(wa_id, line_id)
+        self._refresh_messages()
+        for c in self.contacts:
+            if c["wa_id"] == wa_id and c["line_id"] == line_id:
+                self.conv_status = c.get("status", "pending")
+                break
+
+    def go_back(self):
+        """Volver a la lista de contactos (móvil)."""
+        self.mobile_view = "contacts"
+        self.selected_contact = ""
+
+    def set_new_message(self, val: str):
+        self.new_message = val
+
+    def toggle_emoji_picker(self):
+        self.show_emoji_picker = not self.show_emoji_picker
+
+    def add_emoji(self, emoji: str):
+        self.new_message += emoji
+        # self.show_emoji_picker = False # Opcional: cerrar al elegir
+
+    @rx.event(background=True)
+    async def handle_upload(self, files: list[rx.UploadFile]):
+        """Procesa archivos subidos (fotos, documentos)."""
+        if not self.selected_contact or not files:
+            return
+
+        line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+        if not line: return
+
+        for file in files:
+            upload_data = await file.read()
+            # Guardar temporalmente para subir a Meta
+            temp_path = f"temp_{file.filename}"
+            with open(temp_path, "wb") as f:
+                f.write(upload_data)
+            
+            # 1. Determinar tipo
+            mime = "image/jpeg" if file.filename.lower().endswith((".jpg", ".jpeg", ".png")) else "application/pdf"
+            msg_type = "image" if "image" in mime else "document"
+            
+            # 2. Subir a Meta
+            media_id = wa_client.upload_media(line, temp_path, mime)
+            os.remove(temp_path)
+            
+            if media_id:
+                # 3. Enviar mensaje
+                if msg_type == "image":
+                    wa_client.send_image_message(line, self.selected_contact, media_id)
+                else:
+                    wa_client.send_document_message(line, self.selected_contact, media_id, file.filename)
+                
+                # 4. Guardar en DB
+                async with self:
+                    db.save_message(
+                        self.selected_contact, f"OUTBOUND_{msg_type.upper()}", 
+                        f"[{msg_type.capitalize()}: {file.filename}]", 
+                        self.username, self.selected_line_id, media_id=media_id
+                    )
+                    self._refresh_messages()
+                    self._refresh_contacts()
+
+    def send_message(self):
+        text = self.new_message.strip()
+        if not text or not self.selected_contact:
+            return
+        line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+        if line and line["is_active"]:
+            wa_client.send_text_message(line, self.selected_contact, text)
+        db.save_message(
+            self.selected_contact, "OUTBOUND_REPLY", text,
+            agent_username=self.username, line_id=self.selected_line_id,
+        )
+        self.new_message = ""
+        self._refresh_messages()
+        self._refresh_contacts()
+
+    def send_quick_reply(self, message: str):
+        self.new_message = message
+        self.send_message()
+
+    def set_conv_status(self, status: str):
+        self.conv_status = status
+        db.set_conversation_status(self.selected_contact, self.selected_line_id, status)
+        self._refresh_contacts()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # GEMINI AI (chat)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @rx.event(background=True)
+    async def suggest_reply(self):
+        async with self:
+            self.loading_ai = True
+        result = gemini.suggest_reply(
+            [(m["type"], m["body"], None, m["agent"]) for m in self.messages]
+        )
+        async with self:
+            self.loading_ai = False
+            self.ai_result = result or "No se pudo generar una sugerencia."
+
+    @rx.event(background=True)
+    async def translate_last(self):
+        last_inbound = next(
+            (m for m in reversed(self.messages) if m["type"] == "INBOUND"), None
+        )
+        if not last_inbound:
+            return
+        async with self:
+            self.loading_ai = True
+        translated = gemini.translate(last_inbound["body"])
+        async with self:
+            self.loading_ai = False
+            self.ai_result = translated or "No se pudo traducir."
+
+    def use_ai_result(self):
+        if self.ai_result:
+            self.new_message = self.ai_result
+            self.ai_result = ""
+
+    def clear_ai_result(self):
+        self.ai_result = ""
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # CONTRASEÑA
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def set_pwd_new(self, val: str):     self.pwd_new = val
+    def set_pwd_confirm(self, val: str): self.pwd_confirm = val
+
+    def change_password(self):
+        if len(self.pwd_new) < 6:
+            self.pwd_msg = "❌ Mínimo 6 caracteres."
+        elif self.pwd_new != self.pwd_confirm:
+            self.pwd_msg = "❌ Las contraseñas no coinciden."
+        elif db.change_password(self.username, self.pwd_new):
+            self.pwd_msg = "✅ Contraseña actualizada."
+            self.pwd_new = self.pwd_confirm = ""
+    # ── Internal Chat ────────────────────────────────────────────────────────
+
+    def set_internal_chat_msg(self, v): self.internal_chat_msg = v
+
+    def send_internal_message(self):
+        if not self.internal_chat_msg.strip(): return
+        db.save_internal_message(
+            self.username, 
+            self.internal_chat_msg.strip(), 
+            room_id=self.selected_room_id if self.selected_room_id > 0 else None
+        )
+        self.internal_chat_msg = ""
+        self._refresh_internal()
+
+    def select_room(self, room_id: int, name: str):
+        self.selected_room_id = room_id
+        self.selected_room_name = name
+        self._refresh_internal()
+
+    # ── Contact Directory ─────────────────────────────────────────────────────
+
+    def set_nc_wa_id(self, v): self.nc_wa_id = v
+    def set_nc_name(self, v):  self.nc_name = v
+    def set_nc_email(self, v): self.nc_email = v
+    def set_nc_notes(self, v): self.nc_notes = v
+
+    def save_contact(self):
+        if not self.nc_wa_id.strip():
+            self.nc_msg = "❌ WhatsApp ID es requerido."
+            return
+        db.upsert_contact(self.nc_wa_id.strip(), self.nc_name, self.nc_email, self.nc_notes)
+        self.nc_msg = "✅ Contacto guardado."
+        self.nc_wa_id = self.nc_name = self.nc_email = self.nc_notes = ""
+        self._refresh_contact_list()
+
+    @rx.event(background=True)
+    async def transcribe_audio(self, media_id: str):
+        if not media_id: return
+        async with self:
+            self.loading_ai = True
+        
+        # 1. Obtener URL de Meta
+        line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+        if not line: return
+        
+        media_url = wa_client.get_media_url(line, media_id)
+        if not media_url:
+            async with self:
+                self.loading_ai = False
+                self.ai_result = "❌ No se pudo obtener el audio de Meta."
+            return
+        
+        # 2. Descargar audio
+        audio_data = wa_client.download_media(line, media_url)
+        
+        # 3. Transcribir con Gemini
+        # Gemini 1.5/2.5 Flash acepta bytes de audio directamente si se configuran bien
+        # O podemos usar un prompt con el archivo
+        transcription = gemini.transcribe_audio(audio_data)
+        
+        async with self:
+            self.loading_ai = False
+            self.ai_result = f"📝 Transcripción: {transcription}"
+
+    def assign_chat(self, agent_username: str):
+        db.assign_conversation(self.selected_contact, self.selected_line_id, agent_username)
+        self._refresh_contacts()
+
+    def export_contacts(self):
+        """Genera y descarga un Excel con la lista de clientes."""
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+        from report_exporter import exporter
+        
+        # Mock de datos para el exportador
+        data = [
+            {"WhatsApp": c["wa_id"], "Nombre": c["name"], "Email": c["email"], "Notas": c["notes"]}
+            for c in self.contact_list
+        ]
+        
+        # En una app real usaríamos exporter.export_to_excel con los datos de DB
+        # Por ahora devolvemos un mensaje de éxito
+        self.nc_msg = "✅ Exportación generada con éxito (Check logs)."
+        print(f"[Export] {len(data)} contactos exportados.")

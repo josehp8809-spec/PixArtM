@@ -1,0 +1,30 @@
+services:
+  # Servicio Web Principal (Reflex + Webhook)
+  - type: web
+    name: nyme-app
+    env: python
+    buildCommand: pip install -r requirements.txt && reflex export --frontend-only
+    startCommand: reflex run --env prod
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nyme-db
+          property: connectionString
+      - key: META_VERIFY_TOKEN
+        sync: false
+      - key: META_APP_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: nyme-db
+    plan: free
+    databaseName: nyme_db
+    user: nyme_user

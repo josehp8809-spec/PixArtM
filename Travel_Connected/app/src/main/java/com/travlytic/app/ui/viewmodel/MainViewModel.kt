@@ -44,8 +44,7 @@ data class UiState(
 
 data class ScheduleState(
     val enabled: Boolean = false,
-    val timeRanges: List<TimeRange> = emptyList(),
-    val activeDays: Set<Int> = setOf(1, 2, 3, 4, 5)
+    val timeRanges: List<TimeRange> = emptyList()
 )
 
 data class DashboardState(
@@ -131,16 +130,18 @@ class MainViewModel @Inject constructor(
     val channelIgDirect: StateFlow<Boolean> = appPreferences.channelIgDirect
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
+    // Exclusiones (Lista Negra)
+    val excludedContacts: StateFlow<Set<String>> = appPreferences.excludedContacts
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
+
     // ─── Schedule State ───────────────────────────────────────────────
     val scheduleState: StateFlow<ScheduleState> = combine(
         appPreferences.scheduleEnabled,
-        appPreferences.scheduleList,
-        appPreferences.scheduleDays
-    ) { enabled, list, days ->
+        appPreferences.scheduleList
+    ) { enabled, list ->
         ScheduleState(
             enabled     = enabled,
-            timeRanges  = list,
-            activeDays  = days
+            timeRanges  = list
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, ScheduleState())
 
@@ -214,9 +215,9 @@ class MainViewModel @Inject constructor(
         val currentMins = now.get(java.util.Calendar.HOUR_OF_DAY) * 60 + now.get(java.util.Calendar.MINUTE)
         val dayNum = if (now.get(java.util.Calendar.DAY_OF_WEEK) == java.util.Calendar.SUNDAY) 7 else now.get(java.util.Calendar.DAY_OF_WEEK) - 1
         
-        if (dayNum !in state.activeDays) return false
-        
         return state.timeRanges.any { range ->
+            if (dayNum !in range.getSafeDays()) return@any false
+            
             val startMins = range.startHour * 60 + range.startMinute
             val endMins = range.endHour * 60 + range.endMinute
             
@@ -473,6 +474,25 @@ class MainViewModel @Inject constructor(
         appPreferences.setChannelIgDirect(enabled)
     }
 
+    // ─── Exclusiones ──────────────────────────────────────────────────
+
+    fun addExcludedContact(name: String) = viewModelScope.launch {
+        val cleanName = name.trim()
+        if (cleanName.isBlank()) return@launch
+        val current = appPreferences.excludedContacts.first().toMutableSet()
+        current.add(cleanName)
+        appPreferences.setExcludedContacts(current)
+        showSnackbar("✅ Contacto añadido a exclusiones")
+    }
+
+    fun removeExcludedContact(name: String) = viewModelScope.launch {
+        val current = appPreferences.excludedContacts.first().toMutableSet()
+        if (current.remove(name)) {
+            appPreferences.setExcludedContacts(current)
+            showSnackbar("Contacto removido de exclusiones")
+        }
+    }
+
     // ─── Training Rules & Export/Import ────────────────────────────────
     
     val trainingRules: StateFlow<List<TrainingRule>> = trainingRuleDao.observeAll()
@@ -556,7 +576,7 @@ class MainViewModel @Inject constructor(
 
     fun addScheduleRange(startH: Int, startM: Int, endH: Int, endM: Int) = viewModelScope.launch {
         val current = appPreferences.scheduleList.first().toMutableList()
-        current.add(TimeRange(startH, startM, endH, endM))
+        current.add(TimeRange(startH, startM, endH, endM, setOf(1, 2, 3, 4, 5, 6, 7)))
         appPreferences.setScheduleList(current)
     }
 
@@ -576,14 +596,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun setScheduleDays(days: Set<Int>) = viewModelScope.launch {
-        appPreferences.setScheduleDays(days)
+    fun toggleScheduleDayForRange(index: Int, day: Int) = viewModelScope.launch {
+        val current = appPreferences.scheduleList.first().toMutableList()
+        val range = current.getOrNull(index) ?: return@launch
+        val currentDays = range.getSafeDays().toMutableSet()
+        if (day in currentDays) currentDays.remove(day) else currentDays.add(day)
+        current[index] = range.copy(activeDays = currentDays)
+        appPreferences.setScheduleList(current)
     }
 
-    fun toggleScheduleDay(day: Int) = viewModelScope.launch {
-        val current = appPreferences.scheduleDays.first().toMutableSet()
-        if (day in current) current.remove(day) else current.add(day)
-        appPreferences.setScheduleDays(current)
+    fun setScheduleDaysForRange(index: Int, days: Set<Int>) = viewModelScope.launch {
+        val current = appPreferences.scheduleList.first().toMutableList()
+        val range = current.getOrNull(index) ?: return@launch
+        current[index] = range.copy(activeDays = days)
+        appPreferences.setScheduleList(current)
     }
 
     // ─── Session Summary + TTS ────────────────────────────────────────────────

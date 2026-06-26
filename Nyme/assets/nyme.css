@@ -1,0 +1,157 @@
+/* ═══════════════════════════════════════════════════════════════
+   Nyme — Responsive Styles
+   Desktop: sidebar + chat side by side
+   Mobile: one panel at a time (contacts OR chat)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Fuente ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+/* ── Layout principal del chat ──────────────────────────────────── */
+.contacts-panel {
+    width: 260px;
+    min-width: 260px;
+    flex-shrink: 0;
+    height: 100dvh;
+    overflow-y: auto;
+}
+
+.chat-panel {
+    flex: 1;
+    min-width: 0;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botón "volver" — solo visible en móvil */
+.back-btn {
+    display: none !important;
+}
+
+/* ── Móvil (< 768px) ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+
+    /* Paneles ocupan toda la pantalla */
+    .contacts-panel,
+    .chat-panel {
+        width: 100% !important;
+        min-width: 100% !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100dvh;
+        overflow-y: auto;
+        background: #000;
+        z-index: 10;
+    }
+
+    /* Visibilidad controlada por estado Reflex */
+    .contacts-panel.hidden-mobile {
+        display: none !important;
+    }
+    .chat-panel.hidden-mobile {
+        display: none !important;
+    }
+
+    /* Botón volver — visible en móvil */
+    .back-btn {
+        display: flex !important;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Touch targets más grandes */
+    button, .rt-Button {
+        min-height: 44px;
+    }
+
+    /* Input fijo en la parte inferior (iOS safe area) */
+    .input-row {
+        position: sticky;
+        bottom: 0;
+        background: #000;
+        padding-bottom: env(safe-area-inset-bottom, 12px) !important;
+        z-index: 100;
+    }
+
+    /* Texto más legible en pantallas pequeñas */
+    .message-body {
+        font-size: 15px !important;
+        line-height: 1.5;
+    }
+
+    /* Quick replies scroll horizontal */
+    .quick-replies-bar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .quick-replies-bar::-webkit-scrollbar { display: none; }
+}
+
+/* ── Desktop (≥ 768px) ──────────────────────────────────────────── */
+@media (min-width: 768px) {
+    /* Siempre mostrar ambos paneles */
+    .contacts-panel,
+    .chat-panel {
+        display: flex !important;
+        flex-direction: column;
+    }
+    .contacts-panel.hidden-mobile,
+    .chat-panel.hidden-mobile {
+        display: flex !important;
+    }
+    /* Botón volver — invisible en desktop */
+    .back-btn {
+        display: none !important;
+    }
+}
+
+/* ── Scroll de mensajes ─────────────────────────────────────────── */
+.messages-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+}
+.messages-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.messages-scroll::-webkit-scrollbar-thumb {
+    background: #3a3a3c;
+    border-radius: 2px;
+}
+
+/* ── Burbujas de mensajes ───────────────────────────────────────── */
+.bubble-in {
+    align-self: flex-start;
+    background: #1c1c1e;
+    border-radius: 4px 14px 14px 14px;
+    padding: 10px 14px;
+    max-width: 78%;
+    word-break: break-word;
+}
+.bubble-out {
+    align-self: flex-end;
+    background: #0a3055;
+    border-radius: 14px 4px 14px 14px;
+    padding: 10px 14px;
+    max-width: 78%;
+    word-break: break-word;
+}
+
+/* ── Formularios (settings) ─────────────────────────────────────── */
+@media (max-width: 767px) {
+    .settings-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .settings-content {
+        padding: 16px !important;
+    }
+}

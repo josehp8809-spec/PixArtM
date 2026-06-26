@@ -133,6 +133,14 @@ class UniversalListenerService : NotificationListenerService() {
                     Log.d(TAG, "⛔ Notificación sin título/contacto. Ignorando.")
                     return@launch
                 }
+                
+                // ─── FILTRO EXCLUSIONES (Lista Negra) ───
+                val excludedContacts = appPreferences.excludedContacts.first()
+                if (excludedContacts.any { it.equals(contactName.trim(), ignoreCase = true) }) {
+                    Log.d(TAG, "⛔ Contacto/Grupo '$contactName' en Lista Negra. Abortando silenciosamente.")
+                    return@launch
+                }
+
                 val messageText = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
                 Log.d(TAG, "📨 Mensaje de '$contactName': ${messageText.take(50)}")
 
@@ -338,12 +346,6 @@ class UniversalListenerService : NotificationListenerService() {
         val currentMins = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
         val dayNum = if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else now.get(Calendar.DAY_OF_WEEK) - 1
         
-        val activeDays = appPreferences.scheduleDays.first()
-        if (dayNum !in activeDays) {
-            Log.d(TAG, "📅 [Horario] Hoy ($dayNum) no está en días permitidos: $activeDays")
-            return false
-        }
-        
         val ranges = appPreferences.scheduleList.first()
         if (ranges.isEmpty()) {
             Log.d(TAG, "📅 [Horario] Lista de rangos vacía.")
@@ -351,6 +353,11 @@ class UniversalListenerService : NotificationListenerService() {
         }
         
         val matched = ranges.any { range ->
+            val activeDays = range.getSafeDays()
+            if (dayNum !in activeDays) {
+                return@any false
+            }
+
             val startMins = range.startHour * 60 + range.startMinute
             val endMins = range.endHour * 60 + range.endMinute
             
@@ -359,11 +366,11 @@ class UniversalListenerService : NotificationListenerService() {
             } else {
                 currentMins >= startMins || currentMins <= endMins
             }
-            if (isInside) Log.d(TAG, "📅 [Horario] Match! Hora actual=$currentMins está en rango ${startMins}-${endMins}")
+            if (isInside) Log.d(TAG, "📅 [Horario] Match! Día $dayNum, Hora=$currentMins está en rango ${startMins}-${endMins}")
             isInside
         }
 
-        if (!matched) Log.d(TAG, "📅 [Horario] Fuera de rango. Hora=${currentMins} mins. Rangos=${ranges.size}")
+        if (!matched) Log.d(TAG, "📅 [Horario] Fuera de rango. Día=$dayNum, Hora=${currentMins} mins.")
         return matched
     }
 }

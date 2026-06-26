@@ -1,0 +1,45 @@
+# Ignorar carpetas de compilación de Android/Java/Python
+**/build/
+**/.gradle/
+**/local.properties
+**/.idea/
+**/*.iml
+
+# Ignorar dependencias de Node.js (CRÍTICO)
+**/node_modules/
+
+# Ignorar entornos virtuales y caché de Python
+**/__pycache__/
+**/*.py[cod]
+**/venv/
+**/.venv/
+**/env/
+
+# IGNORAR SECRETOS Y VARIABLES DE ENTORNO (CRÍTICO)
+**/.env
+**/*.env
+**/.env.local
+**/.env.production
+
+# Archivos de logs y temporales
+**/*.log
+**/logs/
+**/*.tmp
+**/*.bak
+**/*.cache
+**/build_err*.txt
+**/build_out*.txt
+**/build_final*.txt
+**/build_output.txt
+**/err.txt
+**/error.txt
+**/log.txt
+**/log2.txt
+**/status.txt
+**/status2.txt
+**/diff.txt
+**/diff2.txt
+**/src_diff.txt
+**/dependencies.txt
+**/git_changes*.txt
+**/out*.txt

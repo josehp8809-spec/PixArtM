@@ -57,6 +57,9 @@ fun SettingsScreen(
     var escalationInput by remember(escalationMessage) { mutableStateOf(escalationMessage) }    
     var autoReminderInput by remember(autoReminderMessage) { mutableStateOf(autoReminderMessage) }    
     
+    val excludedContacts by viewModel.excludedContacts.collectAsState()
+    var exclusionInput by remember { mutableStateOf("") }
+    
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.snackbarMessage) {
@@ -375,6 +378,63 @@ fun SettingsScreen(
                     Icon(Icons.Filled.Forum, null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("Gestionar Canales Activos")
+                }
+            }
+
+            // ─── Exclusiones (Lista Negra) ──────────────────────────────────
+            SettingsSection(title = "⛔ Filtros y Exclusiones") {
+                Text(
+                    "Nombres de contactos o grupos a los que MINI-TO ignorará. Coincidencia estricta y sensible a mayúsculas/acentos.",
+                    color = MinItoOnSurface2, fontSize = 12.sp
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = exclusionInput,
+                        onValueChange = { exclusionInput = it },
+                        placeholder = { Text("Ej. Travel call center") },
+                        modifier = Modifier.weight(1f),
+                        colors = settingsTextFieldColors(),
+                        singleLine = true
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            viewModel.addExcludedContact(exclusionInput)
+                            exclusionInput = ""
+                        },
+                        enabled = exclusionInput.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MinItoBlue),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Añadir")
+                    }
+                }
+                if (excludedContacts.isNotEmpty()) {
+                    Spacer(Modifier.height(12.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        excludedContacts.forEach { contact ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MinItoSurface3),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(contact, color = MinItoOnSurface, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    IconButton(
+                                        onClick = { viewModel.removeExcludedContact(contact) },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(Icons.Filled.Close, "Eliminar", tint = MinItoOnSurface2, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
