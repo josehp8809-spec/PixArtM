@@ -756,13 +756,20 @@ function App() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-lg bg-bg-card border border-white/5 rounded-3xl p-8 shadow-2xl relative z-10 my-8">
-          <div className="flex flex-col items-center gap-2 mb-8">
-            <span className="text-3xl font-black tracking-widest bg-gradient-to-r from-brand-purple to-purple-400 bg-clip-text text-transparent">
-              LIZZYTV
-            </span>
-            <span className="text-xs font-semibold text-brand-neon bg-brand-purple/15 px-3 py-1 rounded-full border border-brand-purple/20">
-              IPTV CLIENT
-            </span>
+          <div className="flex flex-col items-center gap-3 mb-6 select-none">
+            <img 
+              src="/lizzytv_logo.png" 
+              alt="LizzyTV Logo" 
+              className="w-28 h-28 rounded-full border border-white/10 shadow-glow-hover object-cover animate-fade-in"
+            />
+            <div className="text-center flex flex-col gap-1">
+              <span className="text-2xl font-black tracking-widest bg-gradient-to-r from-brand-purple to-purple-400 bg-clip-text text-transparent">
+                LIZZYTV
+              </span>
+              <span className="text-[10px] uppercase font-bold text-brand-neon bg-brand-purple/15 px-3 py-0.5 rounded-full border border-brand-purple/10 self-center">
+                IPTV Client
+              </span>
+            </div>
           </div>
 
           <form onSubmit={handleLoginSubmit} className="flex flex-col gap-5">
@@ -863,13 +870,20 @@ function App() {
       
       {/* LEFT SIDEBAR */}
       <aside className="w-24 md:w-28 flex flex-col items-center justify-between py-8 glass-panel z-20 shrink-0 border-r border-white/5">
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-xl md:text-2xl font-extrabold tracking-wider bg-gradient-to-r from-brand-purple to-purple-400 bg-clip-text text-transparent">
-            Lizzy
-          </span>
-          <span className="text-[10px] md:text-xs font-bold text-brand-neon bg-brand-purple/20 px-2 py-0.5 rounded-full">
-            TV
-          </span>
+        <div className="flex flex-col items-center gap-1.5 select-none">
+          <img 
+            src="/lizzytv_logo.png" 
+            alt="LizzyTV" 
+            className="w-12 h-12 rounded-full border border-white/10 shadow-glow-hover object-cover"
+          />
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-extrabold tracking-wider bg-gradient-to-r from-brand-purple to-purple-400 bg-clip-text text-transparent">
+              Lizzy
+            </span>
+            <span className="text-[9px] font-bold text-brand-neon bg-brand-purple/20 px-2 py-0.2 rounded-full">
+              TV
+            </span>
+          </div>
         </div>
 
         <nav className="flex flex-col gap-6 w-full px-2">
