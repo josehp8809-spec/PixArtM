@@ -133,11 +133,13 @@ function App() {
   const [playerError, setPlayerError] = useState<string | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [recentPlays, setRecentPlays] = useState<any[]>([])
+  const [showControls, setShowControls] = useState(true)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
   const mpegtsPlayerRef = useRef<mpegts.Player | null>(null)
   const playerContainerRef = useRef<HTMLDivElement>(null)
+  const controlsTimeoutRef = useRef<any>(null)
 
   // Series Detail View States
   const [selectedSeriesObj, setSelectedSeriesObj] = useState<XtreamSeries | null>(null)
@@ -155,6 +157,50 @@ function App() {
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
   }, [])
+
+  // Auto-hide controls timer
+  const resetControlsTimer = () => {
+    setShowControls(true)
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+    // Only auto-hide if video is playing and not paused
+    if (videoRef.current && !videoRef.current.paused) {
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false)
+      }, 3500) // 3.5 seconds
+    }
+  }
+
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // If clicking on a button or the controls bar, just reset the timer
+    if ((e.target as HTMLElement).closest('.player-controls-bar')) {
+      resetControlsTimer()
+      return
+    }
+    // Toggle controls visibility when clicking on the background/video
+    if (showControls) {
+      setShowControls(false)
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+    } else {
+      resetControlsTimer()
+    }
+  }
+
+  // Monitor when video starts playing to start the timer, and cleanup on close
+  useEffect(() => {
+    if (isVideoPlaying && activeStream) {
+      setShowControls(true)
+      resetControlsTimer()
+    }
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+    }
+  }, [isVideoPlaying, activeStream])
 
   // Progressive Loading / Pagination limits
   const [visibleLiveCount, setVisibleLiveCount] = useState(60)
@@ -376,6 +422,10 @@ function App() {
     setActiveStream(null)
     setPlayerLoading(false)
     setPlayerError(null)
+    setShowControls(true)
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
 
     // Exit fullscreen if active
     if (document.fullscreenElement) {
@@ -1518,7 +1568,13 @@ function App() {
 
       {/* FULL SCREEN VIDEO PLAYER OVERLAY */}
       {isVideoPlaying && activeStream && (
-        <div ref={playerContainerRef} className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+        <div 
+          ref={playerContainerRef} 
+          className={`fixed inset-0 bg-black z-50 flex items-center justify-center select-none ${showControls ? 'cursor-default' : 'cursor-none'}`}
+          onMouseMove={resetControlsTimer}
+          onTouchStart={resetControlsTimer}
+          onClick={handleContainerClick}
+        >
           <video 
             ref={videoRef}
             className="w-full h-full object-contain"
@@ -1533,9 +1589,19 @@ function App() {
             onPlaying={() => {
               setPlayerLoading(false)
               setIsVideoPaused(false)
+              resetControlsTimer()
             }}
-            onPlay={() => setIsVideoPaused(false)}
-            onPause={() => setIsVideoPaused(true)}
+            onPlay={() => {
+              setIsVideoPaused(false)
+              resetControlsTimer()
+            }}
+            onPause={() => {
+              setIsVideoPaused(true)
+              setShowControls(true)
+              if (controlsTimeoutRef.current) {
+                clearTimeout(controlsTimeoutRef.current)
+              }
+            }}
             onCanPlay={() => setPlayerLoading(false)}
             onError={(e) => {
               console.error("Video element error event:", e)
@@ -1578,12 +1644,14 @@ function App() {
             </div>
           )}
 
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent p-8 flex flex-col gap-4">
+          <div className={`player-controls-bar absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent p-8 flex flex-col gap-4 transition-all duration-300 ${
+            showControls ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}>
             <div className="flex items-center justify-between">
               <h2 className="text-xl md:text-2xl font-black text-white">{activeStreamTitle}</h2>
               <button 
                 onClick={closeVideo}
-                className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full border border-white/10 hover:border-white/20 transition-all focus:outline-none"
+                className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full border border-white/10 hover:border-white/20 transition-all focus:outline-none cursor-pointer"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -1601,28 +1669,28 @@ function App() {
                       }
                     }
                   }}
-                  className="p-3 bg-brand-purple hover:bg-brand-purple-dark text-white rounded-full hover:scale-105 transition-all"
+                  className="p-3 bg-brand-purple hover:bg-brand-purple-dark text-white rounded-full hover:scale-105 transition-all cursor-pointer"
                 >
                   {isVideoPaused ? <Play className="w-5 h-5 fill-white" /> : <Pause className="w-5 h-5 fill-white" />}
                 </button>
 
                 <button 
                   onClick={toggleMute}
-                  className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full hover:scale-105 transition-all"
+                  className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full hover:scale-105 transition-all cursor-pointer"
                 >
                   {isMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5" />}
                 </button>
 
                 <button 
                   onClick={toggleFullscreen}
-                  className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full hover:scale-105 transition-all"
+                  className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full hover:scale-105 transition-all cursor-pointer"
                   title="Pantalla Completa"
                 >
                   {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
                 </button>
               </div>
 
-              <div className="flex items-center gap-3 text-xs font-bold text-gray-300 bg-black/60 px-4 py-2 rounded-full border border-white/10">
+              <div className="flex items-center gap-3 text-xs font-bold text-gray-300 bg-black/60 px-4 py-2 rounded-full border border-white/10 select-none">
                 <span className="text-green-400">1080P FHD</span>
                 <span>•</span>
                 <span>XTREAM STREAM</span>
