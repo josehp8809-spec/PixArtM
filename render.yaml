@@ -5,7 +5,7 @@ services:
     env: python
     rootDir: Nyme
     buildCommand: python build.py
-    startCommand: export PATH=$PWD/node_bin/bin:$PATH && reflex run --env prod
+    startCommand: export PATH=$PWD/node_bin/bin:$PATH && reflex run --env prod --backend-only
     plan: free
     healthCheckPath: /
     envVars:
