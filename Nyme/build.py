@@ -29,8 +29,13 @@ def install_node():
         out_file.write(response.read())
     
     print("[Build] Extrayendo Node.js...")
-    with tarfile.open(archive_path, "r:xz") as tar:
-        tar.extractall(path=node_dir)
+    try:
+        # Usar la herramienta tar del sistema que preserva permisos y no requiere lzma en Python
+        subprocess.check_call(["tar", "-xJf", archive_path, "-C", node_dir])
+    except Exception as e:
+        print(f"[Build] Warning: falló extracción con tar del sistema ({e}). Intentando con tarfile...")
+        with tarfile.open(archive_path, "r:xz") as tar:
+            tar.extractall(path=node_dir)
     
     extracted_folder = os.path.join(node_dir, "node-v18.17.0-linux-x64")
     # Mover archivos de la carpeta extraída a node_dir
@@ -71,12 +76,12 @@ def main():
     print("[Build] Instalando dependencias de requirements.txt...")
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     
-    # Iniciar Reflex y exportar
+    # Iniciar Reflex y exportar usando sys.executable -m reflex
     print("[Build] Inicializando Reflex...")
-    subprocess.check_call(["reflex", "init"])
+    subprocess.check_call([sys.executable, "-m", "reflex", "init"])
     
     print("[Build] Exportando frontend de Reflex...")
-    subprocess.check_call(["reflex", "export", "--frontend-only", "--no-zip"])
+    subprocess.check_call([sys.executable, "-m", "reflex", "export", "--frontend-only", "--no-zip"])
     print("[Build] ✅ ¡Compilación completada con éxito!")
 
 if __name__ == "__main__":
