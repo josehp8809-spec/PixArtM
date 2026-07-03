@@ -7,7 +7,6 @@ services:
     buildCommand: python build.py
     startCommand: export PATH=$PWD/node_bin/bin:$PATH && reflex run --env prod --backend-only
     plan: free
-    healthCheckPath: /
     envVars:
       - key: DATABASE_URL
         fromDatabase:
