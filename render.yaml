@@ -3,8 +3,9 @@ services:
   - type: web
     name: nyme-app
     env: python
-    buildCommand: pip install -r requirements.txt && reflex export --frontend-only
-    startCommand: reflex run --env prod
+    rootDir: Nyme
+    buildCommand: python build.py
+    startCommand: export PATH=$PWD/node_bin/bin:$PATH && reflex run --env prod
     plan: free
     healthCheckPath: /
     envVars:
