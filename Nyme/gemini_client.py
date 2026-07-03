@@ -135,7 +135,7 @@ class GeminiClient:
         except Exception:
             return "desconocido"
 
-    def suggest_reply(self, history):
+    def suggest_reply(self, history, products=None):
         """Genera una sugerencia de respuesta basada en el historial del chat."""
         model = self._get_model()
         if not model:
@@ -145,8 +145,17 @@ class GeminiClient:
                 f"{'Cliente' if t == 'INBOUND' else 'Agente'}: {body}"
                 for t, body, *_ in history[-10:]
             ])
+            
+            catalog_info = ""
+            if products:
+                catalog_info = "Nuestros productos de temporada y ofertas actuales disponibles en stock:\n"
+                for p in products:
+                    catalog_info += f"- {p['name']}: {p['description']} (Precio: ${p['price']:.2f})\n"
+                catalog_info += "\nSi el cliente pregunta por ofertas, productos recomendados, precios o tallas, promueve proactivamente estos productos de temporada.\n\n"
+
             prompt = (
                 "Eres un asistente de atención al cliente profesional y amable. "
+                f"{catalog_info}"
                 "Basándote en este historial de WhatsApp, escribe UNA respuesta breve y apropiada "
                 "para el agente. Solo el texto de la respuesta, sin comillas ni explicaciones.\n\n"
                 f"Historial:\n{history_text}\n\nRespuesta sugerida:"

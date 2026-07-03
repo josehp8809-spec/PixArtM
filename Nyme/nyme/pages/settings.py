@@ -198,6 +198,34 @@ def user_row(u: dict) -> rx.Component:
     )
 
 
+def product_row(p: dict) -> rx.Component:
+    return rx.hstack(
+        rx.cond(
+            p["image_url"] != "",
+            rx.image(src=p["image_url"], width="40px", height="40px", border_radius="6px", object_fit="cover"),
+            rx.center(rx.text("🛍️", size="2"), width="40px", height="40px", background="#2c2c2e", border_radius="6px")
+        ),
+        rx.vstack(
+            rx.text(p["name"], weight="bold", size="2", color="white"),
+            rx.text(p["description"][:100] + ("..." if len(p["description"]) > 100 else ""), size="1", color="#8e8e93"),
+            spacing="0",
+        ),
+        rx.spacer(),
+        rx.text(f"${p['price']:.2f}", weight="bold", size="2", color="#30d158", margin_right="12px"),
+        rx.badge(
+            rx.cond(p["is_seasonal"], "Temporada", "Regular"),
+            color_scheme=rx.cond(p["is_seasonal"], "orange", "blue"),
+            margin_right="12px"
+        ),
+        rx.button("✏️", on_click=SettingsState.start_edit_product(p), size="1", variant="ghost"),
+        rx.button("🗑️", on_click=SettingsState.delete_product(p["id"]), size="1", variant="ghost", color="#ff453a"),
+        padding="12px",
+        border="1px solid #2c2c2e",
+        border_radius="10px",
+        width="100%",
+    )
+
+
 def settings_page() -> rx.Component:
     return rx.box(
         rx.vstack(
@@ -207,6 +235,7 @@ def settings_page() -> rx.Component:
                     rx.tabs.trigger("👥 Usuarios", value="users"),
                     rx.tabs.trigger("📱 Líneas", value="lines"),
                     rx.tabs.trigger("⚡ Atajos", value="qr"),
+                    rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
                     rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
                     rx.tabs.trigger("🔑 Mi Cuenta", value="account"),
                     border_bottom="1px solid #2c2c2e",
@@ -237,7 +266,7 @@ def settings_page() -> rx.Component:
                         rx.button("Crear usuario", on_click=SettingsState.save_user,
                                   color_scheme="blue"),
                         rx.cond(SettingsState.nu_msg != "",
-                                rx.text(SettingsState.nu_msg, size="2")),
+                                  rx.text(SettingsState.nu_msg, size="2")),
                         rx.divider(color="#2c2c2e"),
                         rx.heading("Usuarios activos", size="4", color="white"),
                         rx.foreach(SettingsState.all_users, user_row),
@@ -267,7 +296,7 @@ def settings_page() -> rx.Component:
                         rx.button("💾 Guardar línea", on_click=SettingsState.save_line,
                                   color_scheme="blue"),
                         rx.cond(SettingsState.nl_msg != "",
-                                rx.text(SettingsState.nl_msg, size="2")),
+                                  rx.text(SettingsState.nl_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="lines", padding="24px 32px",
@@ -315,10 +344,77 @@ def settings_page() -> rx.Component:
                         rx.button("✅ Guardar atajo", on_click=SettingsState.save_qr,
                                   color_scheme="blue"),
                         rx.cond(SettingsState.qr_msg != "",
-                                rx.text(SettingsState.qr_msg, size="2")),
+                                  rx.text(SettingsState.qr_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="qr", padding="24px 32px",
+                ),
+
+                # ── Catálogo de Temporada ─────────────────────────────────
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("Gestionar Catálogo de Productos", size="4", color="white"),
+                        rx.text("Administra los productos de temporada y ofertas disponibles para los agentes.", color="#8e8e93", size="2"),
+                        
+                        rx.box(
+                            rx.vstack(
+                                rx.heading(
+                                    rx.cond(SettingsState.editing_product_id > 0, "✏️ Editar Producto", "➕ Agregar Producto"),
+                                    size="3", color="white"
+                                ),
+                                rx.grid(
+                                    _field("Nombre del Producto *", placeholder="Zapatillas Nike Sport", value=SettingsState.new_product_name, on_change=SettingsState.set_new_product_name),
+                                    _field("Precio ($) *", placeholder="59.99", value=SettingsState.new_product_price, on_change=SettingsState.set_new_product_price),
+                                    _field("Imagen URL (Opcional)", placeholder="https://example.com/image.jpg", value=SettingsState.new_product_image, on_change=SettingsState.set_new_product_image),
+                                    rx.vstack(
+                                        rx.text("Tipo de Oferta", size="1", color="#8e8e93"),
+                                        rx.checkbox(
+                                            "Producto de Temporada / Oferta",
+                                            checked=SettingsState.new_product_seasonal,
+                                            on_change=SettingsState.set_new_product_seasonal,
+                                            color_scheme="orange"
+                                        ),
+                                        align_items="start",
+                                        justify_content="center",
+                                        height="100%"
+                                    ),
+                                    columns="2", spacing="3", width="100%",
+                                ),
+                                rx.vstack(
+                                    rx.text("Descripción del Producto", size="1", color="#8e8e93"),
+                                    rx.text_area(
+                                        placeholder="Descripción corta, beneficios, tallas, etc.",
+                                        value=SettingsState.new_product_desc,
+                                        on_change=SettingsState.set_new_product_desc,
+                                        background="#1c1c1e", border="1px solid #3a3a3c",
+                                        color="white", width="100%",
+                                    ),
+                                    spacing="1", width="100%",
+                                ),
+                                rx.hstack(
+                                    rx.button(
+                                        rx.cond(SettingsState.editing_product_id > 0, "💾 Actualizar Producto", "💾 Guardar Producto"),
+                                        on_click=SettingsState.save_product,
+                                        color_scheme="blue"
+                                    ),
+                                    rx.cond(
+                                        SettingsState.editing_product_id > 0,
+                                        rx.button("Cancelar", on_click=SettingsState.cancel_edit_product, variant="soft"),
+                                    ),
+                                    spacing="2"
+                                ),
+                                rx.cond(SettingsState.prod_msg != "", rx.text(SettingsState.prod_msg, size="2", color="#30d158")),
+                                spacing="3", width="100%", padding="16px", background="#111", border="1px solid #2c2c2e", border_radius="12px"
+                            ),
+                            width="100%"
+                        ),
+                        
+                        rx.divider(color="#2c2c2e"),
+                        rx.heading("Catálogo registrado", size="3", color="white"),
+                        rx.foreach(SettingsState.products, product_row),
+                        spacing="4", align_items="start", width="100%",
+                    ),
+                    value="catalog", padding="24px 32px",
                 ),
 
                 # ── Gemini ───────────────────────────────────────────────
@@ -332,7 +428,7 @@ def settings_page() -> rx.Component:
                         rx.button("💾 Guardar", on_click=SettingsState.save_gemini,
                                   color_scheme="blue"),
                         rx.cond(SettingsState.gemini_msg != "",
-                                rx.text(SettingsState.gemini_msg, size="2")),
+                                  rx.text(SettingsState.gemini_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="gemini", padding="24px 32px",
@@ -349,7 +445,7 @@ def settings_page() -> rx.Component:
                         rx.button("Cambiar contraseña", on_click=SettingsState.change_password,
                                   color_scheme="blue"),
                         rx.cond(SettingsState.pwd_msg != "",
-                                rx.text(SettingsState.pwd_msg, size="2")),
+                                  rx.text(SettingsState.pwd_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="account", padding="24px 32px",

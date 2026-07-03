@@ -80,6 +80,27 @@ class AppState(rx.State):
     pwd_confirm: str = ""
     pwd_msg: str     = ""
 
+    # ── Módulo de Catálogo ────────────────────────────────────────────────────
+    products: list[dict] = []
+    editing_product_id: int = 0
+    new_product_name: str = ""
+    new_product_desc: str = ""
+    new_product_price: str = ""
+    new_product_image: str = ""
+    new_product_seasonal: bool = True
+    prod_msg: str = ""
+
+    # ── Módulo de Pedidos ─────────────────────────────────────────────────────
+    orders: list[dict] = []
+    order_items: list[dict] = [] # Borrador del pedido: [{"product": name, "quantity": qty, "price": pr}]
+    order_address: str = ""
+    orders_filter_status: str = "all"
+    order_msg: str = ""
+    
+    # Campo auxiliar para agregar un item libre personalizado
+    special_item_name: str = ""
+    special_item_price: str = ""
+
     # ─────────────────────────────────────────────────────────────────────────
     # AUTH
     # ─────────────────────────────────────────────────────────────────────────
@@ -142,6 +163,8 @@ class AppState(rx.State):
         self._refresh_contact_list()
         self._refresh_team()
         self._update_total_unread()
+        self._refresh_products()
+        self._refresh_orders()
 
     def _update_total_unread(self):
         new_total = sum(c["unread"] for c in self.contacts)
@@ -171,6 +194,18 @@ class AppState(rx.State):
             u for u in self.team_list 
             if q in u["full_name"].lower() or q in u["username"].lower()
         ]
+
+    @rx.var
+    def order_total_amount(self) -> float:
+        total = 0.0
+        for item in self.order_items:
+            try:
+                qty = int(item.get("quantity", 1))
+                price = float(item.get("price", 0.0))
+                total += qty * price
+            except (ValueError, TypeError):
+                pass
+        return total
 
     def _refresh_contacts(self):
         raw = db.get_contacts_for_user(self.user_id, self.role)
@@ -251,6 +286,8 @@ class AppState(rx.State):
                 self._refresh_internal()
                 self._refresh_team()
                 self._update_total_unread()
+                self._refresh_products()
+                self._refresh_orders()
                 if self.selected_contact:
                     self._refresh_messages()
 
@@ -268,6 +305,17 @@ class AppState(rx.State):
             if c["wa_id"] == wa_id and c["line_id"] == line_id:
                 self.conv_status = c.get("status", "pending")
                 break
+
+    def start_chat_with(self, wa_id: str):
+        line_id = 0
+        for c in self.contacts:
+            if c["wa_id"] == wa_id:
+                line_id = c["line_id"]
+                break
+        if line_id == 0 and self.all_lines:
+            line_id = self.all_lines[0]["id"]
+        self.select_contact(wa_id, line_id)
+        return rx.redirect("/chat")
 
     def go_back(self):
         """Volver a la lista de contactos (móvil)."""
@@ -357,8 +405,10 @@ class AppState(rx.State):
     async def suggest_reply(self):
         async with self:
             self.loading_ai = True
+            products_list = list(self.products)
         result = gemini.suggest_reply(
-            [(m["type"], m["body"], None, m["agent"]) for m in self.messages]
+            [(m["type"], m["body"], None, m["agent"]) for m in self.messages],
+            products=products_list
         )
         async with self:
             self.loading_ai = False
@@ -485,3 +535,315 @@ class AppState(rx.State):
         # Por ahora devolvemos un mensaje de éxito
         self.nc_msg = "✅ Exportación generada con éxito (Check logs)."
         print(f"[Export] {len(data)} contactos exportados.")
+
+    # ── Métodos Auxiliares de Carga ──────────────────────────────────────────
+
+    def _refresh_products(self):
+        raw = db.get_all_products()
+        self.products = [
+            {
+                "id": p[0], "name": p[1], "description": p[2] or "",
+                "price": float(p[3]), "image_url": p[4] or "",
+                "is_seasonal": bool(p[5])
+            }
+            for p in raw
+        ]
+
+    def _refresh_orders(self):
+        import json
+        raw = db.get_orders()
+        self.orders = []
+        for r in raw:
+            try:
+                items_val = r[3]
+                if isinstance(items_val, str):
+                    items = json.loads(items_val)
+                elif isinstance(items_val, list):
+                    items = items_val
+                else:
+                    items = []
+            except Exception:
+                items = []
+            
+            contact_name = ""
+            for c in self.contact_list:
+                if c["wa_id"] == r[1]:
+                    contact_name = c["name"]
+                    break
+            if not contact_name:
+                contact_name = f"+{r[1]}"
+
+            self.orders.append({
+                "id": r[0],
+                "wa_id": r[1],
+                "contact_name": contact_name,
+                "agent_username": r[2] or "Sistema",
+                "items": items,
+                "total_amount": float(r[4]),
+                "status": r[5],
+                "shipping_address": r[6] or "Retiro en local",
+                "created_at": r[7].strftime("%d/%m/%Y %H:%M") if r[7] else "",
+                "updated_at": r[8].strftime("%d/%m/%Y %H:%M") if r[8] else ""
+            })
+
+    # ── Handlers de Formulario de Catálogo ─────────────────────────────────────
+
+    def set_new_product_name(self, v): self.new_product_name = v
+    def set_new_product_desc(self, v): self.new_product_desc = v
+    def set_new_product_price(self, v): self.new_product_price = v
+    def set_new_product_image(self, v): self.new_product_image = v
+    def set_new_product_seasonal(self, v): self.new_product_seasonal = bool(v)
+
+    def start_edit_product(self, product: dict):
+        self.editing_product_id = product["id"]
+        self.new_product_name = product["name"]
+        self.new_product_desc = product["description"]
+        self.new_product_price = str(product["price"])
+        self.new_product_image = product["image_url"]
+        self.new_product_seasonal = product["is_seasonal"]
+        self.prod_msg = "✏️ Editando producto."
+
+    def cancel_edit_product(self):
+        self.editing_product_id = 0
+        self.new_product_name = ""
+        self.new_product_desc = ""
+        self.new_product_price = ""
+        self.new_product_image = ""
+        self.new_product_seasonal = True
+        self.prod_msg = ""
+
+    def save_product(self):
+        if not self.new_product_name.strip():
+            self.prod_msg = "❌ El nombre es obligatorio."
+            return
+        try:
+            price = float(self.new_product_price)
+        except ValueError:
+            self.prod_msg = "❌ El precio debe ser un número válido."
+            return
+
+        if self.editing_product_id > 0:
+            ok = db.update_product(
+                self.editing_product_id,
+                self.new_product_name.strip(),
+                self.new_product_desc.strip(),
+                price,
+                self.new_product_image.strip(),
+                self.new_product_seasonal
+            )
+            if ok:
+                self.prod_msg = "✅ Producto actualizado."
+                self.cancel_edit_product()
+                self._refresh_products()
+            else:
+                self.prod_msg = "❌ Error al actualizar producto."
+        else:
+            ok = db.create_product(
+                self.new_product_name.strip(),
+                self.new_product_desc.strip(),
+                price,
+                self.new_product_image.strip(),
+                self.new_product_seasonal
+            )
+            if ok:
+                self.prod_msg = "✅ Producto guardado."
+                self.new_product_name = ""
+                self.new_product_desc = ""
+                self.new_product_price = ""
+                self.new_product_image = ""
+                self.new_product_seasonal = True
+                self._refresh_products()
+            else:
+                self.prod_msg = "❌ Error al guardar producto."
+
+    def delete_product(self, product_id: int):
+        if db.delete_product(product_id):
+            self.prod_msg = "🗑️ Producto eliminado."
+            self._refresh_products()
+        else:
+            self.prod_msg = "❌ Error al eliminar producto."
+
+    # ── Handlers de Borrador de Pedidos ──────────────────────────────────────
+
+    def set_order_address(self, v): self.order_address = v
+    def set_special_item_name(self, v): self.special_item_name = v
+    def set_special_item_price(self, v): self.special_item_price = v
+
+    def add_product_to_order_draft(self, product: dict):
+        for item in self.order_items:
+            if item.get("product") == product["name"]:
+                item["quantity"] += 1
+                self.order_items = list(self.order_items)
+                return
+        self.order_items.append({
+            "product": product["name"],
+            "quantity": 1,
+            "price": product["price"]
+        })
+        self.order_items = list(self.order_items)
+
+    def add_special_item_to_order_draft(self):
+        name = self.special_item_name.strip()
+        if not name:
+            return
+        try:
+            price = float(self.special_item_price)
+        except ValueError:
+            price = 0.0
+        self.order_items.append({
+            "product": name,
+            "quantity": 1,
+            "price": price
+        })
+        self.order_items = list(self.order_items)
+        self.special_item_name = ""
+        self.special_item_price = ""
+
+    def remove_order_item(self, product_name: str):
+        self.order_items = [item for item in self.order_items if item.get("product") != product_name]
+        self.order_items = list(self.order_items)
+
+    def update_order_item_qty(self, product_name: str, value: str):
+        try:
+            val = int(value)
+            for item in self.order_items:
+                if item.get("product") == product_name:
+                    item["quantity"] = val
+                    break
+            self.order_items = list(self.order_items)
+        except ValueError:
+            pass
+
+    def update_order_item_price(self, product_name: str, value: str):
+        try:
+            val = float(value)
+            for item in self.order_items:
+                if item.get("product") == product_name:
+                    item["price"] = val
+                    break
+            self.order_items = list(self.order_items)
+        except ValueError:
+            pass
+
+    def clear_order_draft(self):
+        self.order_items = []
+        self.order_address = ""
+        self.order_msg = ""
+
+    @rx.event(background=True)
+    async def create_order(self):
+        async with self:
+            if not self.selected_contact:
+                self.order_msg = "❌ Selecciona un contacto primero."
+                return
+            if not self.order_items:
+                self.order_msg = "❌ El pedido está vacío."
+                return
+            
+            wa_id = self.selected_contact
+            agent = self.username
+            items = list(self.order_items)
+            total = self.order_total_amount
+            address = self.order_address.strip()
+            
+            order_id = db.create_order(wa_id, agent, items, total, address)
+            
+            if order_id:
+                self.order_items = []
+                self.order_address = ""
+                self.order_msg = f"✅ Pedido #{order_id} creado con éxito."
+                self._refresh_orders()
+            else:
+                self.order_msg = "❌ Error al registrar el pedido en la base de datos."
+                return
+
+        customer_email = None
+        for c in self.contact_list:
+            if c["wa_id"] == wa_id:
+                customer_email = c.get("email")
+                break
+        
+        from email_client import email_client
+        await email_client.send_order_notification(
+            order_id, wa_id, agent, items, total, address, "pending", customer_email
+        )
+
+    @rx.event(background=True)
+    async def update_order_status(self, order_id: int, new_status: str):
+        if db.update_order_status(order_id, new_status):
+            async with self:
+                self._refresh_orders()
+                order = next((o for o in self.orders if o["id"] == order_id), None)
+                if not order:
+                    return
+                wa_id = order["wa_id"]
+                agent = order["agent_username"]
+                items = order["items"]
+                total = order["total_amount"]
+                address = order["shipping_address"]
+
+            customer_email = None
+            for c in self.contact_list:
+                if c["wa_id"] == wa_id:
+                    customer_email = c.get("email")
+                    break
+
+            from email_client import email_client
+            await email_client.send_order_notification(
+                order_id, wa_id, agent, items, total, address, new_status, customer_email
+            )
+
+    @rx.event(background=True)
+    async def auto_fill_order_with_ai(self):
+        async with self:
+            if not self.selected_contact or not self.messages:
+                return
+            self.loading_ai = True
+        
+        history_text = "\n".join([f"{m['type']}: {m['body']}" for m in self.messages[-10:]])
+        
+        prompt = f"""
+        Analiza la siguiente conversación de chat y extrae la información del pedido.
+        Debes responder ÚNICAMENTE en formato JSON con la siguiente estructura, sin bloques de código ```json o texto adicional:
+        {{
+            "items": [
+                {{"product": "Nombre del producto", "quantity": 1, "price": 0.0}}
+            ],
+            "address": "Dirección completa de entrega, o vacío si no se menciona"
+        }}
+        
+        Conversación:
+        {history_text}
+        """
+        
+        try:
+            model = gemini._get_model()
+            if model:
+                response = model.generate_content(prompt)
+                res_text = response.text.strip()
+                if res_text.startswith("```"):
+                    res_text = res_text.split("\n", 1)[1].rsplit("\n", 1)[0].strip()
+                
+                import json
+                parsed = json.loads(res_text)
+                
+                async with self:
+                    self.order_items = parsed.get("items", [])
+                    self.order_address = parsed.get("address", "")
+                    self.order_msg = "✨ Pedido autocompletado por IA."
+            else:
+                async with self:
+                    self.order_msg = "❌ Gemini no está configurado."
+        except Exception as e:
+            print(f"[Gemini Autocompletado] Error: {e}")
+            async with self:
+                self.order_msg = "❌ No se pudo extraer la información con la IA."
+        
+        async with self:
+            self.loading_ai = False
+
+    def send_product_details(self, product: dict):
+        detail_msg = f"🛍️ *{product['name']}*\n{product['description']}\n🏷️ *Precio:* ${product['price']:.2f}"
+        if product.get("image_url"):
+            detail_msg += f"\n📸 *Imagen:* {product['image_url']}"
+        self.new_message = detail_msg

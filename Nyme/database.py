@@ -9,20 +9,24 @@ load_dotenv()
 
 class Database:
     def __init__(self):
-        self.conn_params = {
-            "host":     os.getenv("DB_HOST", "localhost"),
-            "dbname":   os.getenv("DB_NAME", "nyme_db"),
-            "user":     os.getenv("DB_USER", "postgres"),
-            "password": os.getenv("DB_PASS", "password"),
-            "port":     os.getenv("DB_PORT", "5432"),
-        }
+        self.dsn = os.getenv("DATABASE_URL")
+        if not self.dsn:
+            self.conn_params = {
+                "host":     os.getenv("DB_HOST", "localhost"),
+                "dbname":   os.getenv("DB_NAME", "nyme_db"),
+                "user":     os.getenv("DB_USER", "postgres"),
+                "password": os.getenv("DB_PASS", "password"),
+                "port":     os.getenv("DB_PORT", "5432"),
+            }
+        else:
+            self.conn_params = None
         self._available = None
 
     def _check_available(self):
         if self._available is not None:
             return self._available
         try:
-            conn = psycopg2.connect(**self.conn_params, connect_timeout=5)
+            conn = self.get_connection()
             conn.close()
             self._available = True
         except Exception as e:
@@ -31,6 +35,8 @@ class Database:
         return self._available
 
     def get_connection(self):
+        if self.dsn:
+            return psycopg2.connect(self.dsn)
         return psycopg2.connect(**self.conn_params)
 
     def init_db(self):
@@ -39,11 +45,27 @@ class Database:
             return False
         commands = [
             """
-            CREATE TABLE IF NOT EXISTS contacts (
+            CREATE TABLE IF NOT EXISTS products (
                 id SERIAL PRIMARY KEY,
-                wa_id VARCHAR(20) UNIQUE NOT NULL,
-                name VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                name VARCHAR(200) NOT NULL,
+                description TEXT,
+                price NUMERIC(10, 2) NOT NULL,
+                image_url TEXT,
+                is_seasonal BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS orders (
+                id SERIAL PRIMARY KEY,
+                wa_id VARCHAR(20) NOT NULL,
+                agent_username VARCHAR(100),
+                items JSONB NOT NULL,
+                total_amount NUMERIC(10, 2) NOT NULL,
+                status VARCHAR(20) DEFAULT 'pending',
+                shipping_address TEXT,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
             )
             """,
             """
@@ -179,6 +201,13 @@ class Database:
             # Migration: add line_id to messages if not exists
             cur.execute(
                 "ALTER TABLE messages ADD COLUMN IF NOT EXISTS line_id INTEGER REFERENCES lines(id)"
+            )
+            # Migration: add email and notes to contacts if not exists
+            cur.execute(
+                "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS email VARCHAR(200)"
+            )
+            cur.execute(
+                "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS notes TEXT"
             )
             conn.commit()
             cur.close()
@@ -851,5 +880,165 @@ class Database:
                 cur.execute("INSERT INTO internal_room_members (room_id, user_id) VALUES (%s, %s)", (room_id, uid))
             conn.commit(); cur.close(); conn.close(); return room_id
         except Exception: return None
+
+    # ── Contacts Directory ────────────────────────────────────────────
+
+    def get_all_contacts(self):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("SELECT wa_id, name, email, notes FROM contacts ORDER BY name")
+            rows = cur.fetchall(); cur.close(); conn.close(); return rows
+        except Exception as e:
+            print(f"[DB] Error obteniendo todos los contactos: {e}")
+            return []
+
+    def upsert_contact(self, wa_id, name, email, notes):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO contacts (wa_id, name, email, notes)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (wa_id)
+                DO UPDATE SET name = EXCLUDED.name, email = EXCLUDED.email, notes = EXCLUDED.notes
+                """,
+                (wa_id, name, email, notes)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error guardando contacto: {e}")
+            return False
+
+    # ── Chat Assignation ──────────────────────────────────────────────
+
+    def assign_conversation(self, wa_id, line_id, agent_username):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO conversation_status (wa_id, line_id, assigned_to)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                DO UPDATE SET assigned_to = EXCLUDED.assigned_to, updated_at = NOW()
+                """,
+                (wa_id, line_id, agent_username)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error asignando conversación: {e}")
+            return False
+
+    # ── Catalog Products ──────────────────────────────────────────────
+
+    def create_product(self, name, description, price, image_url, is_seasonal=True):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO products (name, description, price, image_url, is_seasonal) VALUES (%s, %s, %s, %s, %s)",
+                (name, description, price, image_url, is_seasonal)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error creando producto: {e}")
+            return False
+
+    def update_product(self, product_id, name, description, price, image_url, is_seasonal):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                UPDATE products 
+                SET name = %s, description = %s, price = %s, image_url = %s, is_seasonal = %s 
+                WHERE id = %s
+                """,
+                (name, description, price, image_url, is_seasonal, product_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error actualizando producto: {e}")
+            return False
+
+    def get_all_products(self, only_seasonal=False):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            if only_seasonal:
+                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products WHERE is_seasonal = TRUE ORDER BY name")
+            else:
+                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products ORDER BY name")
+            rows = cur.fetchall(); cur.close(); conn.close(); return rows
+        except Exception as e:
+            print(f"[DB] Error obteniendo productos: {e}")
+            return []
+
+    def delete_product(self, product_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM products WHERE id = %s", (product_id,))
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error eliminando producto: {e}")
+            return False
+
+    # ── Sales Orders ──────────────────────────────────────────────────
+
+    def create_order(self, wa_id, agent_username, items, total_amount, shipping_address):
+        if not self._check_available(): return None
+        try:
+            import json
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO orders (wa_id, agent_username, items, total_amount, shipping_address)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id
+                """,
+                (wa_id, agent_username, json.dumps(items), total_amount, shipping_address)
+            )
+            order_id = cur.fetchone()[0]
+            conn.commit(); cur.close(); conn.close(); return order_id
+        except Exception as e:
+            print(f"[DB] Error creando pedido: {e}")
+            return None
+
+    def update_order_status(self, order_id, new_status):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "UPDATE orders SET status = %s, updated_at = NOW() WHERE id = %s",
+                (new_status, order_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error actualizando estado de pedido: {e}")
+            return False
+
+    def get_orders(self, status=None, wa_id=None):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            query = "SELECT id, wa_id, agent_username, items, total_amount, status, shipping_address, created_at, updated_at FROM orders"
+            params = []
+            conditions = []
+            if status:
+                conditions.append("status = %s")
+                params.append(status)
+            if wa_id:
+                conditions.append("wa_id = %s")
+                params.append(wa_id)
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+            query += " ORDER BY created_at DESC"
+            cur.execute(query, params)
+            rows = cur.fetchall(); cur.close(); conn.close(); return rows
+        except Exception as e:
+            print(f"[DB] Error obteniendo pedidos: {e}")
+            return []
 
 db = Database()

@@ -12,6 +12,7 @@ from nyme.pages.chat import chat_page
 from nyme.pages.settings import settings_page
 from nyme.pages.internal import internal_chat_page
 from nyme.pages.contacts import contacts_page
+from nyme.pages.orders import orders_page
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Navbar compartida
@@ -26,7 +27,11 @@ def navbar() -> rx.Component:
         rx.link("🏢 Equipo",    href="/internal", color="#8e8e93", size="2"),
         rx.cond(
             (AppState.role == "admin") | (AppState.role == "coordinator"),
-            rx.link("📊 Reportes", href="/reports", color="#8e8e93", size="2"),
+            rx.hstack(
+                rx.link("📊 Ventas",   href="/orders",  color="#8e8e93", size="2"),
+                rx.link("📊 Reportes", href="/reports", color="#8e8e93", size="2"),
+                spacing="4"
+            )
         ),
         rx.cond(
             AppState.role == "admin",
@@ -173,6 +178,7 @@ app.add_page(contacts_page,      route="/contacts",  title="Nyme — Directorio"
 app.add_page(internal_chat_page, route="/internal",  title="Nyme — Equipo")
 app.add_page(settings_page,      route="/settings",  title="Nyme — Config")
 app.add_page(reports_page,       route="/reports",   title="Nyme — Reportes")
+app.add_page(orders_page,        route="/orders",    title="Nyme — Ventas")
 
 # Montar webhook dentro del FastAPI interno de Reflex
 app.api.add_api_route("/webhook", webhook_get,  methods=["GET"])

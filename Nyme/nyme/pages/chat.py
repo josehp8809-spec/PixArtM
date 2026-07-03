@@ -225,9 +225,157 @@ def _active_chat() -> rx.Component:
         background="#000", width="100%", height="100dvh", spacing="0", overflow="hidden",
     )
 
+def order_draft_item(item: dict) -> rx.Component:
+    return rx.hstack(
+        rx.text(item["product"], weight="bold", size="1", color="white", flex="1"),
+        rx.input(
+            value=item["quantity"].to_string(),
+            on_change=lambda val: AppState.update_order_item_qty(item["product"], val),
+            width="45px", height="24px", background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
+        ),
+        rx.text("x", size="1", color="#8e8e93"),
+        rx.input(
+            value=item["price"].to_string(),
+            on_change=lambda val: AppState.update_order_item_price(item["product"], val),
+            width="65px", height="24px", background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
+        ),
+        rx.button("🗑️", on_click=AppState.remove_order_item(item["product"]), size="1", variant="ghost", color="#ff453a"),
+        align_items="center", spacing="1", width="100%"
+    )
+
+
+def orders_sidebar() -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.tabs.root(
+                rx.tabs.list(
+                    rx.tabs.trigger("📦 Pedidos", value="draft"),
+                    rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
+                    width="100%",
+                ),
+                
+                # Tab 1: Pedidos / Borrador
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("Borrador del Pedido", size="2", color="white", margin_top="8px"),
+                        rx.cond(
+                            AppState.order_items.length() == 0,
+                            rx.text("El borrador está vacío. Añade productos desde el catálogo o agrega uno especial abajo.", size="1", color="#636366"),
+                            rx.vstack(
+                                rx.foreach(
+                                    AppState.order_items,
+                                    order_draft_item
+                                ),
+                                width="100%", spacing="2"
+                            )
+                        ),
+                        rx.divider(color="#2c2c2e"),
+                        
+                        # Agregar producto especial / personalizado
+                        rx.heading("Agregar Item Especial", size="1", color="#8e8e93"),
+                        rx.hstack(
+                            rx.input(
+                                placeholder="Nombre (ej: Envoltura)",
+                                value=AppState.special_item_name,
+                                on_change=AppState.set_special_item_name,
+                                background="#1c1c1e", border="1px solid #3a3a3c", color="white", size="1", flex="1", height="28px"
+                            ),
+                            rx.input(
+                                placeholder="Precio",
+                                value=AppState.special_item_price,
+                                on_change=AppState.set_special_item_price,
+                                background="#1c1c1e", border="1px solid #3a3a3c", color="white", size="1", width="60px", height="28px"
+                            ),
+                            rx.button("➕", on_click=AppState.add_special_item_to_order_draft, size="1", color_scheme="blue", height="28px"),
+                            width="100%", spacing="1", align_items="center"
+                        ),
+                        rx.divider(color="#2c2c2e"),
+                        
+                        # Datos finales
+                        rx.vstack(
+                            rx.text("Dirección de Envío", size="1", color="#8e8e93"),
+                            rx.text_area(
+                                placeholder="Dirección completa del cliente",
+                                value=AppState.order_address,
+                                on_change=AppState.set_order_address,
+                                background="#1c1c1e", border="1px solid #3a3a3c", color="white", resize="none", rows="2", font_size="12px", width="100%"
+                            ),
+                            spacing="1", width="100%"
+                        ),
+                        
+                        rx.hstack(
+                            rx.text("Total:", weight="bold", size="2", color="white"),
+                            rx.spacer(),
+                            rx.text(f"${AppState.order_total_amount:.2f}", weight="bold", size="3", color="#30d158"),
+                            width="100%"
+                        ),
+                        
+                        rx.grid(
+                            rx.button("💾 Guardar", on_click=AppState.create_order, color_scheme="green", size="1"),
+                            rx.button("✨ IA Rellenar", on_click=AppState.auto_fill_order_with_ai, color_scheme="blue", size="1", loading=AppState.loading_ai),
+                            rx.button("🗑️ Vaciar", on_click=AppState.clear_order_draft, variant="soft", color_scheme="red", size="1"),
+                            columns="3", spacing="2", width="100%"
+                        ),
+                        rx.cond(AppState.order_msg != "", rx.text(AppState.order_msg, size="1", color="#30d158")),
+                        spacing="3", width="100%", align_items="stretch"
+                    ),
+                    value="draft"
+                ),
+                
+                # Tab 2: Catálogo de temporada
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("Productos de Temporada", size="2", color="white", margin_top="8px"),
+                        rx.scroll_area(
+                            rx.vstack(
+                                rx.foreach(
+                                    AppState.products,
+                                    lambda p: rx.box(
+                                        rx.hstack(
+                                            rx.cond(
+                                                p["image_url"] != "",
+                                                rx.image(src=p["image_url"], width="30px", height="30px", border_radius="4px", object_fit="cover"),
+                                                rx.center(rx.text("🛍️", size="1"), width="30px", height="30px", background="#2c2c2e", border_radius="4px")
+                                            ),
+                                            rx.vstack(
+                                                rx.text(p["name"], weight="bold", size="1", color="white"),
+                                                rx.text(f"${p['price']:.2f}", size="1", color="#30d158"),
+                                                spacing="0", align_items="start"
+                                            ),
+                                            rx.spacer(),
+                                            rx.button("➕", on_click=AppState.add_product_to_order_draft(p), size="1", variant="soft", color_scheme="blue"),
+                                            rx.button("📄 Info", on_click=AppState.send_product_details(p), size="1", variant="ghost", color_scheme="gray"),
+                                            align_items="center", spacing="1", width="100%"
+                                        ),
+                                        rx.text(p["description"][:60] + ("..." if len(p["description"]) > 60 else ""), size="1", color="#8e8e93", padding_top="4px"),
+                                        padding="8px", background="#1c1c1e", border_radius="8px", border="1px solid #2c2c2e", margin_bottom="8px", width="100%"
+                                    )
+                                ),
+                                spacing="1", width="100%"
+                            ),
+                            height="calc(100vh - 120px)"
+                        ),
+                        width="100%", spacing="2"
+                    ),
+                    value="catalog"
+                ),
+                default_value="draft",
+                width="100%"
+            ),
+            spacing="3", padding="12px", width="300px", height="100dvh", background="#111", border_left="1px solid #2c2c2e"
+        ),
+        class_name="hidden-mobile"
+    )
+
+
 def chat_page() -> rx.Component:
     return rx.box(
-        rx.hstack(contacts_panel(), rx.box(_active_chat() if AppState.selected_contact != "" else rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100dvh", background="#000"), flex="1"), spacing="0", width="100%", height="100dvh", overflow="hidden"),
+        rx.hstack(
+            contacts_panel(), 
+            rx.box(_active_chat() if AppState.selected_contact != "" else rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100dvh", background="#000"), flex="1"), 
+            rx.cond(AppState.selected_contact != "", orders_sidebar()),
+            spacing="0", width="100%", height="100dvh", overflow="hidden"
+        ),
         rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.set_play_sound_tick(0), display="none"),
         background="#000", on_mount=[AppState.require_auth, AppState.start_polling],
     )
