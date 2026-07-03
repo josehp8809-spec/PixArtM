@@ -74,7 +74,7 @@ def navbar(active_page: str = "") -> rx.Component:
             rx.hstack(
                 rx.vstack(
                     rx.text(AppState.full_name, color="white", weight="bold", size="2"),
-                    rx.text(AppState.role.to_str().capitalize(), color="#8e8e93", size="1"),
+                    rx.text(AppState.role.to(str).capitalize(), color="#8e8e93", size="1"),
                     spacing="0",
                     align_items="end",
                 ),
