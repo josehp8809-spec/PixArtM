@@ -1,6 +1,7 @@
 """Página de Directorio — Con Buscador, Avatares y Exportación."""
 import reflex as rx
 from nyme.state import AppState
+from nyme.pages.navbar import navbar
 
 # ── Helper para Avatares ──────────────────────────────────────────
 
@@ -97,7 +98,8 @@ def team_card(u: rx.Var) -> rx.Component:
 # ── Página Principal ──────────────────────────────────────────────
 
 def contacts_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        navbar("/contacts"),
         rx.vstack(
             rx.hstack(
                 rx.heading("👥 Directorio Nyme", size="7", color="white"),
@@ -186,6 +188,8 @@ def contacts_page() -> rx.Component:
             ),
             spacing="0", width="100%",
         ),
+        spacing="0",
+        width="100%",
         background="#000",
         min_height="100vh",
         on_mount=AppState.require_auth,

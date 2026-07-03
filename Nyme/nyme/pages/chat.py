@@ -1,6 +1,6 @@
-"""Chat page — Responsivo con Selector de Emojis y Sonido."""
 import reflex as rx
 from nyme.state import AppState
+from nyme.pages.navbar import navbar
 
 STATUS_ICONS  = {"pending": "⏳", "active": "🟡", "resolved": "✅"}
 STATUS_LABELS = {"pending": "Pendiente", "active": "En curso", "resolved": "Resuelto"}
@@ -149,19 +149,11 @@ def contacts_panel() -> rx.Component:
                     rx.foreach(AppState.contacts.to(list[dict]), contact_item),
                     spacing="1", padding="8px",
                 ),
-                flex="1", width="100%",
-            ),
-            rx.divider(color="#2c2c2e"),
-            rx.hstack(
-                rx.link("👥 Clientes",  href="/contacts", color="#8e8e93", size="1"),
-                rx.link("🏢 Equipo",    href="/internal", color="#8e8e93", size="1"),
-                rx.spacer(),
-                rx.button("Salir", on_click=AppState.logout, size="1", variant="ghost", color="#ff453a"),
-                padding="8px 12px", width="100%",
-            ),
-            height="100dvh", width="100%", background="#111", border_right="1px solid #2c2c2e", spacing="0",
+            flex="1", width="100%",
+            background="#111", border_right="1px solid #2c2c2e", spacing="0",
         ),
         class_name=hidden_class,
+        height="100%",
     )
 
 def _active_chat() -> rx.Component:
@@ -382,13 +374,19 @@ def orders_sidebar() -> rx.Component:
 
 
 def chat_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        navbar("/chat"),
         rx.hstack(
             contacts_panel(), 
-            rx.box(rx.cond(AppState.selected_contact != "", _active_chat(), rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100dvh", background="#000")), flex="1"), 
+            rx.box(rx.cond(AppState.selected_contact != "", _active_chat(), rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100%", background="#000")), flex="1", height="100%"), 
             rx.cond(AppState.selected_contact != "", orders_sidebar()),
-            spacing="0", width="100%", height="100dvh", overflow="hidden"
+            spacing="0", width="100%", height="100%", overflow="hidden"
         ),
         rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.reset_sound_tick, display="none"),
-        background="#000", on_mount=[AppState.require_auth, AppState.start_polling],
+        background="#000",
+        spacing="0",
+        width="100%",
+        height="100dvh",
+        overflow="hidden",
+        on_mount=[AppState.require_auth, AppState.start_polling],
     )

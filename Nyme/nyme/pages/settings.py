@@ -1,6 +1,7 @@
 """Settings page — admin only."""
 import reflex as rx
 from nyme.state import AppState
+from nyme.pages.navbar import navbar
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -246,7 +247,8 @@ def product_row(p: rx.Var) -> rx.Component:
 
 
 def settings_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        navbar("/settings"),
         rx.vstack(
             rx.heading("⚙️ Configuración", size="7", color="white", padding="24px 32px 8px"),
             rx.tabs.root(
@@ -473,9 +475,12 @@ def settings_page() -> rx.Component:
                 default_value="users",
                 width="100%",
             ),
-            background="#000000",
-            min_height="100vh",
+            spacing="0",
             width="100%",
         ),
+        background="#000000",
+        spacing="0",
+        min_height="100vh",
+        width="100%",
         on_mount=SettingsState.on_mount_settings,
     )

@@ -1,6 +1,7 @@
 """Página de Chat Interno para el equipo."""
 import reflex as rx
 from nyme.state import AppState
+from nyme.pages.navbar import navbar
 
 def internal_msg_bubble(m: dict) -> rx.Component:
     return rx.box(
@@ -17,7 +18,8 @@ def internal_msg_bubble(m: dict) -> rx.Component:
     )
 
 def internal_chat_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        navbar("/internal"),
         rx.vstack(
             rx.heading("💬 Chat Interno de Equipo", size="7", color="white", padding="24px 32px 8px"),
             rx.text("Espacio general para anuncios y coordinación entre agentes.", color="#8e8e93", padding="0 32px 16px"),
@@ -62,6 +64,8 @@ def internal_chat_page() -> rx.Component:
             spacing="0",
             width="100%",
         ),
+        spacing="0",
+        width="100%",
         background="#000",
         min_height="100vh",
         on_mount=AppState.require_auth,

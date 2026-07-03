@@ -1,6 +1,7 @@
 """Página de Ventas y Administración de Pedidos — Kanban y Gestión."""
 import reflex as rx
 from nyme.state import AppState
+from nyme.pages.navbar import navbar
 
 STATUS_COLORS = {
     "pending": "#ff9f0a",
@@ -95,16 +96,12 @@ def kanban_column(status: str, title: str, color: str) -> rx.Component:
 
 
 def orders_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        navbar("/orders"),
         rx.vstack(
             rx.hstack(
                 rx.heading("📊 Tablero de Ventas y Pedidos", size="7", color="white"),
                 rx.spacer(),
-                rx.button(
-                    "💬 Ir al Chat",
-                    on_click=lambda: rx.redirect("/chat"),
-                    size="2", variant="surface"
-                ),
                 padding="24px 32px 8px", width="100%"
             ),
             rx.text(
@@ -124,12 +121,13 @@ def orders_page() -> rx.Component:
                 spacing="4",
                 width="100%",
                 padding="24px 32px",
-                height="calc(100vh - 180px)",
+                height="calc(100vh - 240px)",
                 align_items="stretch"
             ),
-            spacing="0", width="100%", height="100dvh"
+            spacing="0", width="100%"
         ),
         background="#000",
+        spacing="0",
         min_height="100vh",
         width="100%",
         on_mount=AppState.require_auth

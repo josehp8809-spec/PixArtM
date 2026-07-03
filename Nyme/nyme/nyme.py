@@ -13,6 +13,7 @@ from nyme.pages.settings import settings_page
 from nyme.pages.internal import internal_chat_page
 from nyme.pages.contacts import contacts_page
 from nyme.pages.orders import orders_page
+from nyme.pages.navbar import navbar as premium_navbar
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Navbar compartida
@@ -54,7 +55,8 @@ def navbar() -> rx.Component:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def reports_page() -> rx.Component:
-    return rx.box(
+    return rx.vstack(
+        premium_navbar("/reports"),
         rx.vstack(
             rx.heading("📊 Reportes", size="7", color="white", padding="24px 32px 8px"),
             rx.text(
@@ -67,9 +69,13 @@ def reports_page() -> rx.Component:
                 "Excel y PDF desde report_exporter.py",
                 color="blue", variant="soft", margin="32px",
             ),
+            spacing="0",
+            width="100%",
         ),
         background="#000000",
+        spacing="0",
         min_height="100vh",
+        width="100%",
         on_mount=AppState.require_auth,
     )
 
