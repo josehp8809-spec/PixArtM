@@ -81,8 +81,9 @@ def reports_page() -> rx.Component:
 import hmac
 import hashlib
 import json
-from fastapi import Request, HTTPException, Query
-from fastapi.responses import PlainTextResponse
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse, JSONResponse
+from starlette.exceptions import HTTPException
 
 VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN", "nyme_verify_2024")
 APP_SECRET   = os.getenv("META_APP_SECRET", "")
@@ -97,11 +98,11 @@ def _verify_sig(payload: bytes, sig_header: str) -> bool:
     return hmac.compare_digest(expected, sig_header[7:])
 
 
-async def webhook_get(
-    mode:      str = Query(None, alias="hub.mode"),
-    token:     str = Query(None, alias="hub.verify_token"),
-    challenge: str = Query(None, alias="hub.challenge"),
-):
+async def webhook_get(request: Request):
+    params = request.query_params
+    mode      = params.get("hub.mode")
+    token     = params.get("hub.verify_token")
+    challenge = params.get("hub.challenge", "")
     if mode == "subscribe" and token == VERIFY_TOKEN:
         return PlainTextResponse(challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
@@ -156,9 +157,9 @@ async def webhook_post(request: Request):
                                             line["welcome_message"],
                                             agent_username="[bienvenida]",
                                             line_id=line_id)
-        return {"status": "ok"}
+        return JSONResponse({"status": "ok"})
     except Exception as e:
-        return {"status": "error", "detail": str(e)}
+        return JSONResponse({"status": "error", "detail": str(e)})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
