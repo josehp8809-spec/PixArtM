@@ -9,29 +9,37 @@ STATUS_LABELS = {"pending": "Pendiente", "active": "En curso", "resolved": "Resu
 # Componentes
 # ─────────────────────────────────────────────────────────────────────────────
 
-def avatar_box(name: str, size="40px") -> rx.Component:
-    initial = name[0].upper() if name else "?"
-    colors = ["#0a84ff", "#30d158", "#ff9f0a", "#5e5ce6", "#ff375f", "#64d2ff"]
-    idx = ord(initial) % len(colors)
+def avatar_box(name: rx.Var, size="40px") -> rx.Component:
+    initial = name[0]
     return rx.center(
         rx.text(initial, weight="bold", color="white", size="2"),
-        width=size, height=size, background=colors[idx], border_radius="50%", flex_shrink="0",
+        width=size, height=size, background="#2c2c2e", border_radius="50%", flex_shrink="0",
+        border="1px solid #3a3a3c"
     )
 
-def contact_item(contact: dict) -> rx.Component:
-    unread = contact["unread"]
-    status = contact["status"]
+def contact_item(contact: rx.Var) -> rx.Component:
+    unread = contact["unread"].to(int)
+    status = contact["status"].to(str)
+    wa_id = contact["wa_id"].to(str)
+    line_id = contact["line_id"].to(int)
+    
     is_selected = (
-        (AppState.selected_contact == contact["wa_id"])
-        & (AppState.selected_line_id == contact["line_id"])
+        (AppState.selected_contact == wa_id)
+        & (AppState.selected_line_id == line_id)
     )
     return rx.box(
         rx.hstack(
-            avatar_box(contact["wa_id"]),
+            avatar_box(wa_id),
             rx.vstack(
-                rx.text(f"+{contact['wa_id']}", weight="bold", size="2", color="white"),
+                rx.text("+", wa_id, weight="bold", size="2", color="white"),
                 rx.text(
-                    STATUS_ICONS.get(status, "⏳") + " " + STATUS_LABELS.get(status, status),
+                    rx.match(
+                        status,
+                        ("pending", "⏳ Pendiente"),
+                        ("active", "🟡 En curso"),
+                        ("resolved", "✅ Resuelto"),
+                        "⏳ Pendiente"
+                    ),
                     size="1", color="#8e8e93",
                 ),
                 align_items="start", spacing="0",
@@ -40,47 +48,52 @@ def contact_item(contact: dict) -> rx.Component:
             rx.cond(unread > 0, rx.badge(unread.to_string(), color_scheme="red", radius="full")),
             width="100%",
         ),
-        on_click=AppState.select_contact(contact["wa_id"], contact["line_id"]),
+        on_click=AppState.select_contact(wa_id, line_id),
         background=rx.cond(is_selected, "#1c1c1e", "transparent"),
         border_radius="10px", padding="12px", cursor="pointer", width="100%",
         border=rx.cond(is_selected, "1px solid #3a3a3c", "1px solid transparent"),
         _hover={"background": "#1c1c1e"},
     )
 
-def message_bubble(msg: dict) -> rx.Component:
+def message_bubble(msg: rx.Var) -> rx.Component:
     is_in = msg["type"] == "INBOUND"
-    is_audio = "[🎤 Audio]" in msg["body"] or msg.get("media_id")
+    body_str = msg["body"].to(str)
+    media_id_str = msg["media_id"].to(str)
+    is_audio = body_str.contains("[🎤 Audio]") | (media_id_str != "")
     
     return rx.box(
         rx.vstack(
             rx.cond(
-                is_audio & (msg.get("media_id") != None),
+                is_audio & (media_id_str != ""),
                 rx.vstack(
                     rx.text("🎤 Mensaje de voz", size="1", color="#8e8e93"),
                     rx.button(
                         "📝 Transcribir con IA",
-                        on_click=AppState.transcribe_audio(msg["media_id"]),
+                        on_click=AppState.transcribe_audio(media_id_str),
                         size="1", variant="soft", color_scheme="blue",
                     ),
                     align_items="start", spacing="2",
                 ),
-                rx.text(msg["body"], size="2", color="white", white_space="pre-wrap", class_name="message-body"),
+                rx.text(body_str, size="2", color="white", white_space="pre-wrap", class_name="message-body"),
             ),
-            rx.text(rx.cond(is_in, "Cliente · ", f"@{msg['agent']} · ") + msg["time"], size="1", color="#636366"),
+            rx.text(rx.cond(is_in, "Cliente · ", msg["agent"].to(str) + " · ") + msg["time"].to(str), size="1", color="#636366"),
             align_items=rx.cond(is_in, "start", "end"),
             spacing="1",
         ),
         class_name=rx.cond(is_in, "bubble-in", "bubble-out"),
     )
 
-def quick_reply_btn(qr: dict) -> rx.Component:
+def quick_reply_btn(qr: rx.Var) -> rx.Component:
+    shortcut = qr["shortcut"].to(str)
+    title = qr["title"].to(str)
+    message = qr["message"].to(str)
     return rx.button(
         rx.vstack(
-            rx.text(qr["shortcut"], weight="bold", size="1", color="#0a84ff"),
-            rx.text(qr["title"], size="1", color="#8e8e93"),
+            rx.text(shortcut, weight="bold", size="1", color="#0a84ff"),
+            rx.text(title, size="1", color="#8e8e93"),
             spacing="0", align_items="start",
         ),
-        on_click=AppState.send_quick_reply(qr["message"]),
+        on_click=AppState.send_quick_reply(message),
         variant="outline", border="1px solid #3a3a3c", background="#1c1c1e",
         border_radius="8px", padding="8px 12px", flex_shrink="0",
     )
@@ -94,7 +107,7 @@ def emoji_selector() -> rx.Component:
             rx.scroll_area(
                 rx.grid(
                     rx.foreach(
-                        AppState.emoji_list,
+                        AppState.emoji_list.to(list[str]),
                         lambda e: rx.button(
                             e, on_click=AppState.add_emoji(e),
                             variant="ghost", size="1", font_size="20px",
@@ -133,7 +146,7 @@ def contacts_panel() -> rx.Component:
             rx.divider(color="#2c2c2e"),
             rx.scroll_area(
                 rx.vstack(
-                    rx.foreach(AppState.contacts, contact_item),
+                    rx.foreach(AppState.contacts.to(list[dict]), contact_item),
                     spacing="1", padding="8px",
                 ),
                 flex="1", width="100%",
@@ -168,12 +181,12 @@ def _active_chat() -> rx.Component:
 
         # Mensajes
         rx.scroll_area(
-            rx.vstack(rx.foreach(AppState.messages, message_bubble), spacing="2", align_items="stretch", padding_bottom="8px"),
+            rx.vstack(rx.foreach(AppState.messages.to(list[dict]), message_bubble), spacing="2", align_items="stretch", padding_bottom="8px"),
             class_name="messages-scroll", flex="1", width="100%",
         ),
 
         # Respuestas rápidas
-        rx.cond(AppState.quick_replies.length() > 0, rx.box(rx.hstack(rx.foreach(AppState.quick_replies, quick_reply_btn), spacing="2", padding="8px 12px"), class_name="quick-replies-bar", width="100%", border_top="1px solid #2c2c2e", background="#000")),
+        rx.cond(AppState.quick_replies.length() > 0, rx.box(rx.hstack(rx.foreach(AppState.quick_replies.to(list[dict]), quick_reply_btn), spacing="2", padding="8px 12px"), class_name="quick-replies-bar", width="100%", border_top="1px solid #2c2c2e", background="#000")),
 
         # IA Tools
         rx.cond(AppState.ai_result != "", rx.hstack(rx.callout(AppState.ai_result, color="blue", variant="soft", size="1", flex="1"), rx.vstack(rx.button("✅ Usar", size="1", on_click=AppState.use_ai_result, color_scheme="blue"), rx.button("✕", size="1", on_click=AppState.clear_ai_result, variant="ghost"), spacing="1"), padding="8px 12px", width="100%")),
@@ -263,7 +276,7 @@ def orders_sidebar() -> rx.Component:
                             rx.text("El borrador está vacío. Añade productos desde el catálogo o agrega uno especial abajo.", size="1", color="#636366"),
                             rx.vstack(
                                 rx.foreach(
-                                    AppState.order_items,
+                                    AppState.order_items.to(list[dict]),
                                     order_draft_item
                                 ),
                                 width="100%", spacing="2"
@@ -329,7 +342,7 @@ def orders_sidebar() -> rx.Component:
                         rx.scroll_area(
                             rx.vstack(
                                 rx.foreach(
-                                    AppState.products,
+                                    AppState.products.to(list[dict]),
                                     lambda p: rx.box(
                                         rx.hstack(
                                             rx.cond(
@@ -339,7 +352,7 @@ def orders_sidebar() -> rx.Component:
                                             ),
                                             rx.vstack(
                                                 rx.text(p["name"], weight="bold", size="1", color="white"),
-                                                rx.text(f"${p['price']:.2f}", size="1", color="#30d158"),
+                                                rx.text("$", p["price"].to_string(), size="1", color="#30d158"),
                                                 spacing="0", align_items="start"
                                             ),
                                             rx.spacer(),
@@ -347,7 +360,7 @@ def orders_sidebar() -> rx.Component:
                                             rx.button("📄 Info", on_click=AppState.send_product_details(p), size="1", variant="ghost", color_scheme="gray"),
                                             align_items="center", spacing="1", width="100%"
                                         ),
-                                        rx.text(p["description"][:60] + ("..." if len(p["description"]) > 60 else ""), size="1", color="#8e8e93", padding_top="4px"),
+                                        rx.text(p["description"].to(str)[:60] + "...", size="1", color="#8e8e93", padding_top="4px"),
                                         padding="8px", background="#1c1c1e", border_radius="8px", border="1px solid #2c2c2e", margin_bottom="8px", width="100%"
                                     )
                                 ),
@@ -372,10 +385,10 @@ def chat_page() -> rx.Component:
     return rx.box(
         rx.hstack(
             contacts_panel(), 
-            rx.box(_active_chat() if AppState.selected_contact != "" else rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100dvh", background="#000"), flex="1"), 
+            rx.box(rx.cond(AppState.selected_contact != "", _active_chat(), rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100dvh", background="#000")), flex="1"), 
             rx.cond(AppState.selected_contact != "", orders_sidebar()),
             spacing="0", width="100%", height="100dvh", overflow="hidden"
         ),
-        rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.set_play_sound_tick(0), display="none"),
+        rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.reset_sound_tick, display="none"),
         background="#000", on_mount=[AppState.require_auth, AppState.start_polling],
     )

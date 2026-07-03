@@ -111,6 +111,10 @@ class AppState(rx.State):
     def set_login_password(self, val: str):
         self.login_password = val
 
+    def handle_login_key(self, key: str):
+        if key == "Enter":
+            return self.login()
+
     def login(self):
         user = db.verify_user(self.login_username.strip().lower(), self.login_password)
         if user:
@@ -132,6 +136,9 @@ class AppState(rx.State):
         self.selected_contact = ""
         self.contacts = self.messages = self.all_lines = self.quick_replies = []
         return rx.redirect("/")
+
+    def reset_sound_tick(self):
+        self.play_sound_tick = 0
 
     def require_auth(self):
         if not self.authenticated:
@@ -332,7 +339,6 @@ class AppState(rx.State):
         self.new_message += emoji
         # self.show_emoji_picker = False # Opcional: cerrar al elegir
 
-    @rx.event(background=True)
     async def handle_upload(self, files: list[rx.UploadFile]):
         """Procesa archivos subidos (fotos, documentos)."""
         if not self.selected_contact or not files:
@@ -454,6 +460,10 @@ class AppState(rx.State):
     # ── Internal Chat ────────────────────────────────────────────────────────
 
     def set_internal_chat_msg(self, v): self.internal_chat_msg = v
+
+    def handle_internal_key(self, key: str):
+        if key == "Enter":
+            return self.send_internal_message()
 
     def send_internal_message(self):
         if not self.internal_chat_msg.strip(): return

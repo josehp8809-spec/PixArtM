@@ -180,6 +180,6 @@ app.add_page(settings_page,      route="/settings",  title="Nyme — Config")
 app.add_page(reports_page,       route="/reports",   title="Nyme — Reportes")
 app.add_page(orders_page,        route="/orders",    title="Nyme — Ventas")
 
-# Montar webhook dentro del FastAPI interno de Reflex
-app.api.add_api_route("/webhook", webhook_get,  methods=["GET"])
-app.api.add_api_route("/webhook", webhook_post, methods=["POST"])
+# Montar webhook dentro del FastAPI/Starlette interno de Reflex
+app._api.add_route("/webhook", webhook_get,  methods=["GET"])
+app._api.add_route("/webhook", webhook_post, methods=["POST"])

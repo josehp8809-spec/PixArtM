@@ -1,3 +1,7 @@
+.states
+.web
+assets/external/
+*.db
 # Entorno y secretos — NUNCA subir a GitHub
 .env
 *.env

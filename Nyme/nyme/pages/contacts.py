@@ -4,42 +4,47 @@ from nyme.state import AppState
 
 # ── Helper para Avatares ──────────────────────────────────────────
 
-def avatar_box(name: str, size="40px") -> rx.Component:
-    initial = name[0].upper() if name else "?"
-    # Colores consistentes basados en la inicial
-    colors = ["#0a84ff", "#30d158", "#ff9f0a", "#5e5ce6", "#ff375f", "#64d2ff"]
-    idx = ord(initial) % len(colors)
+def avatar_box(name: rx.Var, size="40px") -> rx.Component:
+    safe_name = rx.cond(name != "", name, "?")
+    initial = safe_name[0]
     return rx.center(
         rx.text(initial, weight="bold", color="white", size="2"),
         width=size, height=size,
-        background=colors[idx],
+        background="#2c2c2e",
         border_radius="50%",
         flex_shrink="0",
+        border="1px solid #3a3a3c"
     )
 
 # ── Componente Cliente ───────────────────────────────────────────
 
-def contact_card(c: dict) -> rx.Component:
+def contact_card(c: rx.Var) -> rx.Component:
+    c_name = c["name"].to(str)
+    wa_id = c["wa_id"].to(str)
+    notes = c["notes"].to(str)
+    avatar_name = rx.cond(c_name != "", c_name, wa_id)
+    display_name = rx.cond(c_name != "", c_name, "Sin nombre")
+
     return rx.box(
         rx.hstack(
-            avatar_box(c["name"] or c["wa_id"]),
+            avatar_box(avatar_name),
             rx.vstack(
-                rx.text(c["name"] or "Sin nombre", weight="bold", size="3", color="white"),
-                rx.text(f"📱 +{c['wa_id']}", size="2", color="#0a84ff"),
+                rx.text(display_name, weight="bold", size="3", color="white"),
+                rx.text("📱 +", wa_id, size="2", color="#0a84ff"),
                 align_items="start", spacing="0",
             ),
             rx.spacer(),
             rx.button(
                 "💬 Chat",
-                on_click=AppState.start_chat_with(c["wa_id"]),
+                on_click=AppState.start_chat_with(wa_id),
                 size="2", variant="surface",
             ),
             padding="16px", align_items="center", width="100%",
         ),
         rx.divider(color="#2c2c2e"),
         rx.cond(
-            c["notes"] != "",
-            rx.text(c["notes"], size="1", color="#636366", padding="8px 16px"),
+            notes != "",
+            rx.text(notes, size="1", color="#636366", padding="8px 16px"),
         ),
         background="#111", border="1px solid #2c2c2e", border_radius="12px",
         width="100%", margin_bottom="12px",
@@ -47,15 +52,20 @@ def contact_card(c: dict) -> rx.Component:
 
 # ── Componente Miembro del Equipo ─────────────────────────────────
 
-def team_card(u: dict) -> rx.Component:
-    is_me = (u["username"] == AppState.username)
+def team_card(u: rx.Var) -> rx.Component:
+    username = u["username"].to(str)
+    full_name = u["full_name"].to(str)
+    role = u["role"].to(str)
+    is_online = u["is_online"].to(bool)
+    is_me = (username == AppState.username)
+
     return rx.box(
         rx.hstack(
             rx.box(
-                avatar_box(u["full_name"]),
+                avatar_box(full_name),
                 rx.box( # Indicador de conexión superpuesto
                     width="12px", height="12px",
-                    background=rx.cond(u["is_online"], "#30d158", "#3a3a3c"),
+                    background=rx.cond(is_online, "#30d158", "#3a3a3c"),
                     border="2px solid #111", border_radius="50%",
                     position="absolute", bottom="0", right="0",
                 ),
@@ -63,20 +73,20 @@ def team_card(u: dict) -> rx.Component:
             ),
             rx.vstack(
                 rx.hstack(
-                    rx.text(u["full_name"], weight="bold", size="3", color="white"),
-                    rx.badge(u["role"], color_scheme="blue", size="1"),
+                    rx.text(full_name, weight="bold", size="3", color="white"),
+                    rx.badge(role, color_scheme="blue", size="1"),
                     spacing="2", align_items="center",
                 ),
                 rx.text(
-                    rx.cond(u["is_online"], "En línea", "Desconectado"),
-                    size="1", color=rx.cond(u["is_online"], "#30d158", "#8e8e93"),
+                    rx.cond(is_online, "En línea", "Desconectado"),
+                    size="1", color=rx.cond(is_online, "#30d158", "#8e8e93"),
                 ),
                 align_items="start", spacing="0",
             ),
             rx.spacer(),
             rx.cond(
                 ~is_me,
-                rx.button("💬 DM", on_click=AppState.select_room(0, u["full_name"]), size="2", variant="soft"),
+                rx.button("💬 DM", on_click=AppState.select_room(0, full_name), size="2", variant="soft"),
             ),
             padding="16px", align_items="center", width="100%",
         ),
@@ -119,7 +129,7 @@ def contacts_page() -> rx.Component:
                         ),
                         rx.scroll_area(
                             rx.vstack(
-                                rx.foreach(AppState.filtered_contact_list, contact_card),
+                                rx.foreach(AppState.filtered_contact_list.to(list[dict]), contact_card),
                                 width="100%", padding="16px 0",
                             ),
                             height="calc(100vh - 320px)",
@@ -140,7 +150,7 @@ def contacts_page() -> rx.Component:
                         ),
                         rx.scroll_area(
                             rx.vstack(
-                                rx.foreach(AppState.filtered_team_list, team_card),
+                                rx.foreach(AppState.filtered_team_list.to(list[dict]), team_card),
                                 width="100%", padding="16px 0",
                             ),
                             height="calc(100vh - 320px)",

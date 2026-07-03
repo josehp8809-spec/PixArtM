@@ -2,14 +2,6 @@
 import reflex as rx
 from nyme.state import AppState
 
-STATUS_LABELS = {
-    "pending": "⏳ Pendiente",
-    "confirmed": "⚙️ Preparación",
-    "shipped": "🚚 En camino",
-    "delivered": "✅ Entregado",
-    "cancelled": "❌ Cancelado"
-}
-
 STATUS_COLORS = {
     "pending": "#ff9f0a",
     "confirmed": "#0a84ff",
@@ -19,16 +11,16 @@ STATUS_COLORS = {
 }
 
 
-def order_item_card(order: dict) -> rx.Component:
+def order_item_card(order: rx.Var) -> rx.Component:
     """Representa un pedido en el tablero Kanban."""
     
     # Formatear lista de items
     items_text = rx.vstack(
         rx.foreach(
-            order["items"],
+            order["items"].to(list[dict]),
             lambda item: rx.hstack(
                 rx.text(item["product"], size="1", color="white", weight="bold", flex="1"),
-                rx.text(f"x{item['quantity']}", size="1", color="#8e8e93"),
+                rx.text("x", item["quantity"].to_string(), size="1", color="#8e8e93"),
                 width="100%"
             )
         ),
@@ -38,19 +30,19 @@ def order_item_card(order: dict) -> rx.Component:
     return rx.box(
         rx.vstack(
             rx.hstack(
-                rx.text(f"Pedido #{order['id']}", weight="bold", size="2", color="white"),
+                rx.text("Pedido #", order["id"].to_string(), weight="bold", size="2", color="white"),
                 rx.spacer(),
-                rx.text(f"${order['total_amount']:.2f}", weight="bold", size="2", color="#30d158"),
+                rx.text("$", order["total_amount"].to_string(), weight="bold", size="2", color="#30d158"),
                 width="100%", align_items="center"
             ),
             rx.divider(color="#2c2c2e"),
-            rx.text(f"Cliente: {order['contact_name']}", size="1", color="#8e8e93"),
-            rx.text(f"WhatsApp: +{order['wa_id']}", size="1", color="#0a84ff"),
+            rx.text("Cliente: ", order["contact_name"], size="1", color="#8e8e93"),
+            rx.text("WhatsApp: +", order["wa_id"].to_string(), size="1", color="#0a84ff"),
             
             items_text,
             
             rx.divider(color="#2c2c2e"),
-            rx.text(f"Dirección: {order['shipping_address']}", size="1", color="#8e8e93", font_style="italic"),
+            rx.text("Dirección: ", order["shipping_address"], size="1", color="#8e8e93", font_style="italic"),
             
             rx.divider(color="#2c2c2e"),
             rx.hstack(
@@ -63,12 +55,12 @@ def order_item_card(order: dict) -> rx.Component:
                 ),
                 width="100%", align_items="center"
             ),
-            rx.text(f"Actualizado: {order['updated_at']}", size="1", color="#636366"),
+            rx.text("Actualizado: ", order["updated_at"], size="1", color="#636366"),
             spacing="2", align_items="start"
         ),
         padding="16px",
         background="#111",
-        border=f"1px solid {STATUS_COLORS.get(order['status'], '#2c2c2e')}",
+        border="1px solid #2c2c2e",
         border_radius="12px",
         margin_bottom="12px",
         width="100%",
@@ -78,11 +70,6 @@ def order_item_card(order: dict) -> rx.Component:
 
 def kanban_column(status: str, title: str, color: str) -> rx.Component:
     """Columna Kanban que filtra y muestra pedidos según su estado."""
-    
-    # Filtrar pedidos por estado
-    filtered_orders = AppState.orders.to(list) # Reflex reactive variable cast helper
-    
-    # Creamos un componente condicional para renderizar los pedidos correspondientes
     return rx.vstack(
         rx.hstack(
             rx.box(width="8px", height="8px", background=color, border_radius="50%"),
@@ -93,7 +80,7 @@ def kanban_column(status: str, title: str, color: str) -> rx.Component:
         rx.scroll_area(
             rx.vstack(
                 rx.foreach(
-                    AppState.orders,
+                    AppState.orders.to(list[dict]),
                     lambda order: rx.cond(
                         order["status"] == status,
                         order_item_card(order)

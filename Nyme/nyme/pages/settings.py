@@ -154,23 +154,29 @@ def _field(label, **props) -> rx.Component:
     )
 
 
-def line_row(line: dict) -> rx.Component:
+def line_row(line: rx.Var) -> rx.Component:
+    line_id = line["id"].to(int)
+    name = line["name"].to(str)
+    phone_id = line["phone_number_id"].to(str)
+    color = line["color"].to(str)
+    is_active = line["is_active"].to(bool)
+    
     return rx.hstack(
-        rx.box(width="12px", height="12px", background=line["color"],
+        rx.box(width="12px", height="12px", background=color,
                border_radius="50%"),
         rx.vstack(
-            rx.text(line["name"], weight="bold", size="2", color="white"),
-            rx.text(line["phone_number_id"], size="1", color="#636366"),
+            rx.text(name, weight="bold", size="2", color="white"),
+            rx.text(phone_id, size="1", color="#636366"),
             spacing="0",
         ),
         rx.spacer(),
         rx.badge(
-            rx.cond(line["is_active"], "Activa", "Inactiva"),
-            color_scheme=rx.cond(line["is_active"], "green", "gray"),
+            rx.cond(is_active, "Activa", "Inactiva"),
+            color_scheme=rx.cond(is_active, "green", "gray"),
         ),
         rx.button(
-            rx.cond(line["is_active"], "Desactivar", "Activar"),
-            on_click=SettingsState.toggle_line(line["id"], line["is_active"]),
+            rx.cond(is_active, "Desactivar", "Activar"),
+            on_click=SettingsState.toggle_line(line_id, is_active),
             size="1", variant="ghost",
         ),
         padding="12px",
@@ -180,16 +186,22 @@ def line_row(line: dict) -> rx.Component:
     )
 
 
-def user_row(u: dict) -> rx.Component:
+def user_row(u: rx.Var) -> rx.Component:
+    user_id = u["id"].to(int)
+    username = u["username"].to(str)
+    full_name = u["full_name"].to(str)
+    role = u["role"].to(str)
+    active = u["active"].to(bool)
+    
     return rx.hstack(
-        rx.text(f"@{u['username']}", weight="bold", size="2", color="white", width="140px"),
-        rx.text(u["full_name"], size="2", color="#8e8e93", flex="1"),
-        rx.badge(u["role"], color_scheme="blue"),
+        rx.text("@", username, weight="bold", size="2", color="white", width="140px"),
+        rx.text(full_name, size="2", color="#8e8e93", flex="1"),
+        rx.badge(role, color_scheme="blue"),
         rx.button(
-            rx.cond(u["active"], "Desactivar", "Activar"),
-            on_click=SettingsState.toggle_user(u["id"], u["active"]),
+            rx.cond(active, "Desactivar", "Activar"),
+            on_click=SettingsState.toggle_user(user_id, active),
             size="1", variant="ghost",
-            color=rx.cond(u["active"], "#ff453a", "#30d158"),
+            color=rx.cond(active, "#ff453a", "#30d158"),
         ),
         padding="10px",
         border="1px solid #2c2c2e",
@@ -198,27 +210,34 @@ def user_row(u: dict) -> rx.Component:
     )
 
 
-def product_row(p: dict) -> rx.Component:
+def product_row(p: rx.Var) -> rx.Component:
+    p_id = p["id"].to(int)
+    image_url = p["image_url"].to(str)
+    name = p["name"].to(str)
+    description = p["description"].to(str)
+    price = p["price"].to_string()
+    is_seasonal = p["is_seasonal"].to(bool)
+    
     return rx.hstack(
         rx.cond(
-            p["image_url"] != "",
-            rx.image(src=p["image_url"], width="40px", height="40px", border_radius="6px", object_fit="cover"),
+            image_url != "",
+            rx.image(src=image_url, width="40px", height="40px", border_radius="6px", object_fit="cover"),
             rx.center(rx.text("🛍️", size="2"), width="40px", height="40px", background="#2c2c2e", border_radius="6px")
         ),
         rx.vstack(
-            rx.text(p["name"], weight="bold", size="2", color="white"),
-            rx.text(p["description"][:100] + ("..." if len(p["description"]) > 100 else ""), size="1", color="#8e8e93"),
+            rx.text(name, weight="bold", size="2", color="white"),
+            rx.text(description[:100] + "...", size="1", color="#8e8e93"),
             spacing="0",
         ),
         rx.spacer(),
-        rx.text(f"${p['price']:.2f}", weight="bold", size="2", color="#30d158", margin_right="12px"),
+        rx.text("$", price, weight="bold", size="2", color="#30d158", margin_right="12px"),
         rx.badge(
-            rx.cond(p["is_seasonal"], "Temporada", "Regular"),
-            color_scheme=rx.cond(p["is_seasonal"], "orange", "blue"),
+            rx.cond(is_seasonal, "Temporada", "Regular"),
+            color_scheme=rx.cond(is_seasonal, "orange", "blue"),
             margin_right="12px"
         ),
         rx.button("✏️", on_click=SettingsState.start_edit_product(p), size="1", variant="ghost"),
-        rx.button("🗑️", on_click=SettingsState.delete_product(p["id"]), size="1", variant="ghost", color="#ff453a"),
+        rx.button("🗑️", on_click=SettingsState.delete_product(p_id), size="1", variant="ghost", color="#ff453a"),
         padding="12px",
         border="1px solid #2c2c2e",
         border_radius="10px",
@@ -269,7 +288,7 @@ def settings_page() -> rx.Component:
                                   rx.text(SettingsState.nu_msg, size="2")),
                         rx.divider(color="#2c2c2e"),
                         rx.heading("Usuarios activos", size="4", color="white"),
-                        rx.foreach(SettingsState.all_users, user_row),
+                        rx.foreach(SettingsState.all_users.to(list[dict]), user_row),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="users", padding="24px 32px",
@@ -279,7 +298,7 @@ def settings_page() -> rx.Component:
                 rx.tabs.content(
                     rx.vstack(
                         rx.heading("Líneas de WhatsApp", size="4", color="white"),
-                        rx.foreach(SettingsState.all_lines, line_row),
+                        rx.foreach(SettingsState.all_lines.to(list[dict]), line_row),
                         rx.divider(color="#2c2c2e"),
                         rx.heading("Agregar línea", size="4", color="white"),
                         rx.grid(
@@ -307,7 +326,7 @@ def settings_page() -> rx.Component:
                     rx.vstack(
                         rx.heading("Respuestas rápidas", size="4", color="white"),
                         rx.foreach(
-                            SettingsState.quick_replies,
+                            SettingsState.quick_replies.to(list[dict]),
                             lambda q: rx.hstack(
                                 rx.badge(q["shortcut"], color_scheme="blue"),
                                 rx.text(q["title"], size="2", color="#8e8e93"),
@@ -411,7 +430,7 @@ def settings_page() -> rx.Component:
                         
                         rx.divider(color="#2c2c2e"),
                         rx.heading("Catálogo registrado", size="3", color="white"),
-                        rx.foreach(SettingsState.products, product_row),
+                        rx.foreach(SettingsState.products.to(list[dict]), product_row),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="catalog", padding="24px 32px",

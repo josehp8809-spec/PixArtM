@@ -27,7 +27,7 @@ def internal_chat_page() -> rx.Component:
             # Muro de mensajes
             rx.scroll_area(
                 rx.vstack(
-                    rx.foreach(AppState.internal_messages, internal_msg_bubble),
+                    rx.foreach(AppState.internal_messages.to(list[dict]), internal_msg_bubble),
                     width="100%",
                     spacing="0",
                     padding="24px 32px",
@@ -42,7 +42,7 @@ def internal_chat_page() -> rx.Component:
                     placeholder="Escribe un anuncio para el equipo...",
                     value=AppState.internal_chat_msg,
                     on_change=AppState.set_internal_chat_msg,
-                    on_key_down=lambda k: AppState.send_internal_message() if k == "Enter" else None,
+                    on_key_down=AppState.handle_internal_key,
                     background="#1c1c1e",
                     border="1px solid #3a3a3c",
                     color="white",

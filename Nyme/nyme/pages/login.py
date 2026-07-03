@@ -23,7 +23,7 @@ def login_page() -> rx.Component:
                 rx.input(
                     placeholder="Usuario",
                     on_change=AppState.set_login_username,
-                    on_key_down=lambda k: AppState.login() if k == "Enter" else None,
+                    on_key_down=AppState.handle_login_key,
                     background="#1c1c1e",
                     border="1px solid #3a3a3c",
                     color="white",
@@ -34,7 +34,7 @@ def login_page() -> rx.Component:
                     placeholder="Contraseña",
                     type="password",
                     on_change=AppState.set_login_password,
-                    on_key_down=lambda k: AppState.login() if k == "Enter" else None,
+                    on_key_down=AppState.handle_login_key,
                     background="#1c1c1e",
                     border="1px solid #3a3a3c",
                     color="white",
