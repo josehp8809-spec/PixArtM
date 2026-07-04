@@ -423,6 +423,24 @@ class Database:
             print(f"[DB] Error verificando usuario: {e}")
             return None
 
+    def get_tenant_by_id(self, tenant_id):
+        """Obtiene la información de un tenant por su ID."""
+        if not self._check_available():
+            return None
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id, name, is_active FROM tenants WHERE id = %s", (tenant_id,))
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row:
+                return {"id": row[0], "name": row[1], "is_active": row[2]}
+            return None
+        except Exception as e:
+            print(f"[DB] Error al obtener tenant por ID: {e}")
+            return None
+
     def get_all_users(self, tenant_id):
         """Obtiene todos los usuarios de un tenant específico."""
         if not self._check_available():
