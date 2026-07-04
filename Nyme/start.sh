@@ -36,4 +36,4 @@ fi
 
 # ── 3. Iniciar el proxy + servidor de frontend en $PORT ───────────────────────
 echo "[Start] Iniciando proxy+frontend en puerto $PORT..."
-python server.py
+python -u server.py

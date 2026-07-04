@@ -14,15 +14,16 @@ from starlette.requests import Request
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
 # ── Configuración ──────────────────────────────────────────────────────────────
+# Usar 127.0.0.1 explícito en vez de localhost para evitar problemas de IPv6
 REFLEX_PORT  = int(os.getenv("REFLEX_BACKEND_PORT", "8000"))
-REFLEX_HTTP  = f"http://localhost:{REFLEX_PORT}"
-REFLEX_WS    = f"ws://localhost:{REFLEX_PORT}"
+REFLEX_HTTP  = f"http://127.0.0.1:{REFLEX_PORT}"
+REFLEX_WS    = f"ws://127.0.0.1:{REFLEX_PORT}"
 BASE         = os.path.dirname(__file__)
 BUILD_DIR    = os.path.join(BASE, ".web", "build", "client")
 
-print(f"[Server] Configurado para conectar al backend en: {REFLEX_HTTP}")
-print(f"[Server] Configurado para conectar WS en: {REFLEX_WS}")
-print(f"[Server] Frontend build: {BUILD_DIR} → existe: {os.path.isdir(BUILD_DIR)}")
+print(f"[Server] Conectando backend en: {REFLEX_HTTP}", flush=True)
+print(f"[Server] Conectando WS en: {REFLEX_WS}", flush=True)
+print(f"[Server] Frontend build: {BUILD_DIR} (existe: {os.path.isdir(BUILD_DIR)})", flush=True)
 
 # ── 1. Proxy HTTP ─────────────────────────────────────────────────────────────
 async def proxy_http(request: Request) -> Response:
@@ -40,12 +41,12 @@ async def proxy_http(request: Request) -> Response:
             return Response(content=resp.content, status_code=resp.status_code,
                             headers=dict(resp.headers))
     except Exception as e:
-        print(f"[HTTP Proxy] Error conectando a {url}: {e}")
+        print(f"[HTTP Proxy] Error conectando a {url}: {e}", flush=True)
         return Response(content=f"Proxy error: {e}", status_code=502)
 
 # ── 2. Proxy WebSocket ────────────────────────────────────────────────────────
 async def proxy_websocket(websocket: WebSocket):
-    """Reenvía conexiones WebSocket al backend de Reflex de manera robusta."""
+    """Reenvía conexiones WebSocket al backend de Reflex."""
     import websockets
     await websocket.accept()
 
@@ -53,9 +54,8 @@ async def proxy_websocket(websocket: WebSocket):
     query = str(websocket.url.query) if websocket.url.query else ""
     ws_url = f"{REFLEX_WS}{path}" + (f"?{query}" if query else "")
     
-    print(f"[WS Proxy] Nueva conexion cliente. Reenviando a backend: {ws_url}")
+    print(f"[WS Proxy] Cliente conectado. Reenviando a: {ws_url}", flush=True)
 
-    # No pasar cabeceras de WebSocket del navegador directo para evitar problemas de handshakes
     headers = []
     for k, v in websocket.headers.items():
         k_lower = k.lower()
@@ -67,16 +67,16 @@ async def proxy_websocket(websocket: WebSocket):
 
     try:
         async with websockets.connect(ws_url, additional_headers=headers) as backend:
-            print("[WS Proxy] Conexion establecida con el backend de Reflex.")
+            print("[WS Proxy] Conexión establecida con el backend de Reflex.", flush=True)
 
             async def client_to_backend():
                 try:
                     async for msg in websocket.iter_text():
                         await backend.send(msg)
                 except WebSocketDisconnect:
-                    print("[WS Proxy] Cliente se desconecto (WebSocketDisconnect).")
+                    print("[WS Proxy] Cliente se desconectó.", flush=True)
                 except Exception as ex:
-                    print(f"[WS Proxy] Error en canal cliente -> backend: {ex}")
+                    print(f"[WS Proxy] Error cliente->backend: {ex}", flush=True)
 
             async def backend_to_client():
                 try:
@@ -85,15 +85,14 @@ async def proxy_websocket(websocket: WebSocket):
                             text = msg if isinstance(msg, str) else msg.decode("utf-8", errors="replace")
                             await websocket.send_text(text)
                 except Exception as ex:
-                    print(f"[WS Proxy] Error en canal backend -> cliente: {ex}")
+                    print(f"[WS Proxy] Error backend->cliente: {ex}", flush=True)
 
-            # Ejecutar ambos bucles en paralelo hasta que uno termine o falle
             await asyncio.gather(client_to_backend(), backend_to_client())
             
     except Exception as e:
-        print(f"[WS Proxy] ERROR CONECTANDO AL BACKEND: {e}")
+        print(f"[WS Proxy] ERROR CONECTANDO AL BACKEND DE REFLEX: {e}", flush=True)
     finally:
-        print("[WS Proxy] Cerrando conexion websocket con el cliente.")
+        print("[WS Proxy] Cerrando websocket cliente.", flush=True)
         try:
             await websocket.close()
         except Exception:
@@ -145,5 +144,5 @@ combined = Starlette(routes=routes)
 # ── 5. Arrancar uvicorn ────────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
-    print(f"[Server] Proxy+Frontend listo en puerto público: {port}")
+    print(f"[Server] Proxy listo en puerto público: {port}", flush=True)
     uvicorn.run(combined, host="0.0.0.0", port=port, log_level="info")
