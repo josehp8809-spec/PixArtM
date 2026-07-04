@@ -13,6 +13,9 @@ openpyxl>=3.1
 fpdf2>=2.7
 plotly>=5.20
 
+# Servidor de producción
+uvicorn>=0.29
+
 # Utilidades
 python-dotenv>=1.0
 requests>=2.31

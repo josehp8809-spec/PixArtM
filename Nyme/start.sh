@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
-# start.sh — Script de inicio para Render
+# start.sh — Script de inicio para Render (producción)
 
-# 1. Configurar el PATH para Node.js portátil
+# Configurar PATH con Node.js portátil instalado en el Build
 export PATH="$PWD/node_bin/bin:$PATH"
 
-# Validar puerto
 if [ -z "$PORT" ]; then
   export PORT=10000
 fi
 
-echo "[Start] Puerto detectado: $PORT"
-echo "[Start] Iniciando backend de Reflex con --backend-only..."
+echo "[Start] Puerto: $PORT"
+echo "[Start] Iniciando Nyme con uvicorn (sin compilacion en caliente)..."
 
-# 2. Ejecutar únicamente el backend de Reflex en producción
-python -m reflex run --backend-only --loglevel info
+python server.py
