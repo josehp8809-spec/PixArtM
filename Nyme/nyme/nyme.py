@@ -208,54 +208,129 @@ async def webhook_post(request: Request):
 
     try:
         body = json.loads(raw)
-        if body.get("object") != "whatsapp_business_account":
-            return {"status": "ignored"}
+        obj_type = body.get("object")
+        if obj_type not in ("whatsapp_business_account", "page", "instagram"):
+            return JSONResponse({"status": "ignored"})
 
-        for entry in body.get("entry", []):
-            for change in entry.get("changes", []):
-                value = change.get("value", {})
-                phone_id = value.get("metadata", {}).get("phone_number_id")
-                line     = db.get_line_by_phone_id(phone_id) if phone_id else None
-                line_id  = line["id"] if line else None
+        # ── Flujo WhatsApp ───────────────────────────────────────────────
+        if obj_type == "whatsapp_business_account":
+            for entry in body.get("entry", []):
+                for change in entry.get("changes", []):
+                    value = change.get("value", {})
+                    phone_id = value.get("metadata", {}).get("phone_number_id")
+                    line     = db.get_line_by_phone_id(phone_id) if phone_id else None
+                    line_id  = line["id"] if line else None
+                    tenant_id = line["tenant_id"] if line else 1
 
-                for msg in value.get("messages", []):
-                    wa_id = msg["from"]
-                    t = msg["type"]
-                    if t == "text":
-                        body_text = msg["text"]["body"]
-                    elif t == "image":
-                        body_text = f"[📷 Imagen]"
-                    elif t == "audio":
-                        body_text = "[🎤 Audio]"
-                    elif t == "document":
-                        body_text = f"[📎 {msg.get('document',{}).get('filename','Documento')}]"
-                    elif t == "location":
-                        loc = msg.get("location", {})
-                        body_text = f"[📍 {loc.get('name','')} {loc.get('address','')}]"
-                    else:
-                        body_text = f"[{t}]"
+                    for msg in value.get("messages", []):
+                        wa_id = msg["from"]
+                        t = msg["type"]
+                        if t == "text":
+                            body_text = msg["text"]["body"]
+                        elif t == "image":
+                            body_text = f"[📷 Imagen]"
+                        elif t == "audio":
+                            body_text = "[🎤 Audio]"
+                        elif t == "document":
+                            body_text = f"[📎 {msg.get('document',{}).get('filename','Documento')}]"
+                        elif t == "location":
+                            loc = msg.get("location", {})
+                            body_text = f"[📍 {loc.get('name','')} {loc.get('address','')}]"
+                        else:
+                            body_text = f"[{t}]"
 
-                    first = db.is_first_contact(wa_id, line_id) if line_id else False
-                    db.save_message(wa_id, "INBOUND", body_text, line_id=line_id)
-                    db.mark_conversation_unread(wa_id, line_id)
+                        first = db.is_first_contact(wa_id, line_id) if line_id else False
+                        db.save_message(wa_id, "INBOUND", body_text, line_id=line_id, tenant_id=tenant_id, channel_type="whatsapp")
+                        db.mark_conversation_unread(wa_id, line_id)
 
-                    # Disparar respondedor de IA automático en segundo plano si es mensaje de texto
-                    if t == "text" and line_id:
-                        tenant_id = line.get("tenant_id", 1) if line else 1
+                        # Disparar respondedor de IA automático y workflows
+                        if t == "text" and line_id:
+                            asyncio.create_task(
+                                run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
+                            )
+                            asyncio.create_task(
+                                execute_workflows_for_message(wa_id, line_id, line, body_text, tenant_id)
+                            )
+
+                        if first and line and line.get("welcome_active") and line.get("welcome_message"):
+                            r = wa_client.send_text_message(line, wa_id, line["welcome_message"])
+                            if r:
+                                db.save_message(wa_id, "OUTBOUND_REPLY",
+                                                line["welcome_message"],
+                                                agent_username="[bienvenida]",
+                                                line_id=line_id,
+                                                tenant_id=tenant_id,
+                                                channel_type="whatsapp")
+
+        # ── Flujo Facebook Messenger o Instagram DMs ───────────────────────
+        elif obj_type in ("page", "instagram"):
+            prefix = "fb_" if obj_type == "page" else "ig_"
+            channel_type = "messenger" if obj_type == "page" else "instagram"
+
+            for entry in body.get("entry", []):
+                page_id = entry.get("id")
+                channel = db.get_channel_by_page_id(page_id) if page_id else None
+                
+                if not channel:
+                    print(f"[Webhook nyme.py] ⚠️ Canal no registrado para page_id: {page_id}")
+                    continue
+
+                line_id = channel["id"]
+                tenant_id = channel["tenant_id"]
+
+                for messaging_event in entry.get("messaging", []):
+                    if "message" not in messaging_event:
+                        continue
+
+                    sender_id = messaging_event["sender"]["id"]
+                    contact_wa_id = f"{prefix}{sender_id}"
+                    message_data = messaging_event["message"]
+
+                    if message_data.get("is_echo"):
+                        continue
+
+                    body_text = message_data.get("text", "")
+                    if not body_text:
+                        attachments = message_data.get("attachments", [])
+                        if attachments:
+                            att_type = attachments[0].get("type", "file")
+                            body_text = f"[{att_type.capitalize()} adjunto]"
+                        else:
+                            body_text = "[Mensaje de red social]"
+
+                    sender_name = "Usuario de Facebook" if obj_type == "page" else "Usuario de Instagram"
+                    db.upsert_contact(contact_wa_id, sender_name, "", "Contacto de Red Social", tenant_id)
+
+                    db.save_message(
+                        contact_wa_id, "INBOUND", body_text,
+                        line_id=line_id, tenant_id=tenant_id,
+                        channel_type=channel_type, sender_name=sender_name
+                    )
+                    db.mark_conversation_unread(contact_wa_id, line_id)
+
+                    # Disparar IA y Workflows para redes sociales
+                    if body_text and not body_text.startswith("["):
                         asyncio.create_task(
-                            run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
+                            run_ai_agent_responder(contact_wa_id, line_id, channel, body_text, tenant_id)
                         )
                         asyncio.create_task(
-                            execute_workflows_for_message(wa_id, line_id, line, body_text, tenant_id)
+                            execute_workflows_for_message(contact_wa_id, line_id, channel, body_text, tenant_id)
                         )
 
-                    if first and line and line.get("welcome_active") and line.get("welcome_message"):
-                        r = wa_client.send_text_message(line, wa_id, line["welcome_message"])
-                        if r:
-                            db.save_message(wa_id, "OUTBOUND_REPLY",
-                                            line["welcome_message"],
-                                            agent_username="[bienvenida]",
-                                            line_id=line_id)
+                    # Mensaje de bienvenida
+                    first = db.is_first_contact(contact_wa_id, line_id)
+                    if first and channel.get("welcome_active") and channel.get("welcome_message"):
+                        from meta_client import meta_client
+                        success = meta_client.send_message(channel, contact_wa_id, channel["welcome_message"])
+                        if success:
+                            db.save_message(
+                                contact_wa_id, "OUTBOUND_REPLY",
+                                channel["welcome_message"],
+                                agent_username="[bienvenida]",
+                                line_id=line_id,
+                                tenant_id=tenant_id,
+                                channel_type=channel_type
+                            )
         return JSONResponse({"status": "ok"})
     except Exception as e:
         return JSONResponse({"status": "error", "detail": str(e)})
