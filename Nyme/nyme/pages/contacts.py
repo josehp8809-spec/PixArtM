@@ -216,7 +216,7 @@ def contacts_page() -> rx.Component:
                                     ),
                                     rx.vstack(
                                         rx.text("Nombre del Cliente", size="1", color="#8e8e93"),
-                                        rx.input(placeholder="Ej: Juan Pérez", on_change=SettingsState.set_nc_name, value=AppState.nc_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        rx.input(placeholder="Ej: Juan Pérez", on_change=AppState.set_nc_name, value=AppState.nc_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
                                         spacing="1", width="100%"
                                     ),
                                     rx.button("💾 Guardar Contacto", on_click=AppState.save_contact, color_scheme="blue", width="100%"),
