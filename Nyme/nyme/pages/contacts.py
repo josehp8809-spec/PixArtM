@@ -23,6 +23,7 @@ def contact_card(c: rx.Var) -> rx.Component:
     c_name = c["name"].to(str)
     wa_id = c["wa_id"].to(str)
     notes = c["notes"].to(str)
+    lifecycle = c["lifecycle_stage"].to(str)
     avatar_name = rx.cond(c_name != "", c_name, wa_id)
     display_name = rx.cond(c_name != "", c_name, "Sin nombre")
 
@@ -30,7 +31,11 @@ def contact_card(c: rx.Var) -> rx.Component:
         rx.hstack(
             avatar_box(avatar_name),
             rx.vstack(
-                rx.text(display_name, weight="bold", size="3", color="white"),
+                rx.hstack(
+                    rx.text(display_name, weight="bold", size="3", color="white"),
+                    rx.badge(lifecycle, color_scheme="gray", variant="outline", size="1", radius="full"),
+                    spacing="2", align_items="center"
+                ),
                 rx.text("📱 +", wa_id, size="2", color="#0a84ff"),
                 align_items="start", spacing="0",
             ),
@@ -95,6 +100,27 @@ def team_card(u: rx.Var) -> rx.Component:
         width="100%", margin_bottom="12px",
     )
 
+# ── Componente Métricas del CRM ────────────────────────────────────
+
+def crm_metric_card(label: str, count_var: rx.Var, icon: str, color: str) -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.text(icon, size="4"),
+                rx.text(label, weight="bold", size="2", color="#8e8e93"),
+                spacing="2", align_items="center"
+            ),
+            rx.text(count_var.to_string(), weight="bold", size="6", color=color, margin_top="4px"),
+            align_items="start", spacing="0",
+        ),
+        background="#111",
+        border="1px solid #2c2c2e",
+        border_radius="12px",
+        padding="16px",
+        flex="1",
+        min_width="160px",
+    )
+
 # ── Página Principal ──────────────────────────────────────────────
 
 def contacts_page() -> rx.Component:
@@ -110,6 +136,18 @@ def contacts_page() -> rx.Component:
                     size="2", variant="outline", color_scheme="green",
                 ),
                 padding="24px 32px 8px", width="100%",
+            ),
+            
+            # Fila de métricas del CRM tipo Respond.io
+            rx.hstack(
+                crm_metric_card("New Customer", AppState.lifecycle_counts["New Customer"], "🏆", "white"),
+                crm_metric_card("Lead", AppState.lifecycle_counts["Lead"], "🚀", "#30d158"),
+                crm_metric_card("Customer", AppState.lifecycle_counts["Customer"], "👥", "#0a84ff"),
+                crm_metric_card("Paid", AppState.lifecycle_counts["Paid"], "💳", "#bf5af2"),
+                spacing="3",
+                padding="8px 32px 16px",
+                width="100%",
+                flex_wrap="wrap",
             ),
             
             rx.tabs.root(

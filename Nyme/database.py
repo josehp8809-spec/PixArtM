@@ -241,6 +241,9 @@ class Database:
             cur.execute(
                 "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS notes TEXT"
             )
+            cur.execute(
+                "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(50) DEFAULT 'New Customer'"
+            )
             
             # Migraciones Multi-tenant: Agregar tenant_id con valor por defecto 1 a todas las tablas principales
             tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines"]
@@ -846,12 +849,17 @@ class Database:
                      """
                      SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
                             COALESCE(cs.status,'pending') AS status,
-                            COALESCE(cs.unread,0) AS unread
+                            COALESCE(cs.unread,0) AS unread,
+                            COALESCE(cs.assigned_to, '') AS assigned_to,
+                            COALESCE(con.name, m.wa_id) AS name,
+                            COALESCE(con.lifecycle_stage, 'New Customer') AS lifecycle_stage
                      FROM messages m
                      LEFT JOIN conversation_status cs
                            ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
+                     LEFT JOIN contacts con
+                           ON con.wa_id = m.wa_id AND con.tenant_id = m.tenant_id
                      WHERE m.tenant_id = %s
-                     GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
+                     GROUP BY m.wa_id, m.line_id, cs.status, cs.unread, cs.assigned_to, con.name, con.lifecycle_stage
                      ORDER BY last_msg DESC
                      """,
                      (tenant_id,)
@@ -865,10 +873,15 @@ class Database:
                      f"""
                      SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
                             COALESCE(cs.status,'pending') AS status,
-                            COALESCE(cs.unread,0) AS unread
+                            COALESCE(cs.unread,0) AS unread,
+                            COALESCE(cs.assigned_to, '') AS assigned_to,
+                            COALESCE(con.name, m.wa_id) AS name,
+                            COALESCE(con.lifecycle_stage, 'New Customer') AS lifecycle_stage
                      FROM messages m
                      LEFT JOIN conversation_status cs
                            ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
+                     LEFT JOIN contacts con
+                           ON con.wa_id = m.wa_id AND con.tenant_id = m.tenant_id
                      WHERE m.tenant_id = %s AND m.line_id IN ({placeholders})
                      GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
                      ORDER BY last_msg DESC
@@ -1160,5 +1173,43 @@ class Database:
         except Exception as e:
             print(f"[DB] Error obteniendo pedidos: {e}")
             return []
+
+    def update_contact_lifecycle(self, wa_id, stage, tenant_id):
+        """Actualiza la etapa de ciclo de vida del contacto."""
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            # Asegurar que el contacto exista antes de actualizar
+            cur.execute(
+                "INSERT INTO contacts (wa_id, lifecycle_stage, tenant_id) VALUES (%s, %s, %s) "
+                "ON CONFLICT (wa_id, tenant_id) DO UPDATE SET lifecycle_stage = EXCLUDED.lifecycle_stage",
+                (wa_id, stage, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error actualizando ciclo de vida del contacto: {e}")
+            return False
+
+    def get_lifecycle_counts(self, tenant_id):
+        """Retorna el conteo de contactos por etapa de ciclo de vida en el tenant."""
+        if not self._check_available(): return {}
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT lifecycle_stage, COUNT(*) FROM contacts WHERE tenant_id = %s GROUP BY lifecycle_stage",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            
+            # Inicializar con todas las etapas en 0
+            stages = {"New Customer": 0, "Lead": 0, "Customer": 0, "Paid": 0}
+            for row in rows:
+                stage_name = row[0]
+                if stage_name in stages:
+                    stages[stage_name] = row[1]
+            return stages
+        except Exception as e:
+            print(f"[DB] Error obteniendo conteos de ciclo de vida: {e}")
+            return {}
 
 db = Database()

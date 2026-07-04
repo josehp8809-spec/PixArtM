@@ -22,31 +22,50 @@ def contact_item(contact: rx.Var) -> rx.Component:
     status = contact["status"].to(str)
     wa_id = contact["wa_id"].to(str)
     line_id = contact["line_id"].to(int)
+    assigned_to = contact["assigned_to"].to(str)
+    name = contact["name"].to(str)
+    lifecycle = contact["lifecycle_stage"].to(str)
     
     is_selected = (
         (AppState.selected_contact == wa_id)
         & (AppState.selected_line_id == line_id)
     )
+    
+    display_name = rx.cond(
+        name != wa_id,
+        name,
+        "+" + wa_id
+    )
+
     return rx.box(
         rx.hstack(
-            avatar_box(wa_id),
+            avatar_box(display_name),
             rx.vstack(
-                rx.text("+", wa_id, weight="bold", size="2", color="white"),
-                rx.text(
-                    rx.match(
-                        status,
-                        ("pending", "⏳ Pendiente"),
-                        ("active", "🟡 En curso"),
-                        ("resolved", "✅ Resuelto"),
-                        "⏳ Pendiente"
+                rx.text(display_name, weight="bold", size="2", color="white", line_clamp=1),
+                rx.hstack(
+                    rx.text(
+                        rx.match(
+                            status,
+                            ("pending", "⏳ Pendiente"),
+                            ("active", "🟡 En curso"),
+                            ("resolved", "✅ Cerrado"),
+                            ("snoozed", "💤 Pospuesto"),
+                            "⏳ Pendiente"
+                        ),
+                        size="1", color="#8e8e93",
                     ),
-                    size="1", color="#8e8e93",
+                    rx.cond(
+                        assigned_to != "",
+                        rx.badge(f"👤 {assigned_to}", color_scheme="blue", size="1", variant="soft", radius="full"),
+                    ),
+                    rx.badge(lifecycle, color_scheme="gray", size="1", variant="outline", radius="full"),
+                    spacing="2", align_items="center"
                 ),
-                align_items="start", spacing="0",
+                align_items="start", spacing="0", flex="1"
             ),
-            rx.spacer(),
             rx.cond(unread > 0, rx.badge(unread.to_string(), color_scheme="red", radius="full")),
             width="100%",
+            align_items="center"
         ),
         on_click=AppState.select_contact(wa_id, line_id),
         background=rx.cond(is_selected, "#1c1c1e", "transparent"),
@@ -55,13 +74,39 @@ def contact_item(contact: rx.Var) -> rx.Component:
         _hover={"background": "#1c1c1e"},
     )
 
+
 def message_bubble(msg: rx.Var) -> rx.Component:
+    msg_type = msg["type"].to(str)
+    is_note = msg_type == "NOTE"
     is_in = msg["type"] == "INBOUND"
     body_str = msg["body"].to(str)
     media_id_str = msg["media_id"].to(str)
     is_audio = body_str.contains("[🎤 Audio]") | (media_id_str != "")
     
-    return rx.box(
+    # Burbuja de Nota Interna
+    note_content = rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.text("📝 NOTA INTERNA", weight="bold", size="1", color="#FFD60A"),
+                rx.spacer(),
+                rx.text("Solo visible para el equipo", size="1", color="#8e8e93"),
+                width="100%", align_items="center"
+            ),
+            rx.text(body_str, size="2", color="white", white_space="pre-wrap"),
+            rx.text(f"Por: {msg['agent'].to(str)} · {msg['time'].to(str)}", size="1", color="#8e8e93"),
+            spacing="1", align_items="stretch"
+        ),
+        background="#1c1c1e",
+        border="1px solid #FFD60A",
+        border_radius="12px",
+        padding="12px",
+        margin_y="4px",
+        width="90%",
+        align_self="center", # Se centra en la pantalla
+    )
+
+    # Burbuja Normal (Inbound/Outbound)
+    normal_content = rx.box(
         rx.vstack(
             rx.cond(
                 is_audio & (media_id_str != ""),
@@ -82,6 +127,8 @@ def message_bubble(msg: rx.Var) -> rx.Component:
         ),
         class_name=rx.cond(is_in, "bubble-in", "bubble-out"),
     )
+
+    return rx.cond(is_note, note_content, normal_content)
 
 def quick_reply_btn(qr: rx.Var) -> rx.Component:
     shortcut = qr["shortcut"].to(str)
@@ -134,6 +181,21 @@ def emoji_selector() -> rx.Component:
 # Paneles
 # ─────────────────────────────────────────────────────────────────────────────
 
+def filter_btn(label: str, value: str, current_value: rx.Var, on_click) -> rx.Component:
+    is_active = current_value == value
+    return rx.button(
+        label,
+        on_click=on_click,
+        size="1",
+        variant=rx.cond(is_active, "solid", "surface"),
+        color_scheme=rx.cond(is_active, "blue", "gray"),
+        border=rx.cond(is_active, "none", "1px solid #2c2c2e"),
+        flex="1",
+        font_size="10px",
+        height="26px",
+        padding="2px 4px",
+    )
+
 def contacts_panel() -> rx.Component:
     hidden_class = rx.cond(AppState.mobile_view == "chat", "contacts-panel hidden-mobile", "contacts-panel")
     return rx.box(
@@ -143,10 +205,26 @@ def contacts_panel() -> rx.Component:
                 rx.spacer(),
                 padding="14px 12px 8px", width="100%",
             ),
+            # Filtros dinámicos al estilo Respond.io
+            rx.vstack(
+                rx.hstack(
+                    filter_btn("Todos", "all", AppState.filter_assignment, AppState.set_filter_assignment("all")),
+                    filter_btn("Míos", "mine", AppState.filter_assignment, AppState.set_filter_assignment("mine")),
+                    filter_btn("Sin Asignar", "unassigned", AppState.filter_assignment, AppState.set_filter_assignment("unassigned")),
+                    width="100%", spacing="1", padding_x="8px"
+                ),
+                rx.hstack(
+                    filter_btn("Abiertos", "open", AppState.filter_status, AppState.set_filter_status("open")),
+                    filter_btn("Pospuestos", "snoozed", AppState.filter_status, AppState.set_filter_status("snoozed")),
+                    filter_btn("Cerrados", "closed", AppState.filter_status, AppState.set_filter_status("closed")),
+                    width="100%", spacing="1", padding_x="8px", padding_bottom="8px"
+                ),
+                width="100%", spacing="1"
+            ),
             rx.divider(color="#2c2c2e"),
             rx.scroll_area(
                 rx.vstack(
-                    rx.foreach(AppState.contacts.to(list[dict]), contact_item),
+                    rx.foreach(AppState.filtered_contacts.to(list[dict]), contact_item),
                     spacing="1", padding="8px",
                 ),
                 flex="1", width="100%",
@@ -164,13 +242,46 @@ def _active_chat() -> rx.Component:
         rx.hstack(
             rx.button("← Volver", on_click=AppState.go_back, size="1", variant="ghost", color="#0a84ff", class_name="back-btn"),
             rx.vstack(
-                rx.text(f"+{AppState.selected_contact}", weight="bold", color="white", size="3"),
-                rx.text(AppState.conv_status, size="1", color="#8e8e93"),
+                rx.text(AppState.selected_contact_name, weight="bold", color="white", size="3", line_clamp=1),
+                rx.text("+" + AppState.selected_contact, size="1", color="#8e8e93"),
                 spacing="0",
+                max_width="160px"
             ),
             rx.spacer(),
-            rx.select(["pending", "active", "resolved"], value=AppState.conv_status, on_change=AppState.set_conv_status, background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"),
-            padding="12px 16px", border_bottom="1px solid #2c2c2e", background="#111", width="100%", align_items="center",
+            # Asignación de Agentes
+            rx.hstack(
+                rx.text("👤 Agente:", size="1", color="#8e8e93"),
+                rx.select(
+                    AppState.agent_options.to(list[str]),
+                    value=AppState.assigned_agent,
+                    on_change=AppState.assign_to_agent,
+                    background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
+                ),
+                rx.cond(
+                    AppState.assigned_agent == "",
+                    rx.button("Asignarme", on_click=AppState.assign_to_me, size="1", color_scheme="blue", variant="soft")
+                ),
+                align_items="center", spacing="1"
+            ),
+            # Ciclo de Vida (CRM)
+            rx.hstack(
+                rx.text("📈 CRM:", size="1", color="#8e8e93"),
+                rx.select(
+                    ["New Customer", "Lead", "Customer", "Paid"],
+                    value=AppState.contact_lifecycle_stage,
+                    on_change=AppState.set_contact_lifecycle_stage,
+                    background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
+                ),
+                align_items="center", spacing="1"
+            ),
+            # Estado de Conversación
+            rx.select(
+                ["pending", "active", "snoozed", "resolved"],
+                value=AppState.conv_status,
+                on_change=AppState.set_conv_status,
+                background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
+            ),
+            padding="12px 16px", border_bottom="1px solid #2c2c2e", background="#111", width="100%", align_items="center", spacing="3"
         ),
 
         # Mensajes
@@ -207,24 +318,73 @@ def _active_chat() -> rx.Component:
         # Input Row
         rx.box(
             emoji_selector(),
-            rx.hstack(
-                rx.button(
-                    "😊", on_click=AppState.toggle_emoji_picker,
-                    variant="ghost", font_size="24px", height="60px",
+            rx.vstack(
+                # Selector de modo de chat (Mensaje vs Nota Interna)
+                rx.hstack(
+                    rx.button(
+                        "💬 Mensaje",
+                        on_click=lambda: AppState.set_chat_mode("message"),
+                        size="1",
+                        variant=rx.cond(AppState.chat_mode == "message", "solid", "ghost"),
+                        color_scheme=rx.cond(AppState.chat_mode == "message", "blue", "gray"),
+                        font_size="12px",
+                        height="28px",
+                    ),
+                    rx.button(
+                        "📝 Nota Interna",
+                        on_click=lambda: AppState.set_chat_mode("note"),
+                        size="1",
+                        variant=rx.cond(AppState.chat_mode == "note", "solid", "ghost"),
+                        color_scheme=rx.cond(AppState.chat_mode == "note", "yellow", "gray"),
+                        font_size="12px",
+                        height="28px",
+                    ),
+                    spacing="2",
+                    padding_x="12px",
+                    padding_top="6px",
+                    width="100%",
                 ),
-                rx.text_area(
-                    placeholder="Escribe tu respuesta... (o pega una imagen)",
-                    value=AppState.new_message,
-                    on_change=AppState.set_new_message,
-                    background="#1c1c1e", border="1px solid #3a3a3c", color="white",
-                    _placeholder={"color": "#636366"}, resize="none", rows="2", flex="1", font_size="16px",
+                rx.hstack(
+                    rx.button(
+                        "😊", on_click=AppState.toggle_emoji_picker,
+                        variant="ghost", font_size="24px", height="60px",
+                    ),
+                    rx.text_area(
+                        placeholder=rx.cond(
+                            AppState.chat_mode == "note",
+                            "Escribe una nota interna para tu equipo... (No se envía al cliente)",
+                            "Escribe tu respuesta... (o pega una imagen)"
+                        ),
+                        value=AppState.new_message,
+                        on_change=AppState.set_new_message,
+                        background="#1c1c1e",
+                        border=rx.cond(
+                            AppState.chat_mode == "note",
+                            "1px solid #FFD60A",
+                            "1px solid #3a3a3c"
+                        ),
+                        color="white",
+                        _placeholder={"color": "#636366"}, resize="none", rows="2", flex="1", font_size="16px",
+                    ),
+                    rx.button(
+                        rx.text("→", size="5"),
+                        on_click=AppState.send_message,
+                        background=rx.cond(
+                            AppState.chat_mode == "note",
+                            "#FFD60A",
+                            "#0a84ff"
+                        ),
+                        color=rx.cond(
+                            AppState.chat_mode == "note",
+                            "black",
+                            "white"
+                        ),
+                        border_radius="12px", height="60px", width="52px",
+                    ),
+                    padding="6px 12px 10px", width="100%", align_items="end",
                 ),
-                rx.button(
-                    rx.text("→", size="5"),
-                    on_click=AppState.send_message,
-                    background="#0a84ff", color="white", border_radius="12px", height="60px", width="52px",
-                ),
-                padding="10px 12px", border_top="1px solid #2c2c2e", background="#000", width="100%", align_items="end",
+                width="100%",
+                spacing="0",
             ),
             width="100%", position="relative", class_name="input-row",
         ),

@@ -83,6 +83,14 @@ class AppState(rx.State):
     loading_ai: bool    = False
     mobile_view: str    = "contacts"   # "contacts" | "chat"  (mobile only)
 
+    # ── Fase 1 (CRM y Filtros Avanzados) ──────────────────────────────────────
+    filter_assignment: str = "all"      # "all" | "mine" | "unassigned"
+    filter_status: str = "open"          # "open" | "closed" | "snoozed"
+    assigned_agent: str = ""             # Agente asignado a la conversación activa
+    chat_mode: str = "message"           # "message" (WhatsApp) | "note" (Nota interna)
+    contact_lifecycle_stage: str = "New Customer" # Etapa de ciclo de vida del contacto activo
+    lifecycle_counts: dict[str, int] = {"New Customer": 0, "Lead": 0, "Customer": 0, "Paid": 0}
+
     # ── Cambio de contraseña ──────────────────────────────────────────────────
     pwd_new: str     = ""
     pwd_confirm: str = ""
@@ -160,7 +168,7 @@ class AppState(rx.State):
     # ─────────────────────────────────────────────────────────────────────────
 
     def _load_core_data(self):
-        """Carga líneas, quick replies y contactos al iniciar sesión."""
+        """Carga líneas, quick replies, contactos y métricas del CRM al iniciar sesión."""
         raw_lines = db.get_all_lines(self.tenant_id)
         self.all_lines = [
             {
@@ -183,6 +191,7 @@ class AppState(rx.State):
         self._update_total_unread()
         self._refresh_products()
         self._refresh_orders()
+        self._refresh_lifecycle_counts()
 
     def _update_total_unread(self):
         new_total = sum(c["unread"] for c in self.contacts)
@@ -228,11 +237,62 @@ class AppState(rx.State):
         raw = db.get_contacts_for_user(self.user_id, self.role, self.tenant_id)
         self.contacts = [
             {
-                "wa_id": c[0], "line_id": c[2] or 0,
-                "status": c[3] or "pending", "unread": c[4] or 0,
+                "wa_id": c[0], 
+                "line_id": c[2] or 0,
+                "status": c[3] or "pending", 
+                "unread": c[4] or 0,
+                "assigned_to": c[5] or "",
+                "name": c[6] or c[0],
+                "lifecycle_stage": c[7] or "New Customer"
             }
             for c in raw
         ]
+
+    @rx.var
+    def filtered_contacts(self) -> list[dict]:
+        res = []
+        for c in self.contacts:
+            # 1. Filtrar por Asignación
+            assign = c.get("assigned_to", "")
+            if self.filter_assignment == "mine" and assign != self.username:
+                continue
+            if self.filter_assignment == "unassigned" and assign != "":
+                continue
+
+            # 2. Filtrar por Estado
+            status = c.get("status", "pending")
+            if self.filter_status == "open" and status not in ("pending", "active", "open"):
+                continue
+            if self.filter_status == "closed" and status not in ("resolved", "closed"):
+                continue
+            if self.filter_status == "snoozed" and status != "snoozed":
+                continue
+
+            res.append(c)
+        return res
+
+    def set_filter_assignment(self, val: str):
+        self.filter_assignment = val
+
+    def set_filter_status(self, val: str):
+        self.filter_status = val
+
+    def set_chat_mode(self, mode: str):
+        self.chat_mode = mode
+        
+    @rx.var
+    def agent_options(self) -> list[str]:
+        # Lista de agentes de la empresa para dropdown de asignación
+        return ["[Sin Asignar]"] + [u["username"] for u in self.team_list]
+
+    @rx.var
+    def selected_contact_name(self) -> str:
+        if not self.selected_contact:
+            return ""
+        for c in self.contacts:
+            if c["wa_id"] == self.selected_contact:
+                return c["name"]
+        return "+" + self.selected_contact
 
     def _refresh_messages(self):
         if not self.selected_contact:
@@ -322,7 +382,36 @@ class AppState(rx.State):
         for c in self.contacts:
             if c["wa_id"] == wa_id and c["line_id"] == line_id:
                 self.conv_status = c.get("status", "pending")
+                self.assigned_agent = c.get("assigned_to", "")
+                self.contact_lifecycle_stage = c.get("lifecycle_stage", "New Customer")
                 break
+
+    def assign_to_agent(self, agent_username: str):
+        if not self.selected_contact:
+            return
+        db.assign_conversation(
+            self.selected_contact, 
+            self.selected_line_id, 
+            agent_username if agent_username != "[Sin Asignar]" else "",
+            self.tenant_id
+        )
+        self.assigned_agent = agent_username if agent_username != "[Sin Asignar]" else ""
+        self._refresh_contacts()
+
+    def assign_to_me(self):
+        self.assign_to_agent(self.username)
+
+    def set_contact_lifecycle_stage(self, stage: str):
+        if not self.selected_contact:
+            return
+        db.update_contact_lifecycle(self.selected_contact, stage, self.tenant_id)
+        self.contact_lifecycle_stage = stage
+        self._refresh_contacts()
+        self._refresh_lifecycle_counts()
+
+    def _refresh_lifecycle_counts(self):
+        counts = db.get_lifecycle_counts(self.tenant_id)
+        self.lifecycle_counts = counts
 
     def start_chat_with(self, wa_id: str):
         line_id = 0
@@ -394,14 +483,21 @@ class AppState(rx.State):
         text = self.new_message.strip()
         if not text or not self.selected_contact:
             return
-        line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
-        if line and line["is_active"]:
-            wa_client.send_text_message(line, self.selected_contact, text)
-        db.save_message(
-            self.selected_contact, "OUTBOUND_REPLY", text,
-            agent_username=self.username, line_id=self.selected_line_id,
-            tenant_id=self.tenant_id
-        )
+        if self.chat_mode == "note":
+            db.save_message(
+                self.selected_contact, "NOTE", text,
+                agent_username=self.username, line_id=self.selected_line_id,
+                tenant_id=self.tenant_id
+            )
+        else:
+            line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+            if line and line["is_active"]:
+                wa_client.send_text_message(line, self.selected_contact, text)
+            db.save_message(
+                self.selected_contact, "OUTBOUND_REPLY", text,
+                agent_username=self.username, line_id=self.selected_line_id,
+                tenant_id=self.tenant_id
+            )
         self.new_message = ""
         self._refresh_messages()
         self._refresh_contacts()
