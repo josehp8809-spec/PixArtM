@@ -1,9 +1,5 @@
 """
-server.py — Servidor de producción para Render.
-
-Combina en un solo proceso uvicorn:
-  1. El backend de Reflex (WebSocket de estado, API, webhook de Meta)
-  2. Los archivos estáticos del frontend compilado en .web/build/
+server.py — Servidor de producción para Render con depuración detallada.
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
@@ -15,52 +11,63 @@ from starlette.staticfiles import StaticFiles
 from starlette.responses import FileResponse, HTMLResponse, Response
 from starlette.requests import Request
 
-# ── 1. Importar la app de Reflex para obtener las rutas de backend ──────────
+# ── 1. Importar la app de Reflex ─────────────────────────────────────────────
 from nyme.nyme import app as reflex_app
 reflex_routes = list(reflex_app._api.routes)
 
-# ── 2. Directorio del frontend compilado ────────────────────────────────────
+# ── 2. Directorio del frontend ───────────────────────────────────────────────
 BUILD_DIR = os.path.join(os.path.dirname(__file__), ".web", "build")
 
 async def serve_page(request: Request) -> Response:
-    """Sirve las páginas SPA del frontend exportado por Reflex."""
     path = request.path_params.get("path", "").strip("/")
+    print(f"[Serve] Petición recibida para ruta: '{path}'")
+    
+    # Listar contenido de BUILD_DIR para depurar
+    try:
+        if os.path.isdir(BUILD_DIR):
+            files = os.listdir(BUILD_DIR)
+            print(f"[Serve] Contenido de {BUILD_DIR}: {files}")
+        else:
+            print(f"[Serve] ERROR: {BUILD_DIR} no es un directorio válido")
+    except Exception as ex:
+        print(f"[Serve] Error listando directorio: {ex}")
 
-    # Buscar archivo exacto (.html, .css, .js, etc.)
     candidates = []
     if path:
-        candidates.append(os.path.join(BUILD_DIR, path))           # archivo directo
-        candidates.append(os.path.join(BUILD_DIR, path + ".html")) # ruta como .html
+        candidates.append(os.path.join(BUILD_DIR, path))
+        candidates.append(os.path.join(BUILD_DIR, path + ".html"))
         candidates.append(os.path.join(BUILD_DIR, path, "index.html"))
 
-    candidates.append(os.path.join(BUILD_DIR, "index.html"))       # SPA fallback
+    candidates.append(os.path.join(BUILD_DIR, "index.html"))
 
     for c in candidates:
-        if os.path.isfile(c):
+        exists = os.path.isfile(c)
+        print(f"[Serve] Probando candidato: {c} -> Existe: {exists}")
+        if exists:
             return FileResponse(c)
 
-    return HTMLResponse("<h1>404 — Not Found</h1>", status_code=404)
+    return HTMLResponse(f"<h1>404 — Not Found</h1><p>Buscando ruta: '{path}' en {BUILD_DIR}</p>", status_code=404)
 
-# ── 3. Construir la app Starlette combinada ──────────────────────────────────
-routes = list(reflex_routes)  # Rutas de Reflex (/_event, /ping, /webhook, etc.)
+# ── 3. Rutas Starlette ────────────────────────────────────────────────────────
+routes = list(reflex_routes)
 
-# Assets de Vite (JS, CSS, imágenes)
+# Servir assets y client si existen
 assets_dir = os.path.join(BUILD_DIR, "assets")
 if os.path.isdir(assets_dir):
+    print("[Server] Registrando /assets de frontend")
     routes.append(Mount("/assets", app=StaticFiles(directory=assets_dir), name="assets"))
 
-# Archivos del cliente (chunks de React Router)
 client_dir = os.path.join(BUILD_DIR, "client")
 if os.path.isdir(client_dir):
+    print("[Server] Registrando /client de frontend")
     routes.append(Mount("/client", app=StaticFiles(directory=client_dir), name="client"))
 
-# Catch-all: sirve páginas del frontend (SPA)
+# Catch-all
 routes.append(Route("/{path:path}", endpoint=serve_page))
 routes.append(Route("/", endpoint=serve_page))
 
 combined = Starlette(routes=routes)
 
-# ── 4. Arrancar uvicorn ──────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
     print(f"[Server] Nyme iniciando en http://0.0.0.0:{port}")
