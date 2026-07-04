@@ -43,6 +43,13 @@ class SettingsState(AppState):
     nt_msg: str = ""
     all_tenants: list[dict] = []
 
+    # Formularios Fase 2
+    selected_ai_line_name: str = "Todas las líneas"
+    
+    @rx.var
+    def line_options_ai(self) -> list[str]:
+        return ["Todas las líneas"] + [l["name"] for l in self.all_lines]
+
     def on_mount_settings(self):
         self.require_auth()
         self._reload_users()
@@ -172,6 +179,20 @@ class SettingsState(AppState):
         db.delete_quick_reply(qr_id, self.tenant_id)
         self._load_core_data()
 
+    # ── Fase 2 Agentes IA ──────────────────────────────────────────────
+    def set_selected_ai_line_name(self, v): 
+        self.selected_ai_line_name = v
+
+    def save_ai_agent_settings(self):
+        line_id = 0
+        if self.selected_ai_line_name != "Todas las líneas":
+            for l in self.all_lines:
+                if l["name"] == self.selected_ai_line_name:
+                    line_id = l["id"]
+                    break
+        self.new_agent_line_id = line_id
+        self.create_ai_agent()
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # UI Components
@@ -288,6 +309,8 @@ def settings_page() -> rx.Component:
                 rx.tabs.list(
                     rx.tabs.trigger("👥 Usuarios", value="users"),
                     rx.tabs.trigger("📱 Líneas", value="lines"),
+                    rx.tabs.trigger("🤖 Agentes IA", value="ai_agents"),
+                    rx.tabs.trigger("📨 Plantillas", value="templates"),
                     rx.tabs.trigger("⚡ Atajos", value="qr"),
                     rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
                     rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
@@ -479,14 +502,10 @@ def settings_page() -> rx.Component:
                 rx.tabs.content(
                     rx.vstack(
                         rx.heading("🤖 Gemini AI", size="4", color="white"),
-                        rx.text("La API Key se comparte para todos los usuarios.",
-                                color="#8e8e93", size="2"),
-                        _field("API Key de Gemini", type="password",
-                               placeholder="AIza...", on_change=SettingsState.set_gemini_key),
-                        rx.button("💾 Guardar", on_click=SettingsState.save_gemini,
-                                  color_scheme="blue"),
-                        rx.cond(SettingsState.gemini_msg != "",
-                                  rx.text(SettingsState.gemini_msg, size="2")),
+                        rx.text("La API Key se comparte para todos los usuarios del tenant.", color="#8e8e93", size="2"),
+                        _field("API Key de Gemini", type="password", placeholder="AIza...", on_change=SettingsState.set_gemini_key),
+                        rx.button("💾 Guardar", on_click=SettingsState.save_gemini, color_scheme="blue"),
+                        rx.cond(SettingsState.gemini_msg != "", rx.text(SettingsState.gemini_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="gemini", padding="24px 32px",
@@ -496,17 +515,188 @@ def settings_page() -> rx.Component:
                 rx.tabs.content(
                     rx.vstack(
                         rx.heading("🔑 Cambiar contraseña", size="4", color="white"),
-                        _field("Nueva contraseña", type="password",
-                               on_change=SettingsState.set_pwd_new),
-                        _field("Confirmar contraseña", type="password",
-                               on_change=SettingsState.set_pwd_confirm),
-                        rx.button("Cambiar contraseña", on_click=SettingsState.change_password,
-                                  color_scheme="blue"),
-                        rx.cond(SettingsState.pwd_msg != "",
-                                  rx.text(SettingsState.pwd_msg, size="2")),
+                        _field("Nueva contraseña", type="password", on_change=SettingsState.set_pwd_new),
+                        _field("Confirmar contraseña", type="password", on_change=SettingsState.set_pwd_confirm),
+                        rx.button("Cambiar contraseña", on_click=SettingsState.change_password, color_scheme="blue"),
+                        rx.cond(SettingsState.pwd_msg != "", rx.text(SettingsState.pwd_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="account", padding="24px 32px",
+                ),
+
+                # ── Agentes IA (Fase 2) ──────────────────────────────────
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("🤖 Configuración de Agentes IA", size="4", color="white"),
+                        rx.text("Configura respondedores automáticos basados en Gemini AI por línea de WhatsApp.", color="#8e8e93", size="2"),
+                        
+                        # Formulario de Creación
+                        rx.box(
+                            rx.vstack(
+                                rx.heading("Crear Nuevo Agente", size="3", color="white"),
+                                rx.hstack(
+                                    rx.vstack(
+                                        rx.text("Nombre del Agente", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: Sophia (Ventas)", on_change=SettingsState.set_new_agent_name, value=SettingsState.new_agent_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="250px"),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Asociar a Línea", size="1", color="#8e8e93"),
+                                        rx.select(
+                                            SettingsState.line_options_ai.to(list[str]),
+                                            value=SettingsState.selected_ai_line_name,
+                                            on_change=SettingsState.set_selected_ai_line_name,
+                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c"
+                                        ),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Estado inicial", size="1", color="#8e8e93"),
+                                        rx.hstack(
+                                            rx.switch(is_checked=SettingsState.new_agent_active, on_change=SettingsState.set_new_agent_active),
+                                            rx.text("Activo", size="2", color="white"),
+                                            spacing="2", align_items="center"
+                                        ),
+                                        spacing="1", padding_top="8px"
+                                    ),
+                                    spacing="4", align_items="end"
+                                ),
+                                rx.vstack(
+                                    rx.text("Instrucciones del Sistema (System Prompt)", size="1", color="#8e8e93"),
+                                    rx.text_area(
+                                        placeholder="Define la personalidad, reglas y cómo debe contestar el agente de IA. Ej: Eres un asistente amigable de PixArtM, debes contestar dudas sobre los productos y guiar al cliente a agendar una cita...",
+                                        value=SettingsState.new_agent_prompt,
+                                        on_change=SettingsState.set_new_agent_prompt,
+                                        background="#1c1c1e", border="1px solid #3a3a3c", color="white",
+                                        resize="vertical", rows="4", width="100%"
+                                    ),
+                                    spacing="1", width="100%"
+                                ),
+                                rx.button("🤖 Guardar Agente IA", on_click=SettingsState.save_ai_agent_settings, color_scheme="blue", width="200px"),
+                                rx.cond(SettingsState.agent_msg != "", rx.text(SettingsState.agent_msg, size="2", color="#30d158")),
+                                spacing="3", align_items="start", width="100%"
+                            ),
+                            background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                        ),
+                        
+                        rx.divider(color="#2c2c2e", margin="16px 0"),
+                        
+                        # Lista de Agentes Creados
+                        rx.heading("Agentes IA configurados", size="3", color="white"),
+                        rx.cond(
+                            SettingsState.ai_agents.length() > 0,
+                            rx.vstack(
+                                rx.foreach(
+                                    SettingsState.ai_agents,
+                                    lambda a: rx.hstack(
+                                        rx.vstack(
+                                            rx.hstack(
+                                                rx.text("🤖 " + a["name"].to(str), weight="bold", size="3", color="white"),
+                                                rx.badge(rx.cond(a["is_active"].to(bool), "Activo", "Inactivo"), color_scheme=rx.cond(a["is_active"].to(bool), "green", "gray")),
+                                                spacing="2"
+                                            ),
+                                            rx.text("Instrucciones: " + a["system_prompt"].to(str), size="1", color="#8e8e93", line_clamp=2),
+                                            spacing="1", align_items="start"
+                                        ),
+                                        rx.spacer(),
+                                        rx.button("🗑️", on_click=SettingsState.delete_ai_agent(a["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                        padding="14px",
+                                        border="1px solid #2c2c2e",
+                                        border_radius="10px",
+                                        width="100%",
+                                        background="#111"
+                                    )
+                                ),
+                                width="100%", spacing="2"
+                            ),
+                            rx.text("No tienes agentes IA creados. Agrega uno arriba.", color="#636366", size="2")
+                        ),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    value="ai_agents", padding="24px 32px"
+                ),
+
+                # ── Plantillas de WhatsApp (Fase 2) ──────────────────────
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("📨 Plantillas de WhatsApp (Meta)", size="4", color="white"),
+                        rx.text("Crea y guarda las plantillas de mensaje para enviar a clientes fuera de la ventana de 24 horas.", color="#8e8e93", size="2"),
+                        
+                        # Formulario de Creación
+                        rx.box(
+                            rx.vstack(
+                                rx.heading("Registrar Nueva Plantilla", size="3", color="white"),
+                                rx.hstack(
+                                    rx.vstack(
+                                        rx.text("Nombre de la Plantilla", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: recordatorio_pago (sin espacios)", on_change=SettingsState.set_new_tpl_name, value=SettingsState.new_tpl_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="250px"),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Categoría", size="1", color="#8e8e93"),
+                                        rx.select(
+                                            ["UTILITY", "MARKETING", "AUTHENTICATION"],
+                                            value=SettingsState.new_tpl_category,
+                                            on_change=SettingsState.set_new_tpl_category,
+                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c"
+                                        ),
+                                        spacing="1"
+                                    ),
+                                    spacing="4", align_items="end"
+                                ),
+                                rx.vstack(
+                                    rx.text("Cuerpo del Mensaje", size="1", color="#8e8e93"),
+                                    rx.text_area(
+                                        placeholder="Escribe el texto de la plantilla. Ej: Hola {{1}}, te recordamos que tu pago de {{2}} está listo para procesar. Saludos!",
+                                        value=SettingsState.new_tpl_body,
+                                        on_change=SettingsState.set_new_tpl_body,
+                                        background="#1c1c1e", border="1px solid #3a3a3c", color="white",
+                                        resize="vertical", rows="3", width="100%"
+                                    ),
+                                    spacing="1", width="100%"
+                                ),
+                                rx.button("📨 Guardar Plantilla", on_click=SettingsState.create_message_template, color_scheme="blue", width="200px"),
+                                rx.cond(SettingsState.tpl_msg != "", rx.text(SettingsState.tpl_msg, size="2", color="#30d158")),
+                                spacing="3", align_items="start", width="100%"
+                            ),
+                            background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                        ),
+                        
+                        rx.divider(color="#2c2c2e", margin="16px 0"),
+                        
+                        # Lista de Plantillas
+                        rx.heading("Plantillas guardadas", size="3", color="white"),
+                        rx.cond(
+                            SettingsState.templates.length() > 0,
+                            rx.vstack(
+                                rx.foreach(
+                                    SettingsState.templates,
+                                    lambda t: rx.hstack(
+                                        rx.vstack(
+                                            rx.hstack(
+                                                rx.text("📨 " + t["name"].to(str), weight="bold", size="3", color="white"),
+                                                rx.badge(t["category"].to(str), color_scheme="blue"),
+                                                spacing="2"
+                                            ),
+                                            rx.text(t["body_text"].to(str), size="2", color="#8e8e93", white_space="pre-wrap"),
+                                            spacing="1", align_items="start"
+                                        ),
+                                        rx.spacer(),
+                                        rx.button("🗑️", on_click=SettingsState.delete_message_template(t["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                        padding="14px",
+                                        border="1px solid #2c2c2e",
+                                        border_radius="10px",
+                                        width="100%",
+                                        background="#111"
+                                    )
+                                ),
+                                width="100%", spacing="2"
+                            ),
+                            rx.text("No tienes plantillas de mensaje creadas.", color="#636366", size="2")
+                        ),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    value="templates", padding="24px 32px"
                 ),
 
                 # ── Empresas (Solo visible para Súper Tenant ID 1)
@@ -523,8 +713,8 @@ def settings_page() -> rx.Component:
                                     on_change=SettingsState.set_nt_name,
                                     background="#1c1c1e", border="1px solid #3a3a3c",
                                     color="white", width="300px"
-                               ),
-                               spacing="1"
+                                ),
+                                spacing="1"
                             ),
                             rx.button("🏢 Registrar Empresa", on_click=SettingsState.save_tenant, color_scheme="green", margin_top="18px"),
                             spacing="3",

@@ -9,6 +9,59 @@ STATUS_LABELS = {"pending": "Pendiente", "active": "En curso", "resolved": "Resu
 # Componentes
 # ─────────────────────────────────────────────────────────────────────────────
 
+def template_selector_modal() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading("📨 Plantillas de WhatsApp", size="4", color="white"),
+                    rx.spacer(),
+                    rx.dialog.close(
+                        rx.button("✕", variant="ghost", on_click=AppState.toggle_template_modal)
+                    ),
+                    width="100%", align_items="center"
+                ),
+                rx.text("Meta requiere usar una plantilla pre-aprobada para abrir conversación si han pasado más de 24 horas.", size="1", color="#8e8e93"),
+                rx.divider(color="#2c2c2e", margin_y="12px"),
+                rx.scroll_area(
+                    rx.vstack(
+                        rx.foreach(
+                            AppState.templates,
+                            lambda t: rx.box(
+                                rx.vstack(
+                                    rx.hstack(
+                                        rx.text("📨 " + t["name"].to(str), weight="bold", size="2", color="#0a84ff"),
+                                        rx.spacer(),
+                                        rx.badge(t["category"].to(str), color_scheme="blue", size="1"),
+                                        spacing="2", width="100%"
+                                    ),
+                                    rx.text(t["body_text"].to(str), size="1", color="white", white_space="pre-wrap"),
+                                    rx.button(
+                                        "Enviar esta plantilla",
+                                        on_click=AppState.send_template(t["body_text"]),
+                                        size="1", color_scheme="green", width="100%", margin_top="8px"
+                                    ),
+                                    align_items="start", spacing="2", width="100%"
+                                ),
+                                background="#1c1c1e",
+                                border="1px solid #3a3a3c",
+                                border_radius="10px",
+                                padding="12px",
+                                width="100%",
+                                margin_bottom="8px"
+                            )
+                        ),
+                        width="100%", spacing="1"
+                    ),
+                    max_height="350px", width="100%"
+                ),
+                align_items="start", width="100%", spacing="3"
+            ),
+            background="#111", border="1px solid #2c2c2e", border_radius="12px", max_width="450px"
+        ),
+        open=AppState.show_template_modal,
+    )
+
 def avatar_box(name: rx.Var, size="40px") -> rx.Component:
     initial = name[0]
     return rx.center(
@@ -318,73 +371,95 @@ def _active_chat() -> rx.Component:
         # Input Row
         rx.box(
             emoji_selector(),
-            rx.vstack(
-                # Selector de modo de chat (Mensaje vs Nota Interna)
-                rx.hstack(
-                    rx.button(
-                        "💬 Mensaje",
-                        on_click=lambda: AppState.set_chat_mode("message"),
-                        size="1",
-                        variant=rx.cond(AppState.chat_mode == "message", "solid", "ghost"),
-                        color_scheme=rx.cond(AppState.chat_mode == "message", "blue", "gray"),
-                        font_size="12px",
-                        height="28px",
+            template_selector_modal(),
+            
+            # Condicionar por ventana de 24 horas y modo (las notas no están bloqueadas)
+            rx.cond(
+                AppState.is_24h_window_closed & (AppState.chat_mode == "message"),
+                # Banner de Ventana de 24 horas cerrada
+                rx.center(
+                    rx.vstack(
+                        rx.text("⚠️ Ventana de 24 horas cerrada", weight="bold", color="#ff453a", size="3"),
+                        rx.text("Meta requiere el uso de plantillas pre-aprobadas para reabrir el chat con este cliente.", color="#8e8e93", size="2", text_align="center"),
+                        rx.button("📨 Seleccionar y Enviar Plantilla", on_click=AppState.toggle_template_modal, color_scheme="green", size="2", margin_top="4px"),
+                        spacing="2",
+                        align_items="center",
+                        padding="24px 16px",
+                        width="100%",
                     ),
-                    rx.button(
-                        "📝 Nota Interna",
-                        on_click=lambda: AppState.set_chat_mode("note"),
-                        size="1",
-                        variant=rx.cond(AppState.chat_mode == "note", "solid", "ghost"),
-                        color_scheme=rx.cond(AppState.chat_mode == "note", "yellow", "gray"),
-                        font_size="12px",
-                        height="28px",
-                    ),
-                    spacing="2",
-                    padding_x="12px",
-                    padding_top="6px",
+                    background="#111",
+                    border_top="1px solid #ff453a",
                     width="100%",
                 ),
-                rx.hstack(
-                    rx.button(
-                        "😊", on_click=AppState.toggle_emoji_picker,
-                        variant="ghost", font_size="24px", height="60px",
+                # Caja de Entrada normal de Mensaje / Nota
+                rx.vstack(
+                    # Selector de modo de chat (Mensaje vs Nota Interna)
+                    rx.hstack(
+                        rx.button(
+                            "💬 Mensaje",
+                            on_click=lambda: AppState.set_chat_mode("message"),
+                            size="1",
+                            variant=rx.cond(AppState.chat_mode == "message", "solid", "ghost"),
+                            color_scheme=rx.cond(AppState.chat_mode == "message", "blue", "gray"),
+                            font_size="12px",
+                            height="28px",
+                        ),
+                        rx.button(
+                            "📝 Nota Interna",
+                            on_click=lambda: AppState.set_chat_mode("note"),
+                            size="1",
+                            variant=rx.cond(AppState.chat_mode == "note", "solid", "ghost"),
+                            color_scheme=rx.cond(AppState.chat_mode == "note", "yellow", "gray"),
+                            font_size="12px",
+                            height="28px",
+                        ),
+                        spacing="2",
+                        padding_x="12px",
+                        padding_top="6px",
+                        width="100%",
                     ),
-                    rx.text_area(
-                        placeholder=rx.cond(
-                            AppState.chat_mode == "note",
-                            "Escribe una nota interna para tu equipo... (No se envía al cliente)",
-                            "Escribe tu respuesta... (o pega una imagen)"
+                    rx.hstack(
+                        rx.button(
+                            "😊", on_click=AppState.toggle_emoji_picker,
+                            variant="ghost", font_size="24px", height="60px",
                         ),
-                        value=AppState.new_message,
-                        on_change=AppState.set_new_message,
-                        background="#1c1c1e",
-                        border=rx.cond(
-                            AppState.chat_mode == "note",
-                            "1px solid #FFD60A",
-                            "1px solid #3a3a3c"
+                        rx.text_area(
+                            placeholder=rx.cond(
+                                AppState.chat_mode == "note",
+                                "Escribe una nota interna para tu equipo... (No se envía al cliente)",
+                                "Escribe tu respuesta... (o pega una imagen)"
+                            ),
+                            value=AppState.new_message,
+                            on_change=AppState.set_new_message,
+                            background="#1c1c1e",
+                            border=rx.cond(
+                                AppState.chat_mode == "note",
+                                "1px solid #FFD60A",
+                                "1px solid #3a3a3c"
+                            ),
+                            color="white",
+                            _placeholder={"color": "#636366"}, resize="none", rows="2", flex="1", font_size="16px",
                         ),
-                        color="white",
-                        _placeholder={"color": "#636366"}, resize="none", rows="2", flex="1", font_size="16px",
+                        rx.button(
+                            rx.text("→", size="5"),
+                            on_click=AppState.send_message,
+                            background=rx.cond(
+                                AppState.chat_mode == "note",
+                                "#FFD60A",
+                                "#0a84ff"
+                            ),
+                            color=rx.cond(
+                                AppState.chat_mode == "note",
+                                "black",
+                                "white"
+                            ),
+                            border_radius="12px", height="60px", width="52px",
+                        ),
+                        padding="6px 12px 10px", width="100%", align_items="end",
                     ),
-                    rx.button(
-                        rx.text("→", size="5"),
-                        on_click=AppState.send_message,
-                        background=rx.cond(
-                            AppState.chat_mode == "note",
-                            "#FFD60A",
-                            "#0a84ff"
-                        ),
-                        color=rx.cond(
-                            AppState.chat_mode == "note",
-                            "black",
-                            "white"
-                        ),
-                        border_radius="12px", height="60px", width="52px",
-                    ),
-                    padding="6px 12px 10px", width="100%", align_items="end",
+                    width="100%",
+                    spacing="0",
                 ),
-                width="100%",
-                spacing="0",
             ),
             width="100%", position="relative", class_name="input-row",
         ),

@@ -215,6 +215,29 @@ class Database:
                 notes      TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             )
+            """,
+            # 17. AI Agents (Agentes IA)
+            """
+            CREATE TABLE IF NOT EXISTS ai_agents (
+                id            SERIAL PRIMARY KEY,
+                name          VARCHAR(100) NOT NULL,
+                system_prompt TEXT NOT NULL,
+                line_id       INTEGER REFERENCES lines(id) ON DELETE SET NULL,
+                is_active     BOOLEAN DEFAULT TRUE,
+                tenant_id     INTEGER REFERENCES tenants(id) DEFAULT 1
+            )
+            """,
+            # 18. Message Templates (Plantillas)
+            """
+            CREATE TABLE IF NOT EXISTS message_templates (
+                id         SERIAL PRIMARY KEY,
+                name       VARCHAR(100) NOT NULL,
+                category   VARCHAR(50),
+                language   VARCHAR(10) DEFAULT 'es',
+                body_text  TEXT NOT NULL,
+                tenant_id  INTEGER REFERENCES tenants(id) DEFAULT 1,
+                UNIQUE(name, tenant_id)
+            )
             """
         ]
         try:
@@ -1211,5 +1234,183 @@ class Database:
         except Exception as e:
             print(f"[DB] Error obteniendo conteos de ciclo de vida: {e}")
             return {}
+
+    def get_last_inbound_time(self, wa_id, tenant_id):
+        """Retorna la fecha y hora del último mensaje INBOUND del contacto."""
+        if not self._check_available(): return None
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT created_at FROM messages WHERE wa_id = %s AND type = 'INBOUND' AND tenant_id = %s ORDER BY created_at DESC LIMIT 1",
+                (wa_id, tenant_id)
+            )
+            row = cur.fetchone(); cur.close(); conn.close()
+            return row[0] if row else None
+        except Exception:
+            return None
+
+    # ── CRUD Agentes IA ────────────────────────────────────────────────
+    def create_ai_agent(self, name, system_prompt, line_id, is_active, tenant_id):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO ai_agents (name, system_prompt, line_id, is_active, tenant_id) VALUES (%s, %s, %s, %s, %s)",
+                (name, system_prompt, line_id if line_id != 0 else None, is_active, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True, None
+        except Exception as e:
+            print(f"[DB] Error creando agente IA: {e}")
+            return False, str(e)
+
+    def get_ai_agents(self, tenant_id):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, name, system_prompt, line_id, is_active FROM ai_agents WHERE tenant_id = %s ORDER BY id DESC",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [{"id": r[0], "name": r[1], "system_prompt": r[2], "line_id": r[3] or 0, "is_active": bool(r[4])} for r in rows]
+        except Exception as e:
+            print(f"[DB] Error obteniendo agentes IA: {e}")
+            return []
+
+    def get_active_agent_for_line(self, line_id, tenant_id):
+        """Retorna el primer agente IA activo asignado a una línea específica."""
+        if not self._check_available(): return None
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, name, system_prompt FROM ai_agents WHERE line_id = %s AND is_active = TRUE AND tenant_id = %s LIMIT 1",
+                (line_id, tenant_id)
+            )
+            row = cur.fetchone(); cur.close(); conn.close()
+            if row:
+                return {"id": row[0], "name": row[1], "system_prompt": row[2]}
+            return None
+        except Exception as e:
+            print(f"[DB] Error obteniendo agente IA activo para línea: {e}")
+            return None
+
+    def delete_ai_agent(self, agent_id, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM ai_agents WHERE id = %s AND tenant_id = %s", (agent_id, tenant_id))
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error borrando agente IA: {e}")
+            return False
+
+    # ── CRUD Plantillas de Mensaje (Templates de Meta) ─────────────────
+    def create_message_template(self, name, category, body_text, tenant_id):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO message_templates (name, category, body_text, tenant_id) VALUES (%s, %s, %s, %s) "
+                "ON CONFLICT (name, tenant_id) DO UPDATE SET category = EXCLUDED.category, body_text = EXCLUDED.body_text",
+                (name, category, body_text, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True, None
+        except Exception as e:
+            print(f"[DB] Error creando plantilla de mensaje: {e}")
+            return False, str(e)
+
+    def get_message_templates(self, tenant_id):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, name, category, language, body_text FROM message_templates WHERE tenant_id = %s ORDER BY name ASC",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [{"id": r[0], "name": r[1], "category": r[2], "language": r[3], "body_text": r[4]} for r in rows]
+        except Exception as e:
+            print(f"[DB] Error obteniendo plantillas: {e}")
+            return []
+
+    def delete_message_template(self, template_id, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM message_templates WHERE id = %s AND tenant_id = %s", (template_id, tenant_id))
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error borrando plantilla: {e}")
+            return False
+
+    # ── Métodos de Analítica Avanzada (Dashboard de Reportes) ───────────
+    def get_average_response_time(self, tenant_id):
+        """Retorna tiempo promedio de respuesta en minutos (según diferencia INBOUND -> primer OUTBOUND)."""
+        if not self._check_available(): return 0.0
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            # Esta consulta calcula la diferencia promedio de tiempo en minutos
+            cur.execute(
+                """
+                WITH inbound_msgs AS (
+                    SELECT wa_id, created_at, lead(created_at) OVER (PARTITION BY wa_id ORDER BY created_at) as next_created_at,
+                           type, lead(type) OVER (PARTITION BY wa_id ORDER BY created_at) as next_type
+                    FROM messages
+                    WHERE tenant_id = %s
+                )
+                SELECT AVG(EXTRACT(EPOCH FROM (next_created_at - created_at)) / 60)
+                FROM inbound_msgs
+                WHERE type = 'INBOUND' AND next_type LIKE 'OUTBOUND%'
+                """,
+                (tenant_id,)
+            )
+            row = cur.fetchone(); cur.close(); conn.close()
+            return round(float(row[0] or 0.0), 1)
+        except Exception as e:
+            print(f"[DB] Error calculando tiempo promedio de respuesta: {e}")
+            return 0.0
+
+    def get_conversation_states_chart(self, tenant_id):
+        """Devuelve el conteo de chats activos por estado en el tenant."""
+        if not self._check_available(): return {}
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT COALESCE(status, 'pending'), COUNT(*) FROM conversation_status WHERE tenant_id = %s GROUP BY status",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            # Mapeo por consistencia
+            states = {"pending": 0, "active": 0, "snoozed": 0, "resolved": 0}
+            for r in rows:
+                k = r[0]
+                if k in states:
+                    states[k] = r[1]
+            return states
+        except Exception as e:
+            print(f"[DB] Error obteniendo estados de conversación: {e}")
+            return {}
+
+    def get_top_agents(self, tenant_id):
+        """Lista agentes humanos e IA y su cantidad total de respuestas enviadas."""
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                SELECT agent_username, COUNT(*) 
+                FROM messages 
+                WHERE tenant_id = %s AND type LIKE 'OUTBOUND%' AND agent_username IS NOT NULL AND agent_username != ''
+                GROUP BY agent_username 
+                ORDER BY COUNT(*) DESC 
+                LIMIT 5
+                """,
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [{"agent": r[0], "count": r[1]} for r in rows]
+        except Exception as e:
+            print(f"[DB] Error obteniendo top agentes: {e}")
+            return []
 
 db = Database()

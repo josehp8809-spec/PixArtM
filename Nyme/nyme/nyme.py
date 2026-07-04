@@ -58,17 +58,100 @@ def reports_page() -> rx.Component:
     return rx.vstack(
         premium_navbar("/reports"),
         rx.vstack(
-            rx.heading("📊 Reportes", size="7", color="white", padding="24px 32px 8px"),
+            rx.heading("📊 Reportes y Dashboard Ejecutivo", size="7", color="white", padding="24px 32px 8px"),
             rx.text(
-                "El módulo de reportes está disponible. Integración completa con SLA, "
-                "análisis de sentimientos y exportación a Excel/PDF.",
-                color="#8e8e93", padding="0 32px",
+                "Métricas clave del rendimiento del equipo, tiempos de respuesta y volumen de interacciones.",
+                color="#8e8e93", padding="0 32px 24px",
             ),
-            rx.callout(
-                "Módulo de reportes avanzado — conecta desde el panel de reportes exportando "
-                "Excel y PDF desde report_exporter.py",
-                color="blue", variant="soft", margin="32px",
+            
+            # Fila de KPIs
+            rx.grid(
+                rx.box(
+                    rx.vstack(
+                        rx.text("⏱️ Tiempo Promedio de Respuesta", size="1", color="#8e8e93", weight="medium"),
+                        rx.hstack(
+                            rx.text(AppState.avg_response_time.to_string() + " min", size="6", color="white", weight="bold"),
+                            rx.badge("Excelente", color_scheme="green", size="1"),
+                            align_items="center", spacing="2"
+                        ),
+                        spacing="1", align_items="start"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px"
+                ),
+                rx.box(
+                    rx.vstack(
+                        rx.text("🟡 Chats en Curso", size="1", color="#8e8e93", weight="medium"),
+                        rx.text(AppState.conversation_states_chart["active"].to_string(), size="6", color="#ffd60a", weight="bold"),
+                        spacing="1", align_items="start"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px"
+                ),
+                rx.box(
+                    rx.vstack(
+                        rx.text("⏳ Chats Pendientes", size="1", color="#8e8e93", weight="medium"),
+                        rx.text(AppState.conversation_states_chart["pending"].to_string(), size="6", color="#0a84ff", weight="bold"),
+                        spacing="1", align_items="start"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px"
+                ),
+                rx.box(
+                    rx.vstack(
+                        rx.text("✅ Chats Cerrados", size="1", color="#8e8e93", weight="medium"),
+                        rx.text(AppState.conversation_states_chart["resolved"].to_string(), size="6", color="#30d158", weight="bold"),
+                        spacing="1", align_items="start"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px"
+                ),
+                columns="4", spacing="4", width="100%", padding="0 32px 24px"
             ),
+            
+            # Sección Principal: Top Agentes
+            rx.grid(
+                # Tarjeta Top Agentes
+                rx.box(
+                    rx.vstack(
+                        rx.heading("🏆 Agentes Más Activos (Humano e IA)", size="4", color="white"),
+                        rx.text("Ranking de volumen de respuestas enviadas.", color="#8e8e93", size="2"),
+                        rx.divider(color="#2c2c2e", margin_y="12px"),
+                        rx.cond(
+                            AppState.top_agents.length() > 0,
+                            rx.vstack(
+                                rx.foreach(
+                                    AppState.top_agents,
+                                    lambda tag: rx.hstack(
+                                        rx.text(tag["agent"].to(str), weight="bold", size="2", color="white"),
+                                        rx.spacer(),
+                                        rx.badge(tag["count"].to_string() + " respuestas", color_scheme="blue"),
+                                        padding="10px",
+                                        border="1px solid #2c2c2e",
+                                        border_radius="10px",
+                                        width="100%",
+                                        background="#1c1c1e"
+                                    )
+                                ),
+                                width="100%", spacing="2"
+                            ),
+                            rx.text("No hay interacciones registradas en este período.", color="#636366", size="2")
+                        ),
+                        spacing="3", align_items="start", width="100%"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="24px", flex="1"
+                ),
+                # Tarjeta Exportación
+                rx.box(
+                    rx.vstack(
+                        rx.heading("📥 Exportar Datos de Negocio", size="4", color="white"),
+                        rx.text("Descarga el historial completo para auditoría y KPIs.", color="#8e8e93", size="2"),
+                        rx.divider(color="#2c2c2e", margin_y="12px"),
+                        rx.button("📊 Descargar Reporte Completo (Excel)", color_scheme="green", size="3", width="100%", on_click=AppState.export_contacts),
+                        rx.text("La exportación incluye datos del CRM, ciclo de vida de clientes, asignaciones y marcas de tiempo de primera respuesta.", size="1", color="#636366"),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="24px"
+                ),
+                columns="2", spacing="4", width="100%", padding="0 32px"
+            ),
+            
             spacing="0",
             width="100%",
         ),
@@ -156,6 +239,13 @@ async def webhook_post(request: Request):
                     db.save_message(wa_id, "INBOUND", body_text, line_id=line_id)
                     db.mark_conversation_unread(wa_id, line_id)
 
+                    # Disparar respondedor de IA automático en segundo plano si es mensaje de texto
+                    if t == "text" and line_id:
+                        tenant_id = line.get("tenant_id", 1) if line else 1
+                        asyncio.create_task(
+                            run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
+                        )
+
                     if first and line and line.get("welcome_active") and line.get("welcome_message"):
                         r = wa_client.send_text_message(line, wa_id, line["welcome_message"])
                         if r:
@@ -166,6 +256,59 @@ async def webhook_post(request: Request):
         return JSONResponse({"status": "ok"})
     except Exception as e:
         return JSONResponse({"status": "error", "detail": str(e)})
+
+async def run_ai_agent_responder(wa_id: str, line_id: int, line: dict, incoming_text: str, tenant_id: int):
+    """Genera y envía una respuesta de IA en background si hay un agente activo y no está asignado a un humano."""
+    from database import db
+    from whatsapp_client import wa_client
+    from gemini_client import gemini
+    import asyncio
+
+    # Pausa corta para asegurar que el mensaje entrante se asiente en la base de datos
+    await asyncio.sleep(1)
+    
+    # 1. Obtener si hay agente IA activo para esta línea
+    agent = db.get_active_agent_for_line(line_id, tenant_id)
+    if not agent:
+        return
+
+    # 2. Verificar si la conversación está asignada a un humano
+    assigned_to = ""
+    try:
+        conn = db.get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT assigned_to FROM conversation_status WHERE wa_id = %s AND line_id = %s",
+            (wa_id, line_id)
+        )
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row:
+            assigned_to = row[0] or ""
+    except Exception:
+        pass
+
+    if assigned_to:
+        # Ya tiene agente humano asignado, omitimos responder automáticamente
+        return
+
+    # 3. Obtener el historial reciente del chat
+    history = db.get_messages(wa_id, tenant_id)
+    
+    # 4. Generar respuesta con Gemini
+    ai_reply = gemini.generate_agent_reply(agent["system_prompt"], history)
+    if ai_reply:
+        # 5. Enviar la respuesta por WhatsApp vía API de Meta
+        r = wa_client.send_text_message(line, wa_id, ai_reply)
+        if r:
+            # 6. Guardar en BD
+            db.save_message(
+                wa_id, "OUTBOUND_REPLY", ai_reply,
+                agent_username=f"[IA] {agent['name']}",
+                line_id=line_id, tenant_id=tenant_id
+            )
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────

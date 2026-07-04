@@ -91,6 +91,28 @@ class AppState(rx.State):
     contact_lifecycle_stage: str = "New Customer" # Etapa de ciclo de vida del contacto activo
     lifecycle_counts: dict[str, int] = {"New Customer": 0, "Lead": 0, "Customer": 0, "Paid": 0}
 
+    # ── Fase 2 (Agentes IA, Plantillas de Meta y Analítica) ───────────────────
+    # Agentes IA
+    ai_agents: list[dict] = []
+    new_agent_name: str = ""
+    new_agent_prompt: str = ""
+    new_agent_line_id: int = 0
+    new_agent_active: bool = True
+    agent_msg: str = ""
+
+    # Plantillas de Mensajes
+    templates: list[dict] = []
+    new_tpl_name: str = ""
+    new_tpl_category: str = "UTILITY"
+    new_tpl_body: str = ""
+    tpl_msg: str = ""
+    show_template_modal: bool = False
+
+    # Analítica y Dashboard
+    avg_response_time: float = 0.0
+    conversation_states_chart: dict[str, int] = {"pending": 0, "active": 0, "snoozed": 0, "resolved": 0}
+    top_agents: list[dict] = []
+
     # ── Cambio de contraseña ──────────────────────────────────────────────────
     pwd_new: str     = ""
     pwd_confirm: str = ""
@@ -168,7 +190,7 @@ class AppState(rx.State):
     # ─────────────────────────────────────────────────────────────────────────
 
     def _load_core_data(self):
-        """Carga líneas, quick replies, contactos y métricas del CRM al iniciar sesión."""
+        """Carga líneas, quick replies, contactos, métricas, agentes IA, plantillas y analítica."""
         raw_lines = db.get_all_lines(self.tenant_id)
         self.all_lines = [
             {
@@ -192,6 +214,9 @@ class AppState(rx.State):
         self._refresh_products()
         self._refresh_orders()
         self._refresh_lifecycle_counts()
+        self._refresh_ai_agents()
+        self._refresh_templates()
+        self._refresh_analytics()
 
     def _update_total_unread(self):
         new_total = sum(c["unread"] for c in self.contacts)
@@ -366,6 +391,8 @@ class AppState(rx.State):
                 self._update_total_unread()
                 self._refresh_products()
                 self._refresh_orders()
+                self._refresh_lifecycle_counts()
+                self._refresh_analytics()
                 if self.selected_contact:
                     self._refresh_messages()
 
@@ -965,3 +992,123 @@ class AppState(rx.State):
         if product.get("image_url"):
             detail_msg += f"\n📸 *Imagen:* {product['image_url']}"
         self.new_message = detail_msg
+
+    # ── Métodos de la Fase 2 ─────────────────────────────────────────────────
+    
+    # Agentes IA
+    def set_new_agent_name(self, v): self.new_agent_name = v
+    def set_new_agent_prompt(self, v): self.new_agent_prompt = v
+    def set_new_agent_line_id(self, v): self.new_agent_line_id = int(v)
+    def set_new_agent_active(self, v): self.new_agent_active = bool(v)
+
+    def _refresh_ai_agents(self):
+        self.ai_agents = db.get_ai_agents(self.tenant_id)
+
+    def create_ai_agent(self):
+        name = self.new_agent_name.strip()
+        prompt = self.new_agent_prompt.strip()
+        if not name or not prompt:
+            self.agent_msg = "❌ Nombre e instrucciones de sistema son obligatorios."
+            return
+        
+        ok, err = db.create_ai_agent(
+            name, prompt, self.new_agent_line_id, self.new_agent_active, self.tenant_id
+        )
+        if ok:
+            self.agent_msg = f"✅ Agente '{name}' guardado correctamente."
+            self.new_agent_name = ""
+            self.new_agent_prompt = ""
+            self.new_agent_line_id = 0
+            self.new_agent_active = True
+            self._refresh_ai_agents()
+        else:
+            self.agent_msg = f"❌ Error: {err}"
+
+    def delete_ai_agent(self, agent_id: int):
+        if db.delete_ai_agent(agent_id, self.tenant_id):
+            self.agent_msg = "🗑️ Agente IA eliminado."
+            self._refresh_ai_agents()
+        else:
+            self.agent_msg = "❌ Error al eliminar agente."
+
+    # Plantillas de Mensajes
+    def set_new_tpl_name(self, v): self.new_tpl_name = v
+    def set_new_tpl_category(self, v): self.new_tpl_category = v
+    def set_new_tpl_body(self, v): self.new_tpl_body = v
+
+    def _refresh_templates(self):
+        self.templates = db.get_message_templates(self.tenant_id)
+
+    def create_message_template(self):
+        name = self.new_tpl_name.strip().lower().replace(" ", "_")
+        body = self.new_tpl_body.strip()
+        if not name or not body:
+            self.tpl_msg = "❌ Nombre y texto del mensaje son obligatorios."
+            return
+        
+        ok, err = db.create_message_template(
+            name, self.new_tpl_category, body, self.tenant_id
+        )
+        if ok:
+            self.tpl_msg = f"✅ Plantilla '{name}' guardada."
+            self.new_tpl_name = ""
+            self.new_tpl_body = ""
+            self._refresh_templates()
+        else:
+            self.tpl_msg = f"❌ Error: {err}"
+
+    def delete_message_template(self, tpl_id: int):
+        if db.delete_message_template(tpl_id, self.tenant_id):
+            self.tpl_msg = "🗑️ Plantilla eliminada."
+            self._refresh_templates()
+        else:
+            self.tpl_msg = "❌ Error al eliminar plantilla."
+
+    def toggle_template_modal(self):
+        self.show_template_modal = not self.show_template_modal
+
+    def send_template(self, body_text: str):
+        """Envía una plantilla de mensaje al cliente seleccionado."""
+        if not self.selected_contact:
+            return
+        
+        # Envío por WhatsApp API
+        line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+        if line and line["is_active"]:
+            wa_client.send_text_message(line, self.selected_contact, body_text)
+            
+        # Registrar en la base de datos
+        db.save_message(
+            self.selected_contact, "OUTBOUND_REPLY", body_text,
+            agent_username=self.username, line_id=self.selected_line_id,
+            tenant_id=self.tenant_id
+        )
+        
+        self.show_template_modal = False
+        self._refresh_messages()
+        self._refresh_contacts()
+
+    # Detección de ventana de 24 horas
+    @rx.var
+    def is_24h_window_closed(self) -> bool:
+        if not self.selected_contact:
+            return False
+        
+        last_inbound_time = db.get_last_inbound_time(self.selected_contact, self.tenant_id)
+        if not last_inbound_time:
+            # Si no hay mensajes entrantes previos, no hay ventana cerrada
+            return False
+            
+        from datetime import datetime, timezone
+        # Comparar en UTC (asumiendo que last_inbound_time está en hora local o UTC)
+        # Para evitar problemas de timezone naive vs aware:
+        now = datetime.now(last_inbound_time.tzinfo) if last_inbound_time.tzinfo else datetime.now()
+        diff = now - last_inbound_time
+        return diff.total_seconds() > (24 * 3600)
+
+    # Analíticas y Reportes
+    def _refresh_analytics(self):
+        self.avg_response_time = db.get_average_response_time(self.tenant_id)
+        self.conversation_states_chart = db.get_conversation_states_chart(self.tenant_id)
+        self.top_agents = db.get_top_agents(self.tenant_id)
+

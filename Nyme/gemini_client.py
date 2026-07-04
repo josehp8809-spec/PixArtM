@@ -204,5 +204,35 @@ class GeminiClient:
             print(f"[Gemini] Error transcribiendo audio: {e}")
             return "Error al procesar el audio con la IA."
 
+    def generate_agent_reply(self, system_prompt, conversation_history):
+        """Genera respuesta automática para el cliente usando el prompt del sistema del agente."""
+        model = self._get_model()
+        if not model:
+            return None
+        try:
+            # Formatear el historial de los últimos 15 mensajes para darle contexto al agente
+            history_text = ""
+            for m in conversation_history[-15:]:
+                m_type = m[0] if isinstance(m, tuple) else m.get("type", "INBOUND")
+                m_body = m[1] if isinstance(m, tuple) else m.get("body", "")
+                agent_name = m[3] if isinstance(m, tuple) and len(m) > 3 else m.get("agent", "")
+                
+                role_label = "Cliente" if m_type == "INBOUND" else f"Agente ({agent_name})"
+                history_text += f"{role_label}: {m_body}\n"
+            
+            prompt = (
+                f"INSTRUCCIONES DE SISTEMA:\n{system_prompt}\n\n"
+                f"HISTORIAL DE CONVERSACIÓN DE WHATSAPP:\n{history_text}\n"
+                f"Escribe la siguiente respuesta para el Cliente. Responde directamente en primera persona como el agente IA, "
+                f"manteniendo la personalidad e instrucciones indicadas. "
+                f"No agregues prefijos como 'Agente:' ni comillas. Tu respuesta será enviada directamente al WhatsApp del cliente:\n"
+            )
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            print(f"[Gemini] Error generando respuesta de agente de IA: {e}")
+            return None
+
 
 gemini = GeminiClient()
+
