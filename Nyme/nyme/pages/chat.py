@@ -167,7 +167,8 @@ def message_bubble(msg: rx.Var) -> rx.Component:
     is_in = msg["type"] == "INBOUND"
     body_str = msg["body"].to(str)
     media_id_str = msg["media_id"].to(str)
-    is_audio = body_str.contains("[🎤 Audio]") | (media_id_str != "")
+    has_media = (media_id_str != "") & (media_id_str != "None") & (media_id_str != "null")
+    is_audio = body_str.contains("[🎤 Audio]") | has_media
     
     # Burbuja de Nota Interna
     note_content = rx.box(
@@ -195,7 +196,7 @@ def message_bubble(msg: rx.Var) -> rx.Component:
     normal_content = rx.box(
         rx.vstack(
             rx.cond(
-                is_audio & (media_id_str != ""),
+                is_audio & has_media,
                 rx.vstack(
                     rx.text("🎤 Mensaje de voz", size="1", color="#8e8e93"),
                     rx.button(
