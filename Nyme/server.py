@@ -1,5 +1,9 @@
 """
-server.py — Servidor de producción para Render con depuración detallada.
+server.py — Servidor de producción para Render.
+
+Combina en un solo proceso uvicorn:
+  1. El backend de Reflex (WebSocket de estado, API, webhook de Meta)
+  2. Los archivos estáticos del frontend compilado en .web/build/client/
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
@@ -15,22 +19,19 @@ from starlette.requests import Request
 from nyme.nyme import app as reflex_app
 reflex_routes = list(reflex_app._api.routes)
 
-# ── 2. Directorio del frontend ───────────────────────────────────────────────
-BUILD_DIR = os.path.join(os.path.dirname(__file__), ".web", "build")
+# ── 2. Directorio correcto del frontend ──────────────────────────────────────
+# Reflex >= 0.9 exporta a .web/build/client/ (no .web/_static/ ni .web/build/)
+BASE = os.path.dirname(__file__)
+BUILD_DIR = os.path.join(BASE, ".web", "build", "client")
+
+print(f"[Server] BUILD_DIR = {BUILD_DIR}")
+print(f"[Server] BUILD_DIR existe: {os.path.isdir(BUILD_DIR)}")
+if os.path.isdir(BUILD_DIR):
+    print(f"[Server] Contenido BUILD_DIR: {os.listdir(BUILD_DIR)[:10]}")
 
 async def serve_page(request: Request) -> Response:
+    """Sirve las páginas del frontend exportado (SPA fallback a index.html)."""
     path = request.path_params.get("path", "").strip("/")
-    print(f"[Serve] Petición recibida para ruta: '{path}'")
-    
-    # Listar contenido de BUILD_DIR para depurar
-    try:
-        if os.path.isdir(BUILD_DIR):
-            files = os.listdir(BUILD_DIR)
-            print(f"[Serve] Contenido de {BUILD_DIR}: {files}")
-        else:
-            print(f"[Serve] ERROR: {BUILD_DIR} no es un directorio válido")
-    except Exception as ex:
-        print(f"[Serve] Error listando directorio: {ex}")
 
     candidates = []
     if path:
@@ -38,40 +39,35 @@ async def serve_page(request: Request) -> Response:
         candidates.append(os.path.join(BUILD_DIR, path + ".html"))
         candidates.append(os.path.join(BUILD_DIR, path, "index.html"))
 
+    candidates.append(os.path.join(BUILD_DIR, "__spa-fallback.html"))
     candidates.append(os.path.join(BUILD_DIR, "index.html"))
 
     for c in candidates:
-        exists = os.path.isfile(c)
-        print(f"[Serve] Probando candidato: {c} -> Existe: {exists}")
-        if exists:
+        if os.path.isfile(c):
             return FileResponse(c)
 
-    return HTMLResponse(f"<h1>404 — Not Found</h1><p>Buscando ruta: '{path}' en {BUILD_DIR}</p>", status_code=404)
+    return HTMLResponse(
+        f"<h1>404</h1><p>No se encontró: '{path}'</p><p>BUILD_DIR={BUILD_DIR}</p>",
+        status_code=404,
+    )
 
-# ── 3. Rutas Starlette ────────────────────────────────────────────────────────
-routes = list(reflex_routes)
+# ── 3. Rutas Starlette combinadas ─────────────────────────────────────────────
+routes = list(reflex_routes)  # /ping, /_health, /_event (WS), /webhook
 
-# Servir assets y client si existen
-assets_dir = os.path.join(BUILD_DIR, "assets")
-if os.path.isdir(assets_dir):
-    print("[Server] Registrando /assets de frontend")
-    routes.append(Mount("/assets", app=StaticFiles(directory=assets_dir), name="assets"))
+# Assets de Vite (JS, CSS, etc.) — están en BUILD_DIR directamente
+if os.path.isdir(BUILD_DIR):
+    routes.append(Mount("/assets", app=StaticFiles(directory=os.path.join(BUILD_DIR, "assets")), name="assets"))
 
-client_dir = os.path.join(BUILD_DIR, "client")
-if os.path.isdir(client_dir):
-    print("[Server] Registrando /client de frontend")
-    routes.append(Mount("/client", app=StaticFiles(directory=client_dir), name="client"))
-
-# Catch-all
+# Catch-all para las páginas del SPA
 routes.append(Route("/{path:path}", endpoint=serve_page))
 routes.append(Route("/", endpoint=serve_page))
 
 combined = Starlette(routes=routes)
 
+# ── 4. Arrancar uvicorn ───────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
     print(f"[Server] Nyme iniciando en http://0.0.0.0:{port}")
-    print(f"[Server] Frontend en: {BUILD_DIR} — existe: {os.path.isdir(BUILD_DIR)}")
     uvicorn.run(
         combined,
         host="0.0.0.0",
