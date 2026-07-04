@@ -270,6 +270,10 @@ class AppState(rx.State):
             except (ValueError, TypeError):
                 pass
         return total
+
+    @rx.var
+    def order_total_amount_str(self) -> str:
+        return f"${self.order_total_amount:.2f}"
     def _refresh_contacts(self):
         raw = db.get_contacts_for_user(self.user_id, self.role, self.tenant_id)
         self.contacts = [

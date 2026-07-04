@@ -109,7 +109,7 @@ def contact_item(contact: rx.Var) -> rx.Component:
                     ),
                     rx.cond(
                         assigned_to != "",
-                        rx.badge(f"👤 {assigned_to}", color_scheme="blue", size="1", variant="soft", radius="full"),
+                        rx.badge("👤 " + assigned_to.to(str), color_scheme="blue", size="1", variant="soft", radius="full"),
                     ),
                     rx.badge(lifecycle, color_scheme="gray", size="1", variant="outline", radius="full"),
                     spacing="2", align_items="center"
@@ -146,7 +146,7 @@ def message_bubble(msg: rx.Var) -> rx.Component:
                 width="100%", align_items="center"
             ),
             rx.text(body_str, size="2", color="white", white_space="pre-wrap"),
-            rx.text(f"Por: {msg['agent'].to(str)} · {msg['time'].to(str)}", size="1", color="#8e8e93"),
+            rx.text("Por: " + msg['agent'].to(str) + " · " + msg['time'].to(str), size="1", color="#8e8e93"),
             spacing="1", align_items="stretch"
         ),
         background="#1c1c1e",
@@ -560,7 +560,7 @@ def orders_sidebar() -> rx.Component:
                         rx.hstack(
                             rx.text("Total:", weight="bold", size="2", color="white"),
                             rx.spacer(),
-                            rx.text(f"${AppState.order_total_amount:.2f}", weight="bold", size="3", color="#30d158"),
+                            rx.text(AppState.order_total_amount_str, weight="bold", size="3", color="#30d158"),
                             width="100%"
                         ),
                         
