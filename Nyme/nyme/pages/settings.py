@@ -311,6 +311,7 @@ def settings_page() -> rx.Component:
                     rx.tabs.trigger("📱 Líneas", value="lines"),
                     rx.tabs.trigger("🤖 Agentes IA", value="ai_agents"),
                     rx.tabs.trigger("📨 Plantillas", value="templates"),
+                    rx.tabs.trigger("⚙️ Automatizaciones", value="workflows"),
                     rx.tabs.trigger("⚡ Atajos", value="qr"),
                     rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
                     rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
@@ -697,6 +698,113 @@ def settings_page() -> rx.Component:
                         spacing="4", align_items="start", width="100%"
                     ),
                     value="templates", padding="24px 32px"
+                ),
+
+                # ── Automatizaciones (Workflows - Fase 3) ──────────────────
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("⚙️ Flujos de Trabajo y Automatizaciones", size="4", color="white"),
+                        rx.text("Define reglas automáticas If/Then basadas en palabras clave recibidas en tus chats.", color="#8e8e93", size="2"),
+                        
+                        # Formulario de Creación
+                        rx.box(
+                            rx.vstack(
+                                rx.heading("Crear Nueva Regla de Automatización", size="3", color="white"),
+                                rx.grid(
+                                    rx.vstack(
+                                        rx.text("Nombre de la Regla", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: Auto-Respuesta Precios", on_change=SettingsState.set_new_wf_name, value=SettingsState.new_wf_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Trigger (Evento)", size="1", color="#8e8e93"),
+                                        rx.select(
+                                            ["message_received"],
+                                            value=SettingsState.new_wf_trigger,
+                                            on_change=SettingsState.set_new_wf_trigger,
+                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        ),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Condición", size="1", color="#8e8e93"),
+                                        rx.select(
+                                            ["body_contains"],
+                                            value=SettingsState.new_wf_cond_field,
+                                            on_change=SettingsState.set_new_wf_cond_field,
+                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        ),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Palabra Clave", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: precio (en minúsculas)", on_change=SettingsState.set_new_wf_cond_val, value=SettingsState.new_wf_cond_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Acción a Ejecutar", size="1", color="#8e8e93"),
+                                        rx.select(
+                                            ["reply", "assign", "set_lifecycle"],
+                                            value=SettingsState.new_wf_action_type,
+                                            on_change=SettingsState.set_new_wf_action_type,
+                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        ),
+                                        spacing="1"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Valor de la Acción", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: El costo es $50 / admin / Lead", on_change=SettingsState.set_new_wf_action_val, value=SettingsState.new_wf_action_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1"
+                                    ),
+                                    columns="3", spacing="3", width="100%"
+                                ),
+                                rx.button("⚙️ Guardar Regla", on_click=SettingsState.create_workflow, color_scheme="blue", width="200px"),
+                                rx.cond(SettingsState.wf_msg != "", rx.text(SettingsState.wf_msg, size="2", color="#30d158")),
+                                spacing="3", align_items="start", width="100%"
+                            ),
+                            background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                        ),
+                        
+                        rx.divider(color="#2c2c2e", margin="16px 0"),
+                        
+                        # Lista de Workflows
+                        rx.heading("Automatizaciones activas", size="3", color="white"),
+                        rx.cond(
+                            SettingsState.workflows.length() > 0,
+                            rx.vstack(
+                                rx.foreach(
+                                    SettingsState.workflows,
+                                    lambda w: rx.hstack(
+                                        rx.vstack(
+                                            rx.text("⚙️ " + w["name"].to(str), weight="bold", size="3", color="white"),
+                                            rx.text(
+                                                rx.match(
+                                                    w["action_type"].to(str),
+                                                    ("reply", f"Si el mensaje contiene '{w['condition_value']}', responder automáticamente: '{w['action_value']}'"),
+                                                    ("assign", f"Si el mensaje contiene '{w['condition_value']}', asignar chat a: @{w['action_value']}"),
+                                                    ("set_lifecycle", f"Si el mensaje contiene '{w['condition_value']}', cambiar etapa CRM a: {w['action_value']}"),
+                                                    "Acción desconocida"
+                                                ),
+                                                size="2", color="#8e8e93"
+                                            ),
+                                            spacing="1", align_items="start"
+                                        ),
+                                        rx.spacer(),
+                                        rx.button("🗑️", on_click=SettingsState.delete_workflow(w["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                        padding="14px",
+                                        border="1px solid #2c2c2e",
+                                        border_radius="10px",
+                                        width="100%",
+                                        background="#111"
+                                    )
+                                ),
+                                width="100%", spacing="2"
+                            ),
+                            rx.text("No tienes flujos de trabajo creados.", color="#636366", size="2")
+                        ),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    value="workflows", padding="24px 32px"
                 ),
 
                 # ── Empresas (Solo visible para Súper Tenant ID 1)

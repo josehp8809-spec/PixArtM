@@ -204,21 +204,78 @@ def contacts_page() -> rx.Component:
                 rx.tabs.content(
                     rx.vstack(
                         rx.grid(
-                            rx.vstack(
-                                rx.text("WhatsApp ID *", size="1", color="#8e8e93"),
-                                rx.input(on_change=AppState.set_nc_wa_id, value=AppState.nc_wa_id, background="#1c1c1e", color="white"),
-                                spacing="1",
+                            # Lado Izquierdo: Creador Individual
+                            rx.box(
+                                rx.vstack(
+                                    rx.heading("➕ Contacto Individual", size="4", color="white"),
+                                    rx.text("Registra un nuevo contacto de WhatsApp manualmente.", size="2", color="#8e8e93"),
+                                    rx.vstack(
+                                        rx.text("WhatsApp ID (Número con código de país) *", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: 5491122334455", on_change=AppState.set_nc_wa_id, value=AppState.nc_wa_id, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1", width="100%"
+                                    ),
+                                    rx.vstack(
+                                        rx.text("Nombre del Cliente", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: Juan Pérez", on_change=SettingsState.set_nc_name, value=AppState.nc_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1", width="100%"
+                                    ),
+                                    rx.button("💾 Guardar Contacto", on_click=AppState.save_contact, color_scheme="blue", width="100%"),
+                                    rx.cond(AppState.nc_msg != "", rx.text(AppState.nc_msg, color="#30d158", size="2")),
+                                    spacing="4", align_items="start", width="100%"
+                                ),
+                                background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="24px"
                             ),
-                            rx.vstack(
-                                rx.text("Nombre Completo", size="1", color="#8e8e93"),
-                                rx.input(on_change=AppState.set_nc_name, value=AppState.nc_name, background="#1c1c1e", color="white"),
-                                spacing="1",
+                            
+                            # Lado Derecho: Importación Masiva por CSV
+                            rx.box(
+                                rx.vstack(
+                                    rx.heading("📥 Importación Masiva (CSV)", size="4", color="white"),
+                                    rx.text("Sube un archivo CSV con columnas: nombre, telefono, email, notas.", size="2", color="#8e8e93"),
+                                    rx.upload(
+                                        rx.center(
+                                            rx.vstack(
+                                                rx.text("📁 Arrastra tu CSV aquí o haz clic para buscar", size="2", color="#8e8e93"),
+                                                rx.text("Tamaño máximo 5MB", size="1", color="#636366"),
+                                                align_items="center", spacing="1"
+                                            ),
+                                            padding="24px",
+                                            border="2px dashed #3a3a3c",
+                                            border_radius="10px",
+                                            cursor="pointer",
+                                            width="100%",
+                                            _hover={"border_color": "#0a84ff"}
+                                        ),
+                                        id="import_csv",
+                                        multiple=False,
+                                        accept={
+                                            "text/csv": [".csv"]
+                                        },
+                                        width="100%"
+                                    ),
+                                    rx.hstack(
+                                        rx.button(
+                                            "Importar CSV",
+                                            on_click=AppState.import_contacts_csv(rx.upload_files(upload_id="import_csv")),
+                                            color_scheme="green", size="2"
+                                        ),
+                                        rx.button(
+                                            "Limpiar",
+                                            on_click=rx.clear_selected_files("import_csv"),
+                                            variant="soft", size="2"
+                                        ),
+                                        spacing="2"
+                                    ),
+                                    rx.cond(
+                                        AppState.wf_msg != "",
+                                        rx.text(AppState.wf_msg, size="2", color="#30d158", weight="bold")
+                                    ),
+                                    spacing="4", align_items="start", width="100%"
+                                ),
+                                background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="24px"
                             ),
-                            columns="2", spacing="4", width="100%",
+                            columns="2", spacing="4", width="100%", padding="24px 0"
                         ),
-                        rx.button("💾 Guardar Contacto", on_click=AppState.save_contact, color_scheme="blue"),
-                        rx.cond(AppState.nc_msg != "", rx.text(AppState.nc_msg, color="green")),
-                        spacing="4", padding="24px 0", align_items="start", width="100%",
+                        width="100%"
                     ),
                     value="new", padding="0 32px",
                 ),

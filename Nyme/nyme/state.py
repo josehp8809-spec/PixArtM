@@ -113,6 +113,17 @@ class AppState(rx.State):
     conversation_states_chart: dict[str, int] = {"pending": 0, "active": 0, "snoozed": 0, "resolved": 0}
     top_agents: list[dict] = []
 
+    # ── Fase 3 (Automatizaciones - Workflows) ──────────────────────────────────
+    workflows: list[dict] = []
+    new_wf_name: str = ""
+    new_wf_trigger: str = "message_received"
+    new_wf_cond_field: str = "body_contains"
+    new_wf_cond_val: str = ""
+    new_wf_action_type: str = "reply"
+    new_wf_action_val: str = ""
+    wf_msg: str = ""
+
+
     # ── Cambio de contraseña ──────────────────────────────────────────────────
     pwd_new: str     = ""
     pwd_confirm: str = ""
@@ -190,7 +201,7 @@ class AppState(rx.State):
     # ─────────────────────────────────────────────────────────────────────────
 
     def _load_core_data(self):
-        """Carga líneas, quick replies, contactos, métricas, agentes IA, plantillas y analítica."""
+        """Carga líneas, quick replies, contactos, métricas, agentes IA, plantillas, analítica y automatizaciones."""
         raw_lines = db.get_all_lines(self.tenant_id)
         self.all_lines = [
             {
@@ -217,6 +228,7 @@ class AppState(rx.State):
         self._refresh_ai_agents()
         self._refresh_templates()
         self._refresh_analytics()
+        self._refresh_workflows()
 
     def _update_total_unread(self):
         new_total = sum(c["unread"] for c in self.contacts)
@@ -517,14 +529,23 @@ class AppState(rx.State):
                 tenant_id=self.tenant_id
             )
         else:
-            line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
-            if line and line["is_active"]:
-                wa_client.send_text_message(line, self.selected_contact, text)
-            db.save_message(
-                self.selected_contact, "OUTBOUND_REPLY", text,
-                agent_username=self.username, line_id=self.selected_line_id,
-                tenant_id=self.tenant_id
-            )
+            if self.selected_contact.startswith("web_"):
+                # Canal Chat Web
+                db.save_message(
+                    self.selected_contact, "OUTBOUND_REPLY", text,
+                    agent_username=self.username, line_id=0,
+                    tenant_id=self.tenant_id
+                )
+            else:
+                # Canal WhatsApp Meta
+                line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
+                if line and line["is_active"]:
+                    wa_client.send_text_message(line, self.selected_contact, text)
+                db.save_message(
+                    self.selected_contact, "OUTBOUND_REPLY", text,
+                    agent_username=self.username, line_id=self.selected_line_id,
+                    tenant_id=self.tenant_id
+                )
         self.new_message = ""
         self._refresh_messages()
         self._refresh_contacts()
@@ -1111,4 +1132,108 @@ class AppState(rx.State):
         self.avg_response_time = db.get_average_response_time(self.tenant_id)
         self.conversation_states_chart = db.get_conversation_states_chart(self.tenant_id)
         self.top_agents = db.get_top_agents(self.tenant_id)
+
+    # ── CRUD Automatizaciones (Workflows - Fase 3) ──────────────────────
+    def set_new_wf_name(self, v): self.new_wf_name = v
+    def set_new_wf_trigger(self, v): self.new_wf_trigger = v
+    def set_new_wf_cond_field(self, v): self.new_wf_cond_field = v
+    def set_new_wf_cond_val(self, v): self.new_wf_cond_val = v
+    def set_new_wf_action_type(self, v): self.new_wf_action_type = v
+    def set_new_wf_action_val(self, v): self.new_wf_action_val = v
+
+    def _refresh_workflows(self):
+        self.workflows = db.get_workflows(self.tenant_id)
+
+    def create_workflow(self):
+        name = self.new_wf_name.strip()
+        cond_val = self.new_wf_cond_val.strip()
+        action_val = self.new_wf_action_val.strip()
+        if not name or not cond_val or not action_val:
+            self.wf_msg = "❌ Todos los campos son obligatorios."
+            return
+        
+        ok, err = db.create_workflow(
+            name, self.new_wf_trigger, self.new_wf_cond_field, cond_val,
+            self.new_wf_action_type, action_val, self.tenant_id
+        )
+        if ok:
+            self.wf_msg = f"✅ Regla '{name}' guardada correctamente."
+            self.new_wf_name = ""
+            self.new_wf_cond_val = ""
+            self.new_wf_action_val = ""
+            self._refresh_workflows()
+        else:
+            self.wf_msg = f"❌ Error: {err}"
+
+    def delete_workflow(self, workflow_id: int):
+        if db.delete_workflow(workflow_id, self.tenant_id):
+            self.wf_msg = "🗑️ Regla de automatización eliminada."
+            self._refresh_workflows()
+        else:
+            self.wf_msg = "❌ Error al eliminar regla."
+
+    # ── Importación Masiva CSV (Fase 3) ──────────────────────────────────
+    @rx.event(background=True)
+    async def import_contacts_csv(self, upload_files: list[rx.UploadFile]):
+        import csv
+        import io
+        import re
+
+        count = 0
+        errors = 0
+        for file in upload_files:
+            try:
+                content = await file.read()
+                decoded = content.decode("utf-8-sig")
+                f = io.StringIO(decoded)
+                reader = csv.reader(f)
+                
+                header = next(reader, None)
+                if not header:
+                    continue
+                
+                name_idx = 0
+                phone_idx = 1
+                email_idx = 2
+                notes_idx = 3
+
+                # Intentar adivinar mapeo de columnas según nombre de cabecera
+                for i, col in enumerate(header):
+                    col_lower = col.lower()
+                    if "nombre" in col_lower or "name" in col_lower:
+                        name_idx = i
+                    elif "telefono" in col_lower or "teléfono" in col_lower or "phone" in col_lower or "wa_id" in col_lower:
+                        phone_idx = i
+                    elif "email" in col_lower or "correo" in col_lower:
+                        email_idx = i
+                    elif "nota" in col_lower or "notes" in col_lower or "comentario" in col_lower:
+                        notes_idx = i
+                
+                for row in reader:
+                    if not row or len(row) <= max(name_idx, phone_idx):
+                        continue
+                    
+                    raw_phone = row[phone_idx].strip()
+                    phone = re.sub(r"\D", "", raw_phone)
+                    if not phone:
+                        continue
+                    
+                    name = row[name_idx].strip() if len(row) > name_idx else "Sin Nombre"
+                    email = row[email_idx].strip() if len(row) > email_idx else ""
+                    notes = row[notes_idx].strip() if len(row) > notes_idx else ""
+                    
+                    db.upsert_contact(phone, name, email, notes, self.tenant_id)
+                    count += 1
+            except Exception as e:
+                print(f"[CSV Import] Error procesando archivo: {e}")
+                errors += 1
+        
+        async with self:
+            if errors > 0:
+                self.wf_msg = f"⚠️ Importados {count} contactos. Ocurrieron {errors} errores."
+            else:
+                self.wf_msg = f"✅ ¡Importación masiva exitosa! {count} contactos añadidos."
+            self._refresh_contact_list()
+            self._refresh_contacts()
+
 

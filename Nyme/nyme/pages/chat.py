@@ -295,10 +295,22 @@ def _active_chat() -> rx.Component:
         rx.hstack(
             rx.button("← Volver", on_click=AppState.go_back, size="1", variant="ghost", color="#0a84ff", class_name="back-btn"),
             rx.vstack(
-                rx.text(AppState.selected_contact_name, weight="bold", color="white", size="3", line_clamp=1),
-                rx.text("+" + AppState.selected_contact, size="1", color="#8e8e93"),
+                rx.hstack(
+                    rx.text(AppState.selected_contact_name, weight="bold", color="white", size="3", line_clamp=1),
+                    rx.cond(
+                        AppState.selected_contact.starts_with("web_"),
+                        rx.badge("🌐 Webchat", color_scheme="blue", size="1"),
+                        rx.badge("📱 WhatsApp", color_scheme="green", size="1")
+                    ),
+                    spacing="2", align_items="center"
+                ),
+                rx.cond(
+                    AppState.selected_contact.starts_with("web_"),
+                    rx.text("ID: " + AppState.selected_contact, size="1", color="#8e8e93"),
+                    rx.text("+" + AppState.selected_contact, size="1", color="#8e8e93")
+                ),
                 spacing="0",
-                max_width="160px"
+                max_width="220px"
             ),
             rx.spacer(),
             # Asignación de Agentes
@@ -375,7 +387,7 @@ def _active_chat() -> rx.Component:
             
             # Condicionar por ventana de 24 horas y modo (las notas no están bloqueadas)
             rx.cond(
-                AppState.is_24h_window_closed & (AppState.chat_mode == "message"),
+                AppState.is_24h_window_closed & (AppState.chat_mode == "message") & (~AppState.selected_contact.starts_with("web_")),
                 # Banner de Ventana de 24 horas cerrada
                 rx.center(
                     rx.vstack(

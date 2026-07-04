@@ -245,6 +245,9 @@ async def webhook_post(request: Request):
                         asyncio.create_task(
                             run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
                         )
+                        asyncio.create_task(
+                            execute_workflows_for_message(wa_id, line_id, line, body_text, tenant_id)
+                        )
 
                     if first and line and line.get("welcome_active") and line.get("welcome_message"):
                         r = wa_client.send_text_message(line, wa_id, line["welcome_message"])
@@ -256,6 +259,41 @@ async def webhook_post(request: Request):
         return JSONResponse({"status": "ok"})
     except Exception as e:
         return JSONResponse({"status": "error", "detail": str(e)})
+
+async def execute_workflows_for_message(wa_id: str, line_id: int, line: dict, text: str, tenant_id: int):
+    """Evalúa y ejecuta flujos de trabajo automáticos en segundo plano basados en palabras clave."""
+    from database import db
+    from whatsapp_client import wa_client
+    import asyncio
+
+    # Pequeña espera para asegurar consistencia en la base de datos
+    await asyncio.sleep(1.5)
+    
+    workflows = db.get_workflows(tenant_id)
+    text_lower = text.strip().lower()
+    
+    for w in workflows:
+        if not w.get("is_active", True):
+            continue
+        if w["trigger_type"] == "message_received" and w["condition_field"] == "body_contains":
+            keyword = w["condition_value"].lower()
+            if keyword in text_lower:
+                action = w["action_type"]
+                act_val = w["action_value"]
+                
+                if action == "reply":
+                    if line and line.get("is_active"):
+                        r = wa_client.send_text_message(line, wa_id, act_val)
+                        if r:
+                            db.save_message(
+                                wa_id, "OUTBOUND_REPLY", act_val,
+                                agent_username="[Regla Auto]",
+                                line_id=line_id, tenant_id=tenant_id
+                            )
+                elif action == "assign":
+                    db.assign_conversation(wa_id, line_id, act_val, tenant_id)
+                elif action == "set_lifecycle":
+                    db.update_contact_lifecycle(wa_id, act_val, tenant_id)
 
 async def run_ai_agent_responder(wa_id: str, line_id: int, line: dict, incoming_text: str, tenant_id: int):
     """Genera y envía una respuesta de IA en background si hay un agente activo y no está asignado a un humano."""
@@ -333,6 +371,212 @@ app.add_page(orders_page,        route="/orders",    title="Nyme — Ventas")
 # Montar webhook dentro del FastAPI/Starlette interno de Reflex
 app._api.add_route("/webhook", webhook_get,  methods=["GET"])
 app._api.add_route("/webhook", webhook_post, methods=["POST"])
+
+# Endpoints de Chat Web (Fase 3)
+async def webchat_widget(request: Request):
+    # Genera el JS para inyectar la burbuja de chat
+    js_content = """
+    (function() {
+        // Crear estilos
+        var style = document.createElement('style');
+        style.innerHTML = `
+            #nyme-chat-trigger {
+                position: fixed; bottom: 20px; right: 20px;
+                width: 60px; height: 60px; border-radius: 50%;
+                background: #30d158; color: white; display: flex;
+                align-items: center; justify-content: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                cursor: pointer; z-index: 999999; font-size: 28px;
+                transition: transform 0.2s ease;
+            }
+            #nyme-chat-trigger:hover { transform: scale(1.05); }
+            #nyme-chat-box {
+                position: fixed; bottom: 90px; right: 20px;
+                width: 350px; height: 450px; border-radius: 12px;
+                background: #111; border: 1px solid #2c2c2e;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+                display: none; flex-direction: column;
+                z-index: 999999; overflow: hidden;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
+            #nyme-chat-header {
+                background: #1c1c1e; color: white; padding: 16px;
+                font-weight: bold; border-bottom: 1px solid #2c2c2e;
+                display: flex; align-items: center; justify-content: space-between;
+            }
+            #nyme-chat-body {
+                flex: 1; padding: 12px; overflow-y: auto;
+                background: #000; display: flex; flex-direction: column; gap: 8px;
+            }
+            .nyme-msg {
+                max-width: 80%; padding: 8px 12px; border-radius: 12px;
+                font-size: 14px; line-height: 1.4; color: white;
+            }
+            .nyme-msg-in { background: #2c2c2e; align-self: flex-start; }
+            .nyme-msg-out { background: #30d158; align-self: flex-end; }
+            #nyme-chat-footer {
+                padding: 10px; background: #1c1c1e; border-top: 1px solid #2c2c2e;
+                display: flex; gap: 6px;
+            }
+            #nyme-chat-input {
+                flex: 1; background: #2c2c2e; border: 1px solid #3a3a3c;
+                border-radius: 6px; padding: 8px; color: white; outline: none; font-size: 14px;
+            }
+            #nyme-chat-send {
+                background: #30d158; border: none; border-radius: 6px;
+                padding: 8px 14px; color: white; cursor: pointer; font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Identificador del cliente
+        var clientWaId = localStorage.getItem('nyme_client_wa_id');
+        if (!clientWaId) {
+            clientWaId = 'web_' + Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('nyme_client_wa_id', clientWaId);
+        }
+        var clientName = localStorage.getItem('nyme_client_name') || 'Visitante Web';
+
+        // Crear elementos UI
+        var trigger = document.createElement('div');
+        trigger.id = 'nyme-chat-trigger';
+        trigger.innerHTML = '💬';
+        document.body.appendChild(trigger);
+
+        var chatBox = document.createElement('div');
+        chatBox.id = 'nyme-chat-box';
+        chatBox.innerHTML = `
+            <div id="nyme-chat-header">
+                <span>PixArtM Soporte</span>
+                <span id="nyme-chat-close" style="cursor:pointer;">✕</span>
+            </div>
+            <div id="nyme-chat-body"></div>
+            <div id="nyme-chat-footer">
+                <input type="text" id="nyme-chat-input" placeholder="Escribe tu duda aquí...">
+                <button id="nyme-chat-send">Enviar</button>
+            </div>
+        `;
+        document.body.appendChild(chatBox);
+
+        // Acciones click
+        trigger.onclick = function() {
+            var display = chatBox.style.display;
+            chatBox.style.display = display === 'flex' ? 'none' : 'flex';
+            if (chatBox.style.display === 'flex') {
+                loadMessages();
+            }
+        };
+
+        document.getElementById('nyme-chat-close').onclick = function() {
+            chatBox.style.display = 'none';
+        };
+
+        // Enviar mensaje
+        var input = document.getElementById('nyme-chat-input');
+        var sendBtn = document.getElementById('nyme-chat-send');
+        
+        function sendMessage() {
+            var text = input.value.trim();
+            if (!text) return;
+            
+            input.value = '';
+            
+            // Render local de inmediato
+            var body = document.getElementById('nyme-chat-body');
+            var msgDiv = document.createElement('div');
+            msgDiv.className = 'nyme-msg nyme-msg-out';
+            msgDiv.innerText = text;
+            body.appendChild(msgDiv);
+            body.scrollTop = body.scrollHeight;
+
+            fetch('/api/webchat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wa_id: clientWaId, name: clientName, body: text, tenant_id: 1 })
+            }).then(() => {
+                setTimeout(loadMessages, 500);
+            });
+        }
+
+        sendBtn.onclick = sendMessage;
+        input.onkeypress = function(e) {
+            if (e.key === 'Enter') sendMessage();
+        };
+
+        // Polling de mensajes
+        function loadMessages() {
+            if (chatBox.style.display !== 'flex') return;
+            fetch('/api/webchat/messages?wa_id=' + clientWaId + '&tenant_id=1')
+                .then(r => r.json())
+                .then(msgs => {
+                    var body = document.getElementById('nyme-chat-body');
+                    body.innerHTML = '';
+                    msgs.forEach(m => {
+                        var msgDiv = document.createElement('div');
+                        msgDiv.className = 'nyme-msg ' + (m.type === 'INBOUND' ? 'nyme-msg-out' : 'nyme-msg-in');
+                        msgDiv.innerText = m.body;
+                        body.appendChild(msgDiv);
+                    });
+                    body.scrollTop = body.scrollHeight;
+                });
+        }
+
+        setInterval(loadMessages, 4000);
+    })();
+    """
+    return PlainTextResponse(js_content, media_type="application/javascript")
+
+async def webchat_send(request: Request):
+    from database import db
+    try:
+        data = await request.json()
+        wa_id = data.get("wa_id")
+        name = data.get("name", "Visitante Web")
+        body = data.get("body", "")
+        tenant_id = data.get("tenant_id", 1)
+        
+        if not wa_id or not body:
+            return JSONResponse({"status": "error", "message": "Missing arguments"}, status_code=400)
+            
+        db.upsert_contact(wa_id, name, "", "Origen: Chat Web", tenant_id)
+        db.save_message(wa_id, "INBOUND", body, line_id=0, tenant_id=tenant_id)
+        db.mark_conversation_unread(wa_id, 0)
+        
+        # Disparar respondedor de IA automático para chat web
+        import asyncio
+        asyncio.create_task(
+            run_ai_agent_responder(wa_id, 0, {}, body, tenant_id)
+        )
+        asyncio.create_task(
+            execute_workflows_for_message(wa_id, 0, {}, body, tenant_id)
+        )
+        
+        return JSONResponse({"status": "ok"})
+    except Exception as e:
+        return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)
+
+async def webchat_messages(request: Request):
+    from database import db
+    params = request.query_params
+    wa_id = params.get("wa_id")
+    tenant_id = int(params.get("tenant_id", "1"))
+    if not wa_id:
+        return JSONResponse([], status_code=400)
+    raw = db.get_messages(wa_id, tenant_id)
+    msgs = [
+        {
+            "type": m[0],
+            "body": m[1],
+            "time": m[2].strftime("%H:%M") if m[2] else "",
+            "agent": m[3] or ""
+        }
+        for m in raw
+    ]
+    return JSONResponse(msgs)
+
+app._api.add_route("/api/webchat/widget.js", webchat_widget, methods=["GET"])
+app._api.add_route("/api/webchat/send", webchat_send, methods=["POST"])
+app._api.add_route("/api/webchat/messages", webchat_messages, methods=["GET"])
 
 # ── 3. Servir frontend estático de forma NATIVA (producción) ──────────────────
 # Evita la necesidad de un servidor proxy y soluciona problemas de WebSocket.

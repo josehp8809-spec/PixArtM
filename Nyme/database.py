@@ -238,6 +238,20 @@ class Database:
                 tenant_id  INTEGER REFERENCES tenants(id) DEFAULT 1,
                 UNIQUE(name, tenant_id)
             )
+            """,
+            # 19. Workflows (Automatizaciones)
+            """
+            CREATE TABLE IF NOT EXISTS workflows (
+                id              SERIAL PRIMARY KEY,
+                name            VARCHAR(100) NOT NULL,
+                trigger_type    VARCHAR(50) NOT NULL,
+                condition_field VARCHAR(50) NOT NULL,
+                condition_value VARCHAR(255) NOT NULL,
+                action_type     VARCHAR(50) NOT NULL,
+                action_value    VARCHAR(255) NOT NULL,
+                is_active       BOOLEAN DEFAULT TRUE,
+                tenant_id       INTEGER REFERENCES tenants(id) DEFAULT 1
+            )
             """
         ]
         try:
@@ -1412,5 +1426,51 @@ class Database:
         except Exception as e:
             print(f"[DB] Error obteniendo top agentes: {e}")
             return []
+
+    # ── CRUD Automatizaciones (Workflows - Fase 3) ──────────────────────
+    def create_workflow(self, name, trigger_type, condition_field, condition_value, action_type, action_value, tenant_id):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO workflows (name, trigger_type, condition_field, condition_value, action_type, action_value, tenant_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (name, trigger_type, condition_field, condition_value.strip().lower(), action_type, action_value, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True, None
+        except Exception as e:
+            print(f"[DB] Error creando flujo de trabajo: {e}")
+            return False, str(e)
+
+    def get_workflows(self, tenant_id):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, name, trigger_type, condition_field, condition_value, action_type, action_value, is_active "
+                "FROM workflows WHERE tenant_id = %s ORDER BY id DESC",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0], "name": r[1], "trigger_type": r[2], "condition_field": r[3],
+                    "condition_value": r[4], "action_type": r[5], "action_value": r[6], "is_active": bool(r[7])
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo flujos de trabajo: {e}")
+            return []
+
+    def delete_workflow(self, workflow_id, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM workflows WHERE id = %s AND tenant_id = %s", (workflow_id, tenant_id))
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error borrando flujo de trabajo: {e}")
+            return False
 
 db = Database()
