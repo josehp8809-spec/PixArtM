@@ -190,3 +190,49 @@ app.add_page(orders_page,        route="/orders",    title="Nyme — Ventas")
 # Montar webhook dentro del FastAPI/Starlette interno de Reflex
 app._api.add_route("/webhook", webhook_get,  methods=["GET"])
 app._api.add_route("/webhook", webhook_post, methods=["POST"])
+
+# ── 3. Servir frontend estático de forma NATIVA (producción) ──────────────────
+# Evita la necesidad de un servidor proxy y soluciona problemas de WebSocket.
+BUILD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".web", "build", "client")
+
+if os.path.isdir(BUILD_DIR):
+    print(f"[Nyme Native] Detectado compilado de producción en {BUILD_DIR}. Montando middleware de frontend estático...")
+    from starlette.staticfiles import StaticFiles
+    from starlette.responses import FileResponse
+    from starlette.types import ASGIApp, Scope, Receive, Send
+
+    class NativeFrontendMiddleware:
+        def __init__(self, asgi_app: ASGIApp):
+            self.asgi_app = asgi_app
+
+        async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] == "http":
+                path = scope.get("path", "/")
+                # Prefijos de rutas reservados para el backend de Reflex y webhooks
+                backend_prefixes = ("/_event", "/ping", "/_health", "/webhook", "/upload", "/backend")
+                is_backend = any(path == prefix or path.startswith(prefix + "/") for prefix in backend_prefixes)
+
+                if not is_backend:
+                    rel = path.lstrip("/")
+                    candidates = []
+                    if rel:
+                        candidates.append(os.path.join(BUILD_DIR, rel))
+                        candidates.append(os.path.join(BUILD_DIR, rel + ".html"))
+                        candidates.append(os.path.join(BUILD_DIR, rel, "index.html"))
+
+                    candidates.append(os.path.join(BUILD_DIR, "__spa-fallback.html"))
+                    candidates.append(os.path.join(BUILD_DIR, "index.html"))
+
+                    for c in candidates:
+                        if os.path.isfile(c):
+                            response = FileResponse(c)
+                            await response(scope, receive, send)
+                            return
+
+            # Para todo lo demás (WebSockets, ping, webhook, uploads) pasamos al backend de Reflex
+            await self.asgi_app(scope, receive, send)
+
+    # Registramos el middleware en la Starlette de Reflex
+    app._api.add_middleware(NativeFrontendMiddleware)
+else:
+    print("[Nyme Native] No se detectó compilado de producción (desarrollo local). El frontend se sirve mediante reflex run.")
