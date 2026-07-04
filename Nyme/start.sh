@@ -7,7 +7,7 @@
 
 export PATH="$PWD/node_bin/bin:$PATH"
 export PORT=${PORT:-10000}
-export REFLEX_BACKEND_PORT=8080
+export REFLEX_BACKEND_PORT=8000
 
 echo "[Start] Puerto público (Render): $PORT"
 echo "[Start] Puerto interno (Reflex):  $REFLEX_BACKEND_PORT"
