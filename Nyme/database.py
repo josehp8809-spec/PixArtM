@@ -1324,9 +1324,9 @@ class Database:
             query = "SELECT id, wa_id, agent_username, items, total_amount, status, shipping_address, created_at, updated_at FROM orders"
             params = []
             conditions = []
-            if status:
+            if status is not None:
                 conditions.append("status = %s")
-                params.append(status)
+                params.append(str(status))
             if wa_id:
                 conditions.append("wa_id = %s")
                 params.append(wa_id)
@@ -1507,7 +1507,9 @@ class Database:
                 (tenant_id,)
             )
             row = cur.fetchone(); cur.close(); conn.close()
-            return round(float(row[0] or 0.0), 1)
+            if not row or row[0] is None:
+                return 0.0
+            return round(float(row[0]), 1)
         except Exception as e:
             print(f"[DB] Error calculando tiempo promedio de respuesta: {e}")
             return 0.0
@@ -1550,7 +1552,9 @@ class Database:
                 (tenant_id,)
             )
             rows = cur.fetchall(); cur.close(); conn.close()
-            return [{"agent": r[0], "count": r[1]} for r in rows]
+            if not rows:
+                return []
+            return [{"agent": r[0], "count": r[1]} for r in rows if r and len(r) > 1]
         except Exception as e:
             print(f"[DB] Error obteniendo top agentes: {e}")
             return []
