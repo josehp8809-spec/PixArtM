@@ -522,15 +522,27 @@ class Database:
 
     def get_all_users(self, tenant_id):
         """Obtiene todos los usuarios de un tenant específico."""
+    def get_users_by_tenant(self, tenant_id):
+        """Recupera usuarios vinculados a un tenant. Si es el tenant 1 (superadmin), retorna todos con el nombre de su empresa."""
         if not self._check_available():
             return []
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute(
-                "SELECT id, username, full_name, role, is_active, created_at FROM users WHERE tenant_id = %s ORDER BY role, username",
-                (tenant_id,)
-            )
+            if tenant_id == 1:
+                cur.execute(
+                    "SELECT u.id, u.username, u.full_name, u.role, u.is_active, u.created_at, t.name as tenant_name, u.tenant_id "
+                    "FROM users u "
+                    "LEFT JOIN tenants t ON u.tenant_id = t.id "
+                    "ORDER BY u.tenant_id, u.role, u.username"
+                )
+            else:
+                cur.execute(
+                    "SELECT u.id, u.username, u.full_name, u.role, u.is_active, u.created_at, '' as tenant_name, u.tenant_id "
+                    "FROM users u "
+                    "WHERE u.tenant_id = %s ORDER BY u.role, u.username",
+                    (tenant_id,)
+                )
             rows = cur.fetchall()
             cur.close()
             conn.close()

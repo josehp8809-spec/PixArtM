@@ -25,6 +25,7 @@ class SettingsState(AppState):
     nu_fullname: str = ""
     nu_password: str = ""
     nu_role: str = "agent"
+    selected_user_tenant_name: str = "SaaS Global"
     nu_msg: str = ""
     all_users: list[dict] = []
 
@@ -50,6 +51,10 @@ class SettingsState(AppState):
     def line_options_ai(self) -> list[str]:
         return ["Todas las líneas"] + [l["name"] for l in self.all_lines]
 
+    @rx.var
+    def tenant_options_for_user(self) -> list[str]:
+        return [t["name"] for t in self.all_tenants]
+
     def on_mount_settings(self):
         self.require_auth()
         self._reload_users()
@@ -58,10 +63,14 @@ class SettingsState(AppState):
             self._reload_tenants()
 
     def _reload_users(self):
-        raw = db.get_all_users(self.tenant_id)
+        raw = db.get_users_by_tenant(self.tenant_id)
         self.all_users = [
-            {"id": u[0], "username": u[1], "full_name": u[2],
-             "role": u[3], "active": bool(u[4])}
+            {
+                "id": u[0], "username": u[1], "full_name": u[2],
+                "role": u[3], "active": bool(u[4]),
+                "tenant_name": u[6] if len(u) > 6 else "",
+                "tenant_id": u[7] if len(u) > 7 else self.tenant_id
+            }
             for u in raw
         ]
 
@@ -122,15 +131,23 @@ class SettingsState(AppState):
     def set_nu_fullname(self, v): self.nu_fullname = v
     def set_nu_password(self, v): self.nu_password = v
     def set_nu_role(self, v): self.nu_role = v
+    def set_selected_user_tenant_name(self, v): self.selected_user_tenant_name = v
 
     def save_user(self):
         if not self.nu_username or not self.nu_password:
             self.nu_msg = "❌ Usuario y contraseña requeridos."
             return
+        
+        target_tenant_id = self.tenant_id
+        if self.tenant_id == 1:
+            tenant = next((t for t in self.all_tenants if t["name"] == self.selected_user_tenant_name), None)
+            if tenant:
+                target_tenant_id = tenant["id"]
+        
         ok, err = db.create_user(
             self.nu_username.lower().strip(), self.nu_password,
             self.nu_fullname, self.nu_role,
-            self.tenant_id
+            target_tenant_id
         )
         if ok:
             self.nu_msg = f"✅ Usuario @{self.nu_username} creado."
@@ -247,11 +264,16 @@ def user_row(u: rx.Var) -> rx.Component:
     full_name = u["full_name"].to(str)
     role = u["role"].to(str)
     active = u["active"].to(bool)
+    tenant_name = u["tenant_name"].to(str)
     
     return rx.hstack(
-        rx.text("@", username, weight="bold", size="2", color="white", width="140px"),
+        rx.text("@" + username, weight="bold", size="2", color="white", width="140px"),
         rx.text(full_name, size="2", color="#8e8e93", flex="1"),
-        rx.badge(role, color_scheme="blue"),
+        rx.cond(
+            SettingsState.tenant_id == 1,
+            rx.badge("🏢 " + tenant_name, color_scheme="purple", size="1"),
+        ),
+        rx.badge(role, color_scheme="blue", size="1"),
         rx.button(
             rx.cond(active, "Desactivar", "Activar"),
             on_click=SettingsState.toggle_user(user_id, active),
@@ -262,6 +284,8 @@ def user_row(u: rx.Var) -> rx.Component:
         border="1px solid #2c2c2e",
         border_radius="10px",
         width="100%",
+        spacing="3",
+        align_items="center"
     )
 
 
@@ -340,8 +364,26 @@ def settings_page() -> rx.Component:
                                     on_change=SettingsState.set_nu_role,
                                     background="#1c1c1e", color="white",
                                     border="1px solid #3a3a3c",
+                                    width="100%"
                                 ),
                                 spacing="1",
+                                width="100%"
+                            ),
+                            rx.cond(
+                                SettingsState.tenant_id == 1,
+                                rx.vstack(
+                                    rx.text("Asociar a Empresa (Tenant)", size="1", color="#8e8e93"),
+                                    rx.select(
+                                        SettingsState.tenant_options_for_user.to(list[str]),
+                                        value=SettingsState.selected_user_tenant_name,
+                                        on_change=SettingsState.set_selected_user_tenant_name,
+                                        background="#1c1c1e", color="white",
+                                        border="1px solid #3a3a3c",
+                                        width="100%"
+                                    ),
+                                    spacing="1",
+                                    width="100%"
+                                )
                             ),
                             columns="2", spacing="3", width="100%",
                         ),
@@ -780,9 +822,9 @@ def settings_page() -> rx.Component:
                                             rx.text(
                                                 rx.match(
                                                     w["action_type"].to(str),
-                                                    ("reply", f"Si el mensaje contiene '{w['condition_value']}', responder automáticamente: '{w['action_value']}'"),
-                                                    ("assign", f"Si el mensaje contiene '{w['condition_value']}', asignar chat a: @{w['action_value']}"),
-                                                    ("set_lifecycle", f"Si el mensaje contiene '{w['condition_value']}', cambiar etapa CRM a: {w['action_value']}"),
+                                                    ("reply", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', responder automáticamente: '" + w["action_value"].to(str) + "'"),
+                                                    ("assign", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', asignar chat a: @" + w["action_value"].to(str)),
+                                                    ("set_lifecycle", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', cambiar etapa CRM a: " + w["action_value"].to(str)),
                                                     "Acción desconocida"
                                                 ),
                                                 size="2", color="#8e8e93"
