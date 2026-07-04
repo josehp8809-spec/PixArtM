@@ -301,7 +301,31 @@ async def webhook_post(request: Request):
                         else:
                             body_text = "[Mensaje de red social]"
 
+                    # Intentar obtener el nombre real del perfil de Facebook/Instagram
+                    import requests
                     sender_name = "Usuario de Facebook" if obj_type == "page" else "Usuario de Instagram"
+                    if channel.get("access_token"):
+                        try:
+                            if obj_type == "page":
+                                url = f"https://graph.facebook.com/v19.0/{sender_id}?fields=first_name,last_name&access_token={channel['access_token']}"
+                                res = requests.get(url, timeout=5)
+                                if res.status_code == 200:
+                                    data = res.json()
+                                    first_name = data.get("first_name", "")
+                                    last_name = data.get("last_name", "")
+                                    if first_name or last_name:
+                                        sender_name = f"{first_name} {last_name}".strip()
+                            else:
+                                url = f"https://graph.facebook.com/v19.0/{sender_id}?fields=username&access_token={channel['access_token']}"
+                                res = requests.get(url, timeout=5)
+                                if res.status_code == 200:
+                                    data = res.json()
+                                    username = data.get("username", "")
+                                    if username:
+                                        sender_name = f"@{username}"
+                        except Exception as e:
+                            print(f"[Webhook Profile Fetch] Error obteniendo perfil de Meta: {e}")
+
                     db.upsert_contact(contact_wa_id, sender_name, "", "Contacto de Red Social", tenant_id)
 
                     db.save_message(
