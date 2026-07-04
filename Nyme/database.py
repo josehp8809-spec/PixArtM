@@ -281,6 +281,12 @@ class Database:
             cur.execute(
                 "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(50) DEFAULT 'New Customer'"
             )
+
+            # Migraciones Empresas: Agregar campos adicionales a tenants
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS email VARCHAR(200)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS phone VARCHAR(50)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS website VARCHAR(300)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notes TEXT")
             
             # Migraciones Multi-tenant: Agregar tenant_id con valor por defecto 1 a todas las tablas principales
             tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines"]
@@ -488,7 +494,7 @@ class Database:
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute("SELECT id, name, is_active FROM tenants ORDER BY id ASC")
+            cur.execute("SELECT id, name, is_active, email, phone, website, notes FROM tenants ORDER BY id ASC")
             rows = cur.fetchall()
             cur.close()
             conn.close()
@@ -519,6 +525,92 @@ class Database:
             print(f"[DB] Error creando tenant: {e}")
             return False, str(e)
 
+    def update_tenant(self, tenant_id, name, email, phone, website, notes):
+        """Actualiza datos de una empresa existente."""
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE tenants SET name=%s, email=%s, phone=%s, website=%s, notes=%s WHERE id=%s",
+                (name, email or None, phone or None, website or None, notes or None, tenant_id)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, ""
+        except psycopg2.errors.UniqueViolation:
+            return False, f"Ya existe una empresa con el nombre '{name}'"
+        except Exception as e:
+            return False, str(e)
+
+    def delete_tenant(self, tenant_id):
+        """Elimina una empresa (tenant) y todos sus usuarios asociados. No permite eliminar el tenant 1 (SaaS Global)."""
+        if tenant_id == 1:
+            return False, "No se puede eliminar la empresa principal (SaaS Global)."
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            # Desasociar usuarios del tenant antes de borrar
+            cur.execute("UPDATE users SET tenant_id = 1 WHERE tenant_id = %s", (tenant_id,))
+            cur.execute("DELETE FROM tenants WHERE id = %s", (tenant_id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, ""
+        except Exception as e:
+            print(f"[DB] Error eliminando tenant: {e}")
+            return False, str(e)
+
+    def delete_user(self, user_id):
+        """Elimina un usuario permanentemente."""
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, ""
+        except Exception as e:
+            print(f"[DB] Error eliminando usuario: {e}")
+            return False, str(e)
+
+    def update_user_tenant(self, user_id, new_tenant_id):
+        """Cambia la empresa a la que pertenece un usuario."""
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET tenant_id = %s WHERE id = %s", (new_tenant_id, user_id))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, ""
+        except Exception as e:
+            return False, str(e)
+
+    def update_user_password(self, user_id, new_password):
+        """Actualiza la contraseña de un usuario usando bcrypt."""
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            pwd_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (pwd_hash, user_id))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, ""
+        except Exception as e:
+            return False, str(e)
 
     def get_all_users(self, tenant_id):
         """Obtiene todos los usuarios de un tenant específico."""
