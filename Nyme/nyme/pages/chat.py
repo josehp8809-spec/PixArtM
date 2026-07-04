@@ -87,7 +87,39 @@ def contact_item(contact: rx.Var) -> rx.Component:
     display_name = rx.cond(
         name != wa_id,
         name,
-        "+" + wa_id
+        rx.cond(
+            wa_id.startswith("fb_") | wa_id.startswith("ig_") | wa_id.startswith("web_"),
+            wa_id,
+            "+" + wa_id
+        )
+    )
+
+    channel_icon = rx.cond(
+        wa_id.startswith("fb_"),
+        "💬 Messenger",
+        rx.cond(
+            wa_id.startswith("ig_"),
+            "📸 Instagram",
+            rx.cond(
+                wa_id.startswith("web_"),
+                "🌐 Webchat",
+                "📱 WhatsApp"
+            )
+        )
+    )
+    
+    channel_color = rx.cond(
+        wa_id.startswith("fb_"),
+        "blue",
+        rx.cond(
+            wa_id.startswith("ig_"),
+            "purple",
+            rx.cond(
+                wa_id.startswith("web_"),
+                "gray",
+                "green"
+            )
+        )
     )
 
     return rx.box(
@@ -96,6 +128,7 @@ def contact_item(contact: rx.Var) -> rx.Component:
             rx.vstack(
                 rx.text(display_name, weight="bold", size="2", color="white", line_clamp=1),
                 rx.hstack(
+                    rx.badge(channel_icon, color_scheme=channel_color, size="1", variant="solid", radius="full"),
                     rx.text(
                         rx.match(
                             status,
@@ -300,12 +333,20 @@ def _active_chat() -> rx.Component:
                     rx.cond(
                         AppState.selected_contact.startswith("web_"),
                         rx.badge("🌐 Webchat", color_scheme="blue", size="1"),
-                        rx.badge("📱 WhatsApp", color_scheme="green", size="1")
+                        rx.cond(
+                            AppState.selected_contact.startswith("fb_"),
+                            rx.badge("💬 Messenger", color_scheme="blue", size="1"),
+                            rx.cond(
+                                AppState.selected_contact.startswith("ig_"),
+                                rx.badge("📸 Instagram", color_scheme="purple", size="1"),
+                                rx.badge("📱 WhatsApp", color_scheme="green", size="1")
+                            )
+                        )
                     ),
                     spacing="2", align_items="center"
                 ),
                 rx.cond(
-                    AppState.selected_contact.startswith("web_"),
+                    AppState.selected_contact.startswith("web_") | AppState.selected_contact.startswith("fb_") | AppState.selected_contact.startswith("ig_"),
                     rx.text("ID: " + AppState.selected_contact, size="1", color="#8e8e93"),
                     rx.text("+" + AppState.selected_contact, size="1", color="#8e8e93")
                 ),
@@ -387,7 +428,7 @@ def _active_chat() -> rx.Component:
             
             # Condicionar por ventana de 24 horas y modo (las notas no están bloqueadas)
             rx.cond(
-                AppState.is_24h_window_closed & (AppState.chat_mode == "message") & (~AppState.selected_contact.startswith("web_")),
+                AppState.is_24h_window_closed & (AppState.chat_mode == "message") & (~AppState.selected_contact.startswith("web_")) & (~AppState.selected_contact.startswith("fb_")) & (~AppState.selected_contact.startswith("ig_")),
                 # Banner de Ventana de 24 horas cerrada
                 rx.center(
                     rx.vstack(

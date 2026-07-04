@@ -287,6 +287,14 @@ class Database:
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS phone VARCHAR(50)")
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS website VARCHAR(300)")
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notes TEXT")
+
+            # Migraciones Fase 4: Canales de Facebook e Instagram
+            cur.execute("ALTER TABLE lines ADD COLUMN IF NOT EXISTS channel_type VARCHAR(20) DEFAULT 'whatsapp'")
+            cur.execute("ALTER TABLE lines ADD COLUMN IF NOT EXISTS page_id VARCHAR(100)")
+            cur.execute("ALTER TABLE lines ADD COLUMN IF NOT EXISTS app_id VARCHAR(100)")
+            cur.execute("ALTER TABLE messages ADD COLUMN IF NOT EXISTS channel_type VARCHAR(20) DEFAULT 'whatsapp'")
+            cur.execute("ALTER TABLE messages ADD COLUMN IF NOT EXISTS sender_name VARCHAR(200)")
+            cur.execute("ALTER TABLE contacts ADD COLUMN IF NOT EXISTS channel_type VARCHAR(20) DEFAULT 'whatsapp'")
             
             # Migraciones Multi-tenant: Agregar tenant_id con valor por defecto 1 a todas las tablas principales
             tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines"]
@@ -323,15 +331,15 @@ class Database:
 
     # ── Messages ──────────────────────────────────────────────────────
 
-    def save_message(self, wa_id, msg_type, body, agent_username=None, line_id=None, tenant_id=1):
+    def save_message(self, wa_id, msg_type, body, agent_username=None, line_id=None, tenant_id=1, channel_type='whatsapp', sender_name=None):
          if not self._check_available():
              return False
          try:
              conn = self.get_connection()
              cur = conn.cursor()
              cur.execute(
-                 "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id) VALUES (%s, %s, %s, %s, %s, %s)",
-                 (wa_id, msg_type, body, agent_username, line_id, tenant_id),
+                 "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id, channel_type, sender_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                 (wa_id, msg_type, body, agent_username, line_id, tenant_id, channel_type, sender_name),
              )
              if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
                  cur.execute(
@@ -856,14 +864,14 @@ class Database:
             c = cur.fetchone()[0]; cur.close(); conn.close(); return c
         except Exception: return 0
 
-    def create_line(self, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id):
+    def create_line(self, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type='whatsapp', page_id=None, app_id=None):
         if not self._check_available(): return False, "DB no disponible"
         if self.count_lines(tenant_id) >= self.MAX_LINES: return False, f"Límite de {self.MAX_LINES} líneas alcanzado"
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "INSERT INTO lines (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id)
+                "INSERT INTO lines (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type, page_id, app_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type, page_id, app_id)
             )
             conn.commit(); cur.close(); conn.close(); return True, ""
         except Exception as e: return False, str(e)
@@ -872,7 +880,7 @@ class Database:
         if not self._check_available(): return []
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active FROM lines WHERE tenant_id = %s ORDER BY id", (tenant_id,))
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, channel_type, page_id, app_id FROM lines WHERE tenant_id = %s ORDER BY id", (tenant_id,))
             rows = cur.fetchall(); cur.close(); conn.close(); return rows
         except Exception: return []
 
@@ -880,10 +888,10 @@ class Database:
         if not self._check_available(): return None
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id FROM lines WHERE id = %s AND tenant_id = %s", (line_id, tenant_id))
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE id = %s AND tenant_id = %s", (line_id, tenant_id))
             row = cur.fetchone(); cur.close(); conn.close()
             if not row: return None
-            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id"]
+            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id","channel_type","page_id","app_id"]
             return dict(zip(keys, row))
         except Exception: return None
 
@@ -892,20 +900,32 @@ class Database:
         if not self._check_available(): return None
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id FROM lines WHERE phone_number_id = %s AND is_active = TRUE", (phone_number_id,))
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE phone_number_id = %s AND is_active = TRUE", (phone_number_id,))
             row = cur.fetchone(); cur.close(); conn.close()
             if not row: return None
-            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id"]
+            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id","channel_type","page_id","app_id"]
             return dict(zip(keys, row))
         except Exception: return None
 
-    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id):
+    def get_channel_by_page_id(self, page_id):
+        """Obtiene la línea/canal por su id de página (usado por webhook de FB/Instagram)."""
+        if not self._check_available(): return None
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE page_id = %s AND is_active = TRUE", (page_id,))
+            row = cur.fetchone(); cur.close(); conn.close()
+            if not row: return None
+            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id","channel_type","page_id","app_id"]
+            return dict(zip(keys, row))
+        except Exception: return None
+
+    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type='whatsapp', page_id=None, app_id=None):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s WHERE id=%s AND tenant_id=%s",
-                (name, phone_number_id, access_token, welcome_message, welcome_active, color, line_id, tenant_id)
+                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s, channel_type=%s, page_id=%s, app_id=%s WHERE id=%s AND tenant_id=%s",
+                (name, phone_number_id, access_token, welcome_message, welcome_active, color, channel_type, page_id, app_id, line_id, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception: return False

@@ -209,6 +209,9 @@ class AppState(rx.State):
                 "access_token": l[3], "welcome_message": l[4] or "",
                 "welcome_active": bool(l[5]), "color": l[6] or "#0A84FF",
                 "is_active": bool(l[7]),
+                "channel_type": l[8] if len(l) > 8 else "whatsapp",
+                "page_id": l[9] if len(l) > 9 else "",
+                "app_id": l[10] if len(l) > 10 else "",
             }
             for l in raw_lines
         ]
@@ -541,14 +544,21 @@ class AppState(rx.State):
                     tenant_id=self.tenant_id
                 )
             else:
-                # Canal WhatsApp Meta
+                # Canal WhatsApp o Red Social
                 line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
-                if line and line["is_active"]:
-                    wa_client.send_text_message(line, self.selected_contact, text)
+                channel_type = "whatsapp"
+                if line:
+                    channel_type = line.get("channel_type", "whatsapp")
+                    if line["is_active"]:
+                        if channel_type in ("messenger", "instagram"):
+                            from meta_client import meta_client
+                            meta_client.send_message(line, self.selected_contact, text)
+                        else:
+                            wa_client.send_text_message(line, self.selected_contact, text)
                 db.save_message(
                     self.selected_contact, "OUTBOUND_REPLY", text,
                     agent_username=self.username, line_id=self.selected_line_id,
-                    tenant_id=self.tenant_id
+                    tenant_id=self.tenant_id, channel_type=channel_type
                 )
         self.new_message = ""
         self._refresh_messages()
@@ -1097,16 +1107,23 @@ class AppState(rx.State):
         if not self.selected_contact:
             return
         
-        # Envío por WhatsApp API
+        # Envío por WhatsApp o Red Social
         line = next((l for l in self.all_lines if l["id"] == self.selected_line_id), None)
-        if line and line["is_active"]:
-            wa_client.send_text_message(line, self.selected_contact, body_text)
+        channel_type = "whatsapp"
+        if line:
+            channel_type = line.get("channel_type", "whatsapp")
+            if line["is_active"]:
+                if channel_type in ("messenger", "instagram"):
+                    from meta_client import meta_client
+                    meta_client.send_message(line, self.selected_contact, body_text)
+                else:
+                    wa_client.send_text_message(line, self.selected_contact, body_text)
             
         # Registrar en la base de datos
         db.save_message(
             self.selected_contact, "OUTBOUND_REPLY", body_text,
             agent_username=self.username, line_id=self.selected_line_id,
-            tenant_id=self.tenant_id
+            tenant_id=self.tenant_id, channel_type=channel_type
         )
         
         self.show_template_modal = False

@@ -11,13 +11,16 @@ from gemini_client import gemini
 
 
 class SettingsState(AppState):
-    # Nueva línea
+    # Nueva línea/canal
     nl_name: str = ""
     nl_phone_id: str = ""
     nl_token: str = ""
     nl_welcome: str = ""
     nl_welcome_on: bool = True
     nl_color: str = "#0A84FF"
+    nl_channel_type: str = "whatsapp"
+    nl_page_id: str = ""
+    nl_app_id: str = ""
     nl_msg: str = ""
 
     # Nuevo usuario
@@ -165,19 +168,36 @@ class SettingsState(AppState):
     def set_nl_welcome(self, v): self.nl_welcome = v
     def set_nl_welcome_on(self, v): self.nl_welcome_on = v
     def set_nl_color(self, v): self.nl_color = v
+    def set_nl_channel_type(self, v): self.nl_channel_type = v
+    def set_nl_page_id(self, v): self.nl_page_id = v
+    def set_nl_app_id(self, v): self.nl_app_id = v
 
     def save_line(self):
-        if not self.nl_name or not self.nl_phone_id or not self.nl_token:
-            self.nl_msg = "❌ Nombre, Phone ID y Token son obligatorios."
+        if not self.nl_name or not self.nl_token:
+            self.nl_msg = "❌ Nombre y Token son obligatorios."
             return
+
+        p_id = self.nl_phone_id
+        page_id = self.nl_page_id
+
+        if self.nl_channel_type == "whatsapp":
+            if not p_id:
+                self.nl_msg = "❌ Phone Number ID es obligatorio para WhatsApp."
+                return
+        else:
+            if not page_id:
+                self.nl_msg = "❌ ID de Página/Cuenta (Page ID) es obligatorio para redes sociales."
+                return
+            p_id = ""  # No se usa para Messenger/Instagram
+
         ok, err = db.create_line(
-            self.nl_name, self.nl_phone_id, self.nl_token,
+            self.nl_name, p_id, self.nl_token,
             self.nl_welcome, self.nl_welcome_on, self.nl_color,
-            self.tenant_id
+            self.tenant_id, self.nl_channel_type, page_id, self.nl_app_id
         )
         if ok:
-            self.nl_msg = "✅ Línea creada."
-            self.nl_name = self.nl_phone_id = self.nl_token = self.nl_welcome = ""
+            self.nl_msg = "✅ Canal creado."
+            self.nl_name = self.nl_phone_id = self.nl_token = self.nl_welcome = self.nl_page_id = self.nl_app_id = ""
             self._load_core_data()
         else:
             self.nl_msg = f"❌ {err}"
@@ -325,18 +345,49 @@ def line_row(line: rx.Var) -> rx.Component:
     phone_id = line["phone_number_id"].to(str)
     color = line["color"].to(str)
     is_active = line["is_active"].to(bool)
+    channel_type = line["channel_type"].to(str)
+    page_id = line["page_id"].to(str)
     
+    channel_label = rx.cond(
+        channel_type == "messenger",
+        "💬 Messenger",
+        rx.cond(
+            channel_type == "instagram",
+            "📸 Instagram",
+            "📱 WhatsApp"
+        )
+    )
+    
+    channel_badge_color = rx.cond(
+        channel_type == "messenger",
+        "blue",
+        rx.cond(
+            channel_type == "instagram",
+            "purple",
+            "green"
+        )
+    )
+
+    identifier_text = rx.cond(
+        channel_type == "whatsapp",
+        "Phone ID: " + phone_id,
+        "Page ID: " + page_id
+    )
+
     return rx.hstack(
-        rx.box(width="12px", height="12px", background=color,
-               border_radius="50%"),
+        rx.box(width="12px", height="12px", background=color, border_radius="50%"),
         rx.vstack(
-            rx.text(name, weight="bold", size="2", color="white"),
-            rx.text(phone_id, size="1", color="#636366"),
+            rx.hstack(
+                rx.text(name, weight="bold", size="2", color="white"),
+                rx.badge(channel_label, color_scheme=channel_badge_color, size="1"),
+                spacing="2", align_items="center"
+            ),
+            rx.text(identifier_text, size="1", color="#636366"),
             spacing="0",
         ),
         rx.spacer(),
         rx.badge(
-            rx.cond(is_active, "Activa", "Inactiva"),
+            rx.cond(is_active, "Activo", "Inactivo"),
             color_scheme=rx.cond(is_active, "green", "gray"),
         ),
         rx.button(
@@ -507,7 +558,7 @@ def settings_page() -> rx.Component:
             rx.tabs.root(
                 rx.tabs.list(
                     rx.tabs.trigger("👥 Usuarios", value="users"),
-                    rx.tabs.trigger("📱 Líneas", value="lines"),
+                    rx.tabs.trigger("📡 Canales", value="lines"),
                     rx.tabs.trigger("🤖 Agentes IA", value="ai_agents"),
                     rx.tabs.trigger("📨 Plantillas", value="templates"),
                     rx.tabs.trigger("⚙️ Automatizaciones", value="workflows"),
@@ -574,28 +625,65 @@ def settings_page() -> rx.Component:
                     value="users", padding="24px 32px",
                 ),
 
-                # ── Líneas ───────────────────────────────────────────────
+                # ── Canales (WhatsApp / FB / Instagram) ──────────────────
                 rx.tabs.content(
                     rx.vstack(
-                        rx.heading("Líneas de WhatsApp", size="4", color="white"),
+                        rx.heading("Canales de Comunicación Activos", size="4", color="white"),
+                        rx.text("Configura múltiples líneas de WhatsApp o cuentas de Facebook e Instagram para esta empresa.", size="2", color="#8e8e93"),
                         rx.foreach(SettingsState.all_lines.to(list[dict]), line_row),
+                        
                         rx.divider(color="#2c2c2e"),
-                        rx.heading("Agregar línea", size="4", color="white"),
+                        
+                        rx.heading("Agregar nuevo canal", size="4", color="white"),
                         rx.grid(
-                            _field("Nombre *", placeholder="Ventas / Soporte",
-                                   on_change=SettingsState.set_nl_name),
-                            _field("Phone Number ID *", on_change=SettingsState.set_nl_phone_id),
-                            _field("Access Token *", type="password",
-                                   on_change=SettingsState.set_nl_token),
-                            _field("Mensaje de bienvenida",
-                                   placeholder="¡Hola! ¿En qué te ayudamos?",
-                                   on_change=SettingsState.set_nl_welcome),
+                            rx.vstack(
+                                rx.text("Tipo de Canal *", size="1", color="#8e8e93"),
+                                rx.select(
+                                    ["whatsapp", "messenger", "instagram"],
+                                    value=SettingsState.nl_channel_type,
+                                    on_change=SettingsState.set_nl_channel_type,
+                                    background="#1c1c1e", color="white",
+                                    border="1px solid #3a3a3c", width="100%"
+                                ),
+                                spacing="1", width="100%"
+                            ),
+                            _field("Nombre del Canal *", placeholder="Ventas FB / WhatsApp Principal / IG Soporte", value=SettingsState.nl_name, on_change=SettingsState.set_nl_name),
+                            
+                            # Campo condicional de ID de teléfono (solo para whatsapp)
+                            rx.cond(
+                                SettingsState.nl_channel_type == "whatsapp",
+                                _field("Phone Number ID *", placeholder="Ej: 109283748293748", value=SettingsState.nl_phone_id, on_change=SettingsState.set_nl_phone_id)
+                            ),
+                            
+                            # Campo condicional de ID de Página (para facebook/instagram)
+                            rx.cond(
+                                SettingsState.nl_channel_type != "whatsapp",
+                                _field("ID de Página o Cuenta de Instagram (Page ID) *", placeholder="Ej: 109283748293748", value=SettingsState.nl_page_id, on_change=SettingsState.set_nl_page_id)
+                            ),
+
+                            _field("Access Token * (Page Token o Permanent Token)", type="password", value=SettingsState.nl_token, on_change=SettingsState.set_nl_token),
+                            _field("Meta App ID (Opcional)", placeholder="Ej: 123456789012345", value=SettingsState.nl_app_id, on_change=SettingsState.set_nl_app_id),
+                            
+                            _field("Mensaje de bienvenida", placeholder="¡Hola! Bienvenido a nuestro canal oficial. ¿En qué te ayudamos?", value=SettingsState.nl_welcome, on_change=SettingsState.set_nl_welcome),
+                            
                             columns="2", spacing="3", width="100%",
                         ),
-                        rx.button("💾 Guardar línea", on_click=SettingsState.save_line,
-                                  color_scheme="blue"),
-                        rx.cond(SettingsState.nl_msg != "",
-                                  rx.text(SettingsState.nl_msg, size="2")),
+                        
+                        # Panel de ayuda visual de Meta Developers
+                        rx.box(
+                            rx.vstack(
+                                rx.text("💡 ¿Cómo obtener los datos de Meta?", size="2", weight="bold", color="#0A84FF"),
+                                rx.text("1. Ingresa a developers.facebook.com y crea una aplicación tipo 'Negocios' (Business).", size="1", color="#8e8e93"),
+                                rx.text("2. Añade los productos 'WhatsApp', 'Messenger' o 'Instagram' según los canales que desees usar.", size="1", color="#8e8e93"),
+                                rx.text("3. Genera un token de acceso a la página de Facebook vinculada a tu cuenta de Instagram o tu chat de Messenger.", size="1", color="#8e8e93"),
+                                rx.text("4. Copia el ID de la Página (FB Page ID) o el ID de la cuenta de Instagram para enlazarlos aquí.", size="1", color="#8e8e93"),
+                                spacing="1", align_items="start"
+                            ),
+                            background="#1c1c1e", border="1px solid #3a3a3c", border_radius="10px", padding="14px", width="100%"
+                        ),
+
+                        rx.button("💾 Guardar Canal", on_click=SettingsState.save_line, color_scheme="blue"),
+                        rx.cond(SettingsState.nl_msg != "", rx.text(SettingsState.nl_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="lines", padding="24px 32px",
