@@ -1177,7 +1177,6 @@ class AppState(rx.State):
             self.wf_msg = "❌ Error al eliminar regla."
 
     # ── Importación Masiva CSV (Fase 3) ──────────────────────────────────
-    @rx.event(background=True)
     async def import_contacts_csv(self, upload_files: list[rx.UploadFile]):
         import csv
         import io
@@ -1232,12 +1231,11 @@ class AppState(rx.State):
                 print(f"[CSV Import] Error procesando archivo: {e}")
                 errors += 1
         
-        async with self:
-            if errors > 0:
-                self.wf_msg = f"⚠️ Importados {count} contactos. Ocurrieron {errors} errores."
-            else:
-                self.wf_msg = f"✅ ¡Importación masiva exitosa! {count} contactos añadidos."
-            self._refresh_contact_list()
-            self._refresh_contacts()
+        if errors > 0:
+            self.wf_msg = f"⚠️ Importados {count} contactos. Ocurrieron {errors} errores."
+        else:
+            self.wf_msg = f"✅ ¡Importación masiva exitosa! {count} contactos añadidos."
+        self._refresh_contact_list()
+        self._refresh_contacts()
 
 
