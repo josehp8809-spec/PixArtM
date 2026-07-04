@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# start.sh — Script de inicio para Render (producción)
+# start.sh — Script de inicio para Render
 
-# Configurar PATH con Node.js portátil instalado en el Build
+# Configurar PATH con Node.js instalado durante el Build
 export PATH="$PWD/node_bin/bin:$PATH"
 
 if [ -z "$PORT" ]; then
@@ -9,6 +9,14 @@ if [ -z "$PORT" ]; then
 fi
 
 echo "[Start] Puerto: $PORT"
-echo "[Start] Iniciando Nyme con uvicorn (sin compilacion en caliente)..."
+echo "[Start] Verificando frontend compilado..."
 
-python server.py
+if [ -d ".web/build/client" ]; then
+  echo "[Start] Frontend encontrado en .web/build/client/ OK"
+  ls .web/build/client/ | head -5
+else
+  echo "[Start] ADVERTENCIA: .web/build/client/ no existe"
+fi
+
+echo "[Start] Iniciando Reflex backend-only..."
+python -m reflex run --backend-only --loglevel info
