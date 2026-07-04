@@ -5,6 +5,9 @@ El webhook de Meta se monta como ruta de la API interna de Reflex.
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from database import db
+db.init_db()
+
 import reflex as rx
 from nyme.state import AppState
 from nyme.pages.login import login_page
