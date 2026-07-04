@@ -44,81 +44,29 @@ class Database:
         if not self._check_available():
             return False
         commands = [
+            # 1. Tenants (Empresas)
             """
-            CREATE TABLE IF NOT EXISTS products (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(200) NOT NULL,
-                description TEXT,
-                price NUMERIC(10, 2) NOT NULL,
-                image_url TEXT,
-                is_seasonal BOOLEAN DEFAULT TRUE,
+            CREATE TABLE IF NOT EXISTS tenants (
+                id         SERIAL PRIMARY KEY,
+                name       VARCHAR(200) UNIQUE NOT NULL,
+                is_active  BOOLEAN DEFAULT TRUE,
                 created_at TIMESTAMP DEFAULT NOW()
             )
             """,
-            """
-            CREATE TABLE IF NOT EXISTS orders (
-                id SERIAL PRIMARY KEY,
-                wa_id VARCHAR(20) NOT NULL,
-                agent_username VARCHAR(100),
-                items JSONB NOT NULL,
-                total_amount NUMERIC(10, 2) NOT NULL,
-                status VARCHAR(20) DEFAULT 'pending',
-                shipping_address TEXT,
-                created_at TIMESTAMP DEFAULT NOW(),
-                updated_at TIMESTAMP DEFAULT NOW()
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS messages (
-                id             SERIAL PRIMARY KEY,
-                wa_id          VARCHAR(20) NOT NULL,
-                type           VARCHAR(50) NOT NULL, -- INBOUND, OUTBOUND_REPLY, etc.
-                body           TEXT,
-                media_id       VARCHAR(200),
-                media_url      TEXT,
-                agent_username VARCHAR(100),
-                line_id        INTEGER REFERENCES lines(id),
-                created_at     TIMESTAMP DEFAULT NOW()
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS quota_logs (
-                id SERIAL PRIMARY KEY,
-                type VARCHAR(20) DEFAULT 'OUTBOUND_INIT',
-                agent_username VARCHAR(50),
-                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """,
+            # 2. Users (Usuarios)
             """
             CREATE TABLE IF NOT EXISTS users (
                 id            SERIAL PRIMARY KEY,
                 username      VARCHAR(100) UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 full_name     VARCHAR(200),
-                role          VARCHAR(20) DEFAULT 'agent', -- admin, coordinator, agent
+                role          VARCHAR(20) DEFAULT 'agent',
                 is_active     BOOLEAN DEFAULT TRUE,
                 last_seen     TIMESTAMP DEFAULT NOW(),
                 created_at    TIMESTAMP DEFAULT NOW()
             )
             """,
-            """
-            CREATE TABLE IF NOT EXISTS settings (
-                key VARCHAR(100) PRIMARY KEY,
-                value TEXT
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS sentiment_analysis (
-                id          SERIAL PRIMARY KEY,
-                wa_id       VARCHAR(20) NOT NULL,
-                period_date DATE NOT NULL,
-                sentiment   VARCHAR(20),
-                urgent      BOOLEAN DEFAULT FALSE,
-                reason      TEXT,
-                analyzed_at TIMESTAMP DEFAULT NOW(),
-                UNIQUE (wa_id, period_date)
-            )
-            """,
+            # 3. Lines (Líneas de WhatsApp)
             """
             CREATE TABLE IF NOT EXISTS lines (
                 id              SERIAL PRIMARY KEY,
@@ -132,6 +80,76 @@ class Database:
                 created_at      TIMESTAMP DEFAULT NOW()
             )
             """,
+            # 4. Products (Catálogo de Productos)
+            """
+            CREATE TABLE IF NOT EXISTS products (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(200) NOT NULL,
+                description TEXT,
+                price NUMERIC(10, 2) NOT NULL,
+                image_url TEXT,
+                is_seasonal BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            # 5. Orders (Pedidos)
+            """
+            CREATE TABLE IF NOT EXISTS orders (
+                id SERIAL PRIMARY KEY,
+                wa_id VARCHAR(20) NOT NULL,
+                agent_username VARCHAR(100),
+                items JSONB NOT NULL,
+                total_amount NUMERIC(10, 2) NOT NULL,
+                status VARCHAR(20) DEFAULT 'pending',
+                shipping_address TEXT,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            # 6. Messages (Mensajes)
+            """
+            CREATE TABLE IF NOT EXISTS messages (
+                id             SERIAL PRIMARY KEY,
+                wa_id          VARCHAR(20) NOT NULL,
+                type           VARCHAR(50) NOT NULL,
+                body           TEXT,
+                media_id       VARCHAR(200),
+                media_url      TEXT,
+                agent_username VARCHAR(100),
+                line_id        INTEGER REFERENCES lines(id),
+                created_at     TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            # 7. Quota Logs (Cuotas)
+            """
+            CREATE TABLE IF NOT EXISTS quota_logs (
+                id SERIAL PRIMARY KEY,
+                type VARCHAR(20) DEFAULT 'OUTBOUND_INIT',
+                agent_username VARCHAR(50),
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """,
+            # 8. Settings (Configuración)
+            """
+            CREATE TABLE IF NOT EXISTS settings (
+                key VARCHAR(100) PRIMARY KEY,
+                value TEXT
+            )
+            """,
+            # 9. Sentiment Analysis (Análisis de Sentimiento)
+            """
+            CREATE TABLE IF NOT EXISTS sentiment_analysis (
+                id          SERIAL PRIMARY KEY,
+                wa_id       VARCHAR(20) NOT NULL,
+                period_date DATE NOT NULL,
+                sentiment   VARCHAR(20),
+                urgent      BOOLEAN DEFAULT FALSE,
+                reason      TEXT,
+                analyzed_at TIMESTAMP DEFAULT NOW(),
+                UNIQUE (wa_id, period_date)
+            )
+            """,
+            # 10. Quick Replies (Respuestas Rápidas)
             """
             CREATE TABLE IF NOT EXISTS quick_replies (
                 id        SERIAL PRIMARY KEY,
@@ -141,6 +159,7 @@ class Database:
                 created_at TIMESTAMP DEFAULT NOW()
             )
             """,
+            # 11. User Lines (Líneas asignadas a usuarios)
             """
             CREATE TABLE IF NOT EXISTS user_lines (
                 user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -148,17 +167,19 @@ class Database:
                 PRIMARY KEY (user_id, line_id)
             )
             """,
+            # 12. Conversation Status (Estados de Chat)
             """
             CREATE TABLE IF NOT EXISTS conversation_status (
                 wa_id       VARCHAR(20) NOT NULL,
-                line_id     INTEGER REFERENCES lines(id),
+                line_id     INTEGER REFERENCES lines(id) DEFAULT 1,
                 status      VARCHAR(20) DEFAULT 'pending',
                 unread      INTEGER DEFAULT 0,
                 assigned_to VARCHAR(100),
                 updated_at  TIMESTAMP DEFAULT NOW(),
-                PRIMARY KEY (wa_id, COALESCE(line_id, 0))
+                PRIMARY KEY (wa_id, line_id)
             )
             """,
+            # 13. Internal Rooms (Chat Interno)
             """
             CREATE TABLE IF NOT EXISTS internal_rooms (
                 id         SERIAL PRIMARY KEY,
@@ -167,6 +188,7 @@ class Database:
                 created_at TIMESTAMP DEFAULT NOW()
             )
             """,
+            # 14. Internal Room Members (Miembros de Chat Interno)
             """
             CREATE TABLE IF NOT EXISTS internal_room_members (
                 room_id INTEGER REFERENCES internal_rooms(id) ON DELETE CASCADE,
@@ -174,6 +196,7 @@ class Database:
                 PRIMARY KEY (room_id, user_id)
             )
             """,
+            # 15. Internal Messages (Mensajes Internos)
             """
             CREATE TABLE IF NOT EXISTS internal_messages (
                 id         SERIAL PRIMARY KEY,
@@ -183,6 +206,7 @@ class Database:
                 created_at TIMESTAMP DEFAULT NOW()
             )
             """,
+            # 16. Contacts (Contactos)
             """
             CREATE TABLE IF NOT EXISTS contacts (
                 wa_id      VARCHAR(20) PRIMARY KEY,
@@ -191,15 +215,7 @@ class Database:
                 notes      TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
             )
-            """,
             """
-            CREATE TABLE IF NOT EXISTS tenants (
-                id         SERIAL PRIMARY KEY,
-                name       VARCHAR(200) UNIQUE NOT NULL,
-                is_active  BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT NOW()
-            )
-            """,
         ]
         try:
             conn = self.get_connection()
