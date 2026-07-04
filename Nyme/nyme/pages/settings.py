@@ -38,18 +38,49 @@ class SettingsState(AppState):
     qr_message: str = ""
     qr_msg: str = ""
 
+    # Nueva empresa (Tenants)
+    nt_name: str = ""
+    nt_msg: str = ""
+    all_tenants: list[dict] = []
+
     def on_mount_settings(self):
         self.require_auth()
         self._reload_users()
         self._load_core_data()
+        if self.tenant_id == 1:
+            self._reload_tenants()
 
     def _reload_users(self):
-        raw = db.get_all_users()
+        raw = db.get_all_users(self.tenant_id)
         self.all_users = [
             {"id": u[0], "username": u[1], "full_name": u[2],
              "role": u[3], "active": bool(u[4])}
             for u in raw
         ]
+
+    def _reload_tenants(self):
+        raw = db.get_all_tenants()
+        self.all_tenants = [
+            {"id": t[0], "name": t[1], "active": bool(t[2])}
+            for t in raw
+        ]
+
+    def set_nt_name(self, v): self.nt_name = v
+
+    def save_tenant(self):
+        if not self.nt_name.strip():
+            self.nt_msg = "❌ Nombre de empresa requerido."
+            return
+        ok, res = db.create_tenant(self.nt_name.strip())
+        if ok:
+            self.nt_msg = f"✅ Empresa '{self.nt_name.strip()}' creada (ID: {res})."
+            # Auto-crear un administrador por defecto para esa empresa para facilitar el setup
+            admin_uname = f"admin_{self.nt_name.strip().lower().replace(' ', '')}"
+            db.create_user(admin_uname, "Nyme_2026", f"Admin {self.nt_name.strip()}", "admin", res)
+            self.nt_name = ""
+            self._reload_tenants()
+        else:
+            self.nt_msg = f"❌ {res}"
 
     # ── Líneas ────────────────────────────────────────────────────────────────
     def set_nl_name(self, v): self.nl_name = v
@@ -66,6 +97,7 @@ class SettingsState(AppState):
         ok, err = db.create_line(
             self.nl_name, self.nl_phone_id, self.nl_token,
             self.nl_welcome, self.nl_welcome_on, self.nl_color,
+            self.tenant_id
         )
         if ok:
             self.nl_msg = "✅ Línea creada."
@@ -75,7 +107,7 @@ class SettingsState(AppState):
             self.nl_msg = f"❌ {err}"
 
     def toggle_line(self, line_id: int, active: bool):
-        db.toggle_line_active(line_id, not active)
+        db.toggle_line_active(line_id, not active, self.tenant_id)
         self._load_core_data()
 
     # ── Usuarios ──────────────────────────────────────────────────────────────
@@ -91,6 +123,7 @@ class SettingsState(AppState):
         ok, err = db.create_user(
             self.nu_username.lower().strip(), self.nu_password,
             self.nu_fullname, self.nu_role,
+            self.tenant_id
         )
         if ok:
             self.nu_msg = f"✅ Usuario @{self.nu_username} creado."
@@ -100,7 +133,7 @@ class SettingsState(AppState):
             self.nu_msg = f"❌ {err}"
 
     def toggle_user(self, user_id: int, active: bool):
-        db.toggle_user_active(user_id, not active)
+        db.toggle_user_active(user_id, not active, self.tenant_id)
         self._reload_users()
 
     # ── Gemini ────────────────────────────────────────────────────────────────
@@ -127,7 +160,7 @@ class SettingsState(AppState):
         if not self.qr_message:
             self.qr_msg = "❌ Mensaje requerido."
             return
-        ok, err = db.create_quick_reply(self.qr_shortcut, self.qr_title, self.qr_message)
+        ok, err = db.create_quick_reply(self.qr_shortcut, self.qr_title, self.qr_message, self.tenant_id)
         if ok:
             self.qr_msg = "✅ Atajo creado."
             self.qr_shortcut = self.qr_title = self.qr_message = ""
@@ -136,7 +169,7 @@ class SettingsState(AppState):
             self.qr_msg = f"❌ {err}"
 
     def delete_qr(self, qr_id: int):
-        db.delete_quick_reply(qr_id)
+        db.delete_quick_reply(qr_id, self.tenant_id)
         self._load_core_data()
 
 
@@ -259,6 +292,10 @@ def settings_page() -> rx.Component:
                     rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
                     rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
                     rx.tabs.trigger("🔑 Mi Cuenta", value="account"),
+                    rx.cond(
+                        SettingsState.tenant_id == 1,
+                        rx.tabs.trigger("🏢 Empresas", value="tenants"),
+                    ),
                     border_bottom="1px solid #2c2c2e",
                     padding="0 32px",
                 ),
@@ -470,6 +507,46 @@ def settings_page() -> rx.Component:
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="account", padding="24px 32px",
+                ),
+
+                # ── Empresas (Solo visible para Súper Tenant ID 1)
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("🏢 Empresas (Tenants)", size="4", color="white"),
+                        rx.text("Registra y administra clientes comerciales en la plataforma Nyme.", color="#8e8e93", size="2"),
+                        rx.hstack(
+                            rx.vstack(
+                                rx.text("Nombre de la nueva empresa", size="1", color="#8e8e93"),
+                                rx.input(
+                                    placeholder="Nombre de la Empresa",
+                                    value=SettingsState.nt_name,
+                                    on_change=SettingsState.set_nt_name,
+                                    background="#1c1c1e", border="1px solid #3a3a3c",
+                                    color="white", width="300px"
+                               ),
+                               spacing="1"
+                            ),
+                            rx.button("🏢 Registrar Empresa", on_click=SettingsState.save_tenant, color_scheme="green", margin_top="18px"),
+                            spacing="3",
+                            align_items="end"
+                        ),
+                        rx.cond(SettingsState.nt_msg != "", rx.text(SettingsState.nt_msg, size="2", color="#30d158")),
+                        rx.divider(color="#2c2c2e", margin="16px 0"),
+                        rx.heading("Empresas activas", size="3", color="white"),
+                        rx.foreach(
+                            SettingsState.all_tenants,
+                            lambda t: rx.hstack(
+                                rx.text(t["name"].to(str), weight="bold", size="2", color="white", flex="1"),
+                                rx.badge(rx.cond(t["active"].to(bool), "Activa", "Inactiva"), color_scheme="green"),
+                                padding="10px",
+                                border="1px solid #2c2c2e",
+                                border_radius="10px",
+                                width="100%",
+                            )
+                        ),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    value="tenants", padding="24px 32px"
                 ),
 
                 default_value="users",

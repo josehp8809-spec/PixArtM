@@ -28,6 +28,8 @@ class AppState(rx.State):
     username: str = ""
     full_name: str = ""
     role: str = ""
+    tenant_id: int = 1
+    tenant_name: str = ""
 
     # ── Formulario de login ───────────────────────────────────────────────────
     login_username: str = ""
@@ -71,7 +73,13 @@ class AppState(rx.State):
 
     # ── UI helpers ────────────────────────────────────────────────────────────
     toast_message: str  = ""
-    ai_result: str      = ""
+    ai_result:  str = ""
+    orders_filter_status: str = "all"
+    order_msg: str = ""
+    
+    # Campo auxiliar para agregar un item libre personalizado
+    special_item_name: str = ""
+    special_item_price: str = ""
     loading_ai: bool    = False
     mobile_view: str    = "contacts"   # "contacts" | "chat"  (mobile only)
 
@@ -94,11 +102,6 @@ class AppState(rx.State):
     orders: list[dict] = []
     order_items: list[dict] = [] # Borrador del pedido: [{"product": name, "quantity": qty, "price": pr}]
     order_address: str = ""
-    orders_filter_status: str = "all"
-    order_msg: str = ""
-    
-    # Campo auxiliar para agregar un item libre personalizado
-    special_item_name: str = ""
     special_item_price: str = ""
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -123,6 +126,12 @@ class AppState(rx.State):
             self.username  = user["username"]
             self.full_name = user["full_name"] or user["username"]
             self.role      = user["role"]
+            self.tenant_id = user["tenant_id"]
+            tenant_info = db.get_tenant_by_id(self.tenant_id)
+            if tenant_info:
+                self.tenant_name = tenant_info["name"]
+            else:
+                self.tenant_name = "Empresa"
             self.login_error = ""
             self._load_core_data()
             return rx.redirect("/chat")
@@ -133,6 +142,8 @@ class AppState(rx.State):
         self.authenticated = False
         self.user_id = 0
         self.username = self.full_name = self.role = ""
+        self.tenant_id = 1
+        self.tenant_name = ""
         self.selected_contact = ""
         self.contacts = self.messages = self.all_lines = self.quick_replies = []
         return rx.redirect("/")
@@ -150,7 +161,7 @@ class AppState(rx.State):
 
     def _load_core_data(self):
         """Carga líneas, quick replies y contactos al iniciar sesión."""
-        raw_lines = db.get_all_lines()
+        raw_lines = db.get_all_lines(self.tenant_id)
         self.all_lines = [
             {
                 "id": l[0], "name": l[1], "phone_number_id": l[2],
@@ -160,7 +171,7 @@ class AppState(rx.State):
             }
             for l in raw_lines
         ]
-        raw_qr = db.get_quick_replies()
+        raw_qr = db.get_quick_replies(self.tenant_id)
         self.quick_replies = [
             {"id": q[0], "shortcut": q[1], "title": q[2] or "", "message": q[3]}
             for q in raw_qr
@@ -213,9 +224,8 @@ class AppState(rx.State):
             except (ValueError, TypeError):
                 pass
         return total
-
     def _refresh_contacts(self):
-        raw = db.get_contacts_for_user(self.user_id, self.role)
+        raw = db.get_contacts_for_user(self.user_id, self.role, self.tenant_id)
         self.contacts = [
             {
                 "wa_id": c[0], "line_id": c[2] or 0,
@@ -227,13 +237,14 @@ class AppState(rx.State):
     def _refresh_messages(self):
         if not self.selected_contact:
             return
-        raw = db.get_messages(self.selected_contact)
+        raw = db.get_messages(self.selected_contact, self.tenant_id)
         self.messages = [
             {
                 "type": m[0], "body": m[1],
                 "time": m[2].strftime("%H:%M") if m[2] else "",
                 "agent": m[3] or "", "line_id": m[4] or 0,
-                "media_id": m[5], "media_url": m[6],
+                "media_id": m[5] if len(m) > 5 else None,
+                "media_url": m[6] if len(m) > 6 else None,
             }
             for m in raw
         ]
@@ -246,7 +257,7 @@ class AppState(rx.State):
         ]
 
     def _refresh_contact_list(self):
-        raw = db.get_all_contacts()
+        raw = db.get_all_contacts(self.tenant_id)
         self.contact_list = [
             {"wa_id": r[0], "name": r[1] or "", "email": r[2] or "", "notes": r[3] or ""}
             for r in raw
@@ -363,22 +374,22 @@ class AppState(rx.State):
             os.remove(temp_path)
             
             if media_id:
-                # 3. Enviar mensaje
-                if msg_type == "image":
-                    wa_client.send_image_message(line, self.selected_contact, media_id)
-                else:
-                    wa_client.send_document_message(line, self.selected_contact, media_id, file.filename)
-                
-                # 4. Guardar en DB
-                async with self:
-                    db.save_message(
-                        self.selected_contact, f"OUTBOUND_{msg_type.upper()}", 
-                        f"[{msg_type.capitalize()}: {file.filename}]", 
-                        self.username, self.selected_line_id, media_id=media_id
-                    )
-                    self._refresh_messages()
-                    self._refresh_contacts()
-
+                 # 3. Enviar mensaje
+                 if msg_type == "image":
+                     wa_client.send_image_message(line, self.selected_contact, media_id)
+                 else:
+                     wa_client.send_document_message(line, self.selected_contact, media_id, file.filename)
+                 
+                 # 4. Guardar en DB
+                 async with self:
+                     db.save_message(
+                         self.selected_contact, f"OUTBOUND_{msg_type.upper()}", 
+                         f"[{msg_type.capitalize()}: {file.filename}]", 
+                         self.username, self.selected_line_id, tenant_id=self.tenant_id
+                     )
+                     self._refresh_messages()
+                     self._refresh_contacts()
+ 
     def send_message(self):
         text = self.new_message.strip()
         if not text or not self.selected_contact:
@@ -389,6 +400,7 @@ class AppState(rx.State):
         db.save_message(
             self.selected_contact, "OUTBOUND_REPLY", text,
             agent_username=self.username, line_id=self.selected_line_id,
+            tenant_id=self.tenant_id
         )
         self.new_message = ""
         self._refresh_messages()
@@ -486,12 +498,11 @@ class AppState(rx.State):
     def set_nc_name(self, v):  self.nc_name = v
     def set_nc_email(self, v): self.nc_email = v
     def set_nc_notes(self, v): self.nc_notes = v
-
     def save_contact(self):
         if not self.nc_wa_id.strip():
             self.nc_msg = "❌ WhatsApp ID es requerido."
             return
-        db.upsert_contact(self.nc_wa_id.strip(), self.nc_name, self.nc_email, self.nc_notes)
+        db.upsert_contact(self.nc_wa_id.strip(), self.nc_name, self.nc_email, self.nc_notes, self.tenant_id)
         self.nc_msg = "✅ Contacto guardado."
         self.nc_wa_id = self.nc_name = self.nc_email = self.nc_notes = ""
         self._refresh_contact_list()
@@ -517,8 +528,6 @@ class AppState(rx.State):
         audio_data = wa_client.download_media(line, media_url)
         
         # 3. Transcribir con Gemini
-        # Gemini 1.5/2.5 Flash acepta bytes de audio directamente si se configuran bien
-        # O podemos usar un prompt con el archivo
         transcription = gemini.transcribe_audio(audio_data)
         
         async with self:
@@ -526,7 +535,7 @@ class AppState(rx.State):
             self.ai_result = f"📝 Transcripción: {transcription}"
 
     def assign_chat(self, agent_username: str):
-        db.assign_conversation(self.selected_contact, self.selected_line_id, agent_username)
+        db.assign_conversation(self.selected_contact, self.selected_line_id, agent_username, self.tenant_id)
         self._refresh_contacts()
 
     def export_contacts(self):
@@ -549,7 +558,7 @@ class AppState(rx.State):
     # ── Métodos Auxiliares de Carga ──────────────────────────────────────────
 
     def _refresh_products(self):
-        raw = db.get_all_products()
+        raw = db.get_all_products(self.tenant_id)
         self.products = [
             {
                 "id": p[0], "name": p[1], "description": p[2] or "",
@@ -561,7 +570,7 @@ class AppState(rx.State):
 
     def _refresh_orders(self):
         import json
-        raw = db.get_orders()
+        raw = db.get_orders(self.tenant_id)
         self.orders = []
         for r in raw:
             try:
@@ -622,6 +631,7 @@ class AppState(rx.State):
         self.new_product_seasonal = True
         self.prod_msg = ""
 
+ 
     def save_product(self):
         if not self.new_product_name.strip():
             self.prod_msg = "❌ El nombre es obligatorio."
@@ -639,7 +649,8 @@ class AppState(rx.State):
                 self.new_product_desc.strip(),
                 price,
                 self.new_product_image.strip(),
-                self.new_product_seasonal
+                self.new_product_seasonal,
+                self.tenant_id
             )
             if ok:
                 self.prod_msg = "✅ Producto actualizado."
@@ -648,12 +659,13 @@ class AppState(rx.State):
             else:
                 self.prod_msg = "❌ Error al actualizar producto."
         else:
-            ok = db.create_product(
+            ok = db.save_product(
                 self.new_product_name.strip(),
                 self.new_product_desc.strip(),
                 price,
                 self.new_product_image.strip(),
-                self.new_product_seasonal
+                self.new_product_seasonal,
+                self.tenant_id
             )
             if ok:
                 self.prod_msg = "✅ Producto guardado."
@@ -667,7 +679,7 @@ class AppState(rx.State):
                 self.prod_msg = "❌ Error al guardar producto."
 
     def delete_product(self, product_id: int):
-        if db.delete_product(product_id):
+        if db.delete_product(product_id, self.tenant_id):
             self.prod_msg = "🗑️ Producto eliminado."
             self._refresh_products()
         else:
@@ -756,7 +768,7 @@ class AppState(rx.State):
             total = self.order_total_amount
             address = self.order_address.strip()
             
-            order_id = db.create_order(wa_id, agent, items, total, address)
+            order_id = db.create_order(wa_id, agent, items, total, address, self.tenant_id)
             
             if order_id:
                 self.order_items = []
@@ -780,7 +792,7 @@ class AppState(rx.State):
 
     @rx.event(background=True)
     async def update_order_status(self, order_id: int, new_status: str):
-        if db.update_order_status(order_id, new_status):
+        if db.update_order_status(order_id, new_status, self.tenant_id):
             async with self:
                 self._refresh_orders()
                 order = next((o for o in self.orders if o["id"] == order_id), None)

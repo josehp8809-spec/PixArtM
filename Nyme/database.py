@@ -192,12 +192,28 @@ class Database:
                 created_at TIMESTAMP DEFAULT NOW()
             )
             """,
+            """
+            CREATE TABLE IF NOT EXISTS tenants (
+                id         SERIAL PRIMARY KEY,
+                name       VARCHAR(200) UNIQUE NOT NULL,
+                is_active  BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
         ]
         try:
             conn = self.get_connection()
             cur = conn.cursor()
             for cmd in commands:
                 cur.execute(cmd)
+            
+            # Asegurar que exista el tenant predeterminado ID 1
+            cur.execute(
+                "INSERT INTO tenants (id, name) VALUES (1, 'SaaS Global') ON CONFLICT (id) DO NOTHING"
+            )
+            # Reiniciar secuencia del id de tenants si es necesario
+            cur.execute("SELECT setval('tenants_id_seq', COALESCE((SELECT MAX(id)+1 FROM tenants), 1), false)")
+
             # Migration: add line_id to messages if not exists
             cur.execute(
                 "ALTER TABLE messages ADD COLUMN IF NOT EXISTS line_id INTEGER REFERENCES lines(id)"
@@ -209,6 +225,32 @@ class Database:
             cur.execute(
                 "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS notes TEXT"
             )
+            
+            # Migraciones Multi-tenant: Agregar tenant_id con valor por defecto 1 a todas las tablas principales
+            tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines"]
+            for table in tables_to_migrate:
+                cur.execute(
+                    f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id) DEFAULT 1"
+                )
+                # Llenar registros anteriores huérfanos con el tenant 1
+                cur.execute(f"UPDATE {table} SET tenant_id = 1 WHERE tenant_id IS NULL")
+            
+            # Cambiar clave primaria de contacts a compuesta (wa_id, tenant_id)
+            try:
+                # Verificar si ya es compuesta buscando en las restricciones
+                cur.execute("""
+                    SELECT a.attname
+                    FROM pg_index i
+                    JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                    WHERE i.indrelid = 'contacts'::regclass AND i.indisprimary
+                """)
+                pk_cols = [r[0] for r in cur.fetchall()]
+                if len(pk_cols) == 1 and pk_cols[0] == "wa_id":
+                    cur.execute("ALTER TABLE contacts DROP CONSTRAINT IF EXISTS contacts_pkey CASCADE")
+                    cur.execute("ALTER TABLE contacts ADD PRIMARY KEY (wa_id, tenant_id)")
+            except Exception as pk_err:
+                print(f"[DB] Advertencia migrando clave primaria de contacts: {pk_err}")
+
             conn.commit()
             cur.close()
             conn.close()
@@ -219,113 +261,116 @@ class Database:
 
     # ── Messages ──────────────────────────────────────────────────────
 
-    def save_message(self, wa_id, msg_type, body, agent_username=None, line_id=None):
-        if not self._check_available():
-            return False
-        try:
-            conn = self.get_connection()
-            cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO messages (wa_id, type, body, agent_username, line_id) VALUES (%s, %s, %s, %s, %s)",
-                (wa_id, msg_type, body, agent_username, line_id),
-            )
-            if msg_type == "OUTBOUND_INIT":
-                cur.execute(
-                    "INSERT INTO quota_logs (type, agent_username) VALUES ('OUTBOUND_INIT', %s)",
-                    (agent_username,),
-                )
-            conn.commit()
-            cur.close()
-            conn.close()
-            return True
-        except Exception as e:
-            print(f"[DB] Error guardando mensaje: {e}")
-            return False
+    def save_message(self, wa_id, msg_type, body, agent_username=None, line_id=None, tenant_id=1):
+         if not self._check_available():
+             return False
+         try:
+             conn = self.get_connection()
+             cur = conn.cursor()
+             cur.execute(
+                 "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id) VALUES (%s, %s, %s, %s, %s, %s)",
+                 (wa_id, msg_type, body, agent_username, line_id, tenant_id),
+             )
+             if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
+                 cur.execute(
+                     "INSERT INTO quota_logs (type, agent_username, tenant_id) VALUES (%s, %s, %s)",
+                     (msg_type, agent_username, tenant_id),
+                 )
+             conn.commit()
+             cur.close()
+             conn.close()
+             return True
+         except Exception as e:
+             print(f"[DB] Error guardando mensaje: {e}")
+             return False
 
-    def get_quota_usage(self):
-        if not self._check_available():
-            return 0
-        try:
-            conn = self.get_connection()
-            cur = conn.cursor()
-            month, year = datetime.now().month, datetime.now().year
-            cur.execute(
-                """
-                SELECT COUNT(*) FROM quota_logs
-                WHERE EXTRACT(MONTH FROM sent_at) = %s
-                  AND EXTRACT(YEAR  FROM sent_at) = %s
-                """,
-                (month, year),
-            )
-            count = cur.fetchone()[0]
-            cur.close()
-            conn.close()
-            return count
-        except Exception as e:
-            print(f"[DB] Error obteniendo cuota: {e}")
-            return 0
+    def get_quota_usage(self, tenant_id):
+         if not self._check_available():
+             return 0
+         try:
+             conn = self.get_connection()
+             cur = conn.cursor()
+             month, year = datetime.now().month, datetime.now().year
+             cur.execute(
+                 """
+                 SELECT COUNT(*) FROM quota_logs
+                 WHERE EXTRACT(MONTH FROM sent_at) = %s
+                   AND EXTRACT(YEAR  FROM sent_at) = %s
+                   AND tenant_id = %s
+                 """,
+                 (month, year, tenant_id),
+             )
+             count = cur.fetchone()[0]
+             cur.close()
+             conn.close()
+             return count
+         except Exception as e:
+             print(f"[DB] Error obteniendo cuota: {e}")
+             return 0
 
-    def get_contacts(self):
-        if not self._check_available():
-            return []
-        try:
-            conn = self.get_connection()
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT wa_id, MAX(created_at) AS last_msg
-                FROM messages
-                GROUP BY wa_id
-                ORDER BY last_msg DESC
-                """
-            )
-            rows = cur.fetchall()
-            cur.close()
-            conn.close()
-            return [r[0] for r in rows]
-        except Exception as e:
-            print(f"[DB] Error obteniendo contactos: {e}")
-            return []
+    def get_contacts(self, tenant_id):
+         if not self._check_available():
+             return []
+         try:
+             conn = self.get_connection()
+             cur = conn.cursor()
+             cur.execute(
+                 """
+                 SELECT wa_id, MAX(created_at) AS last_msg
+                 FROM messages
+                 WHERE tenant_id = %s
+                 GROUP BY wa_id
+                 ORDER BY last_msg DESC
+                 """,
+                 (tenant_id,)
+             )
+             rows = cur.fetchall()
+             cur.close()
+             conn.close()
+             return [r[0] for r in rows]
+         except Exception as e:
+             print(f"[DB] Error obteniendo contactos: {e}")
+             return []
 
-    def get_messages(self, wa_id):
-        if not self._check_available():
-            return []
-        try:
-            conn = self.get_connection()
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT type, body, created_at, agent_username, line_id
-                FROM messages WHERE wa_id = %s ORDER BY created_at ASC
-                """,
-                (wa_id,),
-            )
-            rows = cur.fetchall()
-            cur.close()
-            conn.close()
-            return rows
-        except Exception as e:
-            print(f"[DB] Error obteniendo mensajes: {e}")
-            return []
+    def get_messages(self, wa_id, tenant_id):
+         if not self._check_available():
+             return []
+         try:
+             conn = self.get_connection()
+             cur = conn.cursor()
+             cur.execute(
+                 """
+                 SELECT type, body, created_at, agent_username, line_id
+                 FROM messages WHERE wa_id = %s AND tenant_id = %s ORDER BY created_at ASC
+                 """,
+                 (wa_id, tenant_id),
+             )
+             rows = cur.fetchall()
+             cur.close()
+             conn.close()
+             return rows
+         except Exception as e:
+             print(f"[DB] Error obteniendo mensajes: {e}")
+             return []
 
     # ── Users ─────────────────────────────────────────────────────────
 
     ROLE_LIMITS = {"admin": 2, "coordinator": 3, "agent": 10}
 
-    def create_user(self, username, password, full_name, role):
-        """Crea usuario con hash bcrypt. Retorna (True, '') o (False, 'motivo')."""
+    def create_user(self, username, password, full_name, role, tenant_id):
+        """Crea usuario con hash bcrypt vinculado a un tenant_id."""
         if not self._check_available():
             return False, "Base de datos no disponible"
         limit = self.ROLE_LIMITS.get(role, 0)
-        if self.count_users_by_role(role) >= limit:
+        if self.count_users_by_role(role, tenant_id) >= limit:
             return False, f"Límite de {role}s alcanzado ({limit} máximo)"
         try:
             pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "INSERT INTO users (username, password_hash, full_name, role) VALUES (%s, %s, %s, %s)",
-                (username, pwd_hash, full_name, role),
+                "INSERT INTO users (username, password_hash, full_name, role, tenant_id) VALUES (%s, %s, %s, %s, %s)",
+                (username, pwd_hash, full_name, role, tenant_id),
             )
             conn.commit()
             cur.close()
@@ -337,14 +382,14 @@ class Database:
             return False, str(e)
 
     def verify_user(self, username, password):
-        """Verifica credenciales. Retorna dict con info del usuario o None."""
+        """Verifica credenciales. Retorna dict con info del usuario y su tenant_id, o None."""
         if not self._check_available():
             return None
         try:
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "SELECT id, username, password_hash, full_name, role, is_active FROM users WHERE username = %s",
+                "SELECT id, username, password_hash, full_name, role, is_active, tenant_id FROM users WHERE username = %s",
                 (username,),
             )
             row = cur.fetchone()
@@ -352,24 +397,26 @@ class Database:
             conn.close()
             if not row:
                 return None
-            uid, uname, pwd_hash, full_name, role, is_active = row
+            uid, uname, pwd_hash, full_name, role, is_active, tenant_id = row
             if not is_active:
                 return None
             if bcrypt.checkpw(password.encode(), pwd_hash.encode()):
-                return {"id": uid, "username": uname, "full_name": full_name, "role": role}
+                return {"id": uid, "username": uname, "full_name": full_name, "role": role, "tenant_id": tenant_id}
             return None
         except Exception as e:
             print(f"[DB] Error verificando usuario: {e}")
             return None
 
-    def get_all_users(self):
+    def get_all_users(self, tenant_id):
+        """Obtiene todos los usuarios de un tenant específico."""
         if not self._check_available():
             return []
         try:
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "SELECT id, username, full_name, role, is_active, created_at FROM users ORDER BY role, username"
+                "SELECT id, username, full_name, role, is_active, created_at FROM users WHERE tenant_id = %s ORDER BY role, username",
+                (tenant_id,)
             )
             rows = cur.fetchall()
             cur.close()
@@ -379,14 +426,15 @@ class Database:
             print(f"[DB] Error obteniendo usuarios: {e}")
             return []
 
-    def count_users_by_role(self, role):
+    def count_users_by_role(self, role, tenant_id):
+        """Cuenta usuarios activos de un rol dentro de un tenant específico."""
         if not self._check_available():
             return 0
         try:
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "SELECT COUNT(*) FROM users WHERE role = %s AND is_active = TRUE", (role,)
+                "SELECT COUNT(*) FROM users WHERE role = %s AND tenant_id = %s AND is_active = TRUE", (role, tenant_id)
             )
             count = cur.fetchone()[0]
             cur.close()
@@ -395,13 +443,14 @@ class Database:
         except Exception:
             return 0
 
-    def toggle_user_active(self, user_id, active):
+    def toggle_user_active(self, user_id, active, tenant_id):
+        """Activa/desactiva un usuario garantizando que pertenece al tenant actual."""
         if not self._check_available():
             return False
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute("UPDATE users SET is_active = %s WHERE id = %s", (active, user_id))
+            cur.execute("UPDATE users SET is_active = %s WHERE id = %s AND tenant_id = %s", (active, user_id, tenant_id))
             conn.commit()
             cur.close()
             conn.close()
@@ -582,74 +631,75 @@ class Database:
 
     MAX_LINES = 5
 
-    def count_lines(self):
+    def count_lines(self, tenant_id):
         if not self._check_available(): return 0
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT COUNT(*) FROM lines WHERE is_active = TRUE")
+            cur.execute("SELECT COUNT(*) FROM lines WHERE is_active = TRUE AND tenant_id = %s", (tenant_id,))
             c = cur.fetchone()[0]; cur.close(); conn.close(); return c
         except Exception: return 0
 
-    def create_line(self, name, phone_number_id, access_token, welcome_message, welcome_active, color):
+    def create_line(self, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id):
         if not self._check_available(): return False, "DB no disponible"
-        if self.count_lines() >= self.MAX_LINES: return False, f"Límite de {self.MAX_LINES} líneas alcanzado"
+        if self.count_lines(tenant_id) >= self.MAX_LINES: return False, f"Límite de {self.MAX_LINES} líneas alcanzado"
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "INSERT INTO lines (name, phone_number_id, access_token, welcome_message, welcome_active, color) VALUES (%s,%s,%s,%s,%s,%s)",
-                (name, phone_number_id, access_token, welcome_message, welcome_active, color)
+                "INSERT INTO lines (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True, ""
         except Exception as e: return False, str(e)
 
-    def get_all_lines(self):
+    def get_all_lines(self, tenant_id):
         if not self._check_available(): return []
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active FROM lines ORDER BY id")
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active FROM lines WHERE tenant_id = %s ORDER BY id", (tenant_id,))
             rows = cur.fetchall(); cur.close(); conn.close(); return rows
         except Exception: return []
 
-    def get_line_by_id(self, line_id):
+    def get_line_by_id(self, line_id, tenant_id):
         if not self._check_available(): return None
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active FROM lines WHERE id = %s", (line_id,))
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id FROM lines WHERE id = %s AND tenant_id = %s", (line_id, tenant_id))
             row = cur.fetchone(); cur.close(); conn.close()
             if not row: return None
-            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active"]
+            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id"]
             return dict(zip(keys, row))
         except Exception: return None
 
     def get_line_by_phone_id(self, phone_number_id):
+        """Obtiene la línea por su id de teléfono (usado por webhook Meta, por lo que incluye el tenant_id)."""
         if not self._check_available(): return None
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active FROM lines WHERE phone_number_id = %s AND is_active = TRUE", (phone_number_id,))
+            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id FROM lines WHERE phone_number_id = %s AND is_active = TRUE", (phone_number_id,))
             row = cur.fetchone(); cur.close(); conn.close()
             if not row: return None
-            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active"]
+            keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id"]
             return dict(zip(keys, row))
         except Exception: return None
 
-    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color):
+    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s WHERE id=%s",
-                (name, phone_number_id, access_token, welcome_message, welcome_active, color, line_id)
+                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s WHERE id=%s AND tenant_id=%s",
+                (name, phone_number_id, access_token, welcome_message, welcome_active, color, line_id, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception: return False
 
-    def toggle_line_active(self, line_id, active):
-        if not self._check_available(): return False
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("UPDATE lines SET is_active = %s WHERE id = %s", (active, line_id))
-            conn.commit(); cur.close(); conn.close(); return True
-        except Exception: return False
+    def toggle_line_active(self, line_id, active, tenant_id):
+         if not self._check_available(): return False
+         try:
+             conn = self.get_connection(); cur = conn.cursor()
+             cur.execute("UPDATE lines SET is_active = %s WHERE id = %s AND tenant_id = %s", (active, line_id, tenant_id))
+             conn.commit(); cur.close(); conn.close(); return True
+         except Exception: return False
 
     def is_first_contact(self, wa_id, line_id):
         """True si este número nunca ha escrito a esta línea."""
@@ -662,29 +712,29 @@ class Database:
 
     # ── Quick Replies ─────────────────────────────────────────────────
 
-    def create_quick_reply(self, shortcut, title, message):
-        if not self._check_available(): return False, "DB no disponible"
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("INSERT INTO quick_replies (shortcut, title, message) VALUES (%s,%s,%s)", (shortcut, title, message))
-            conn.commit(); cur.close(); conn.close(); return True, ""
-        except Exception as e: return False, str(e)
+    def create_quick_reply(self, shortcut, title, message, tenant_id):
+         if not self._check_available(): return False, "DB no disponible"
+         try:
+             conn = self.get_connection(); cur = conn.cursor()
+             cur.execute("INSERT INTO quick_replies (shortcut, title, message, tenant_id) VALUES (%s,%s,%s,%s)", (shortcut, title, message, tenant_id))
+             conn.commit(); cur.close(); conn.close(); return True, ""
+         except Exception as e: return False, str(e)
 
-    def get_quick_replies(self):
-        if not self._check_available(): return []
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, shortcut, title, message FROM quick_replies ORDER BY shortcut")
-            rows = cur.fetchall(); cur.close(); conn.close(); return rows
-        except Exception: return []
+    def get_quick_replies(self, tenant_id):
+         if not self._check_available(): return []
+         try:
+             conn = self.get_connection(); cur = conn.cursor()
+             cur.execute("SELECT id, shortcut, title, message FROM quick_replies WHERE tenant_id = %s ORDER BY shortcut", (tenant_id,))
+             rows = cur.fetchall(); cur.close(); conn.close(); return rows
+         except Exception: return []
 
-    def delete_quick_reply(self, qr_id):
-        if not self._check_available(): return False
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("DELETE FROM quick_replies WHERE id = %s", (qr_id,))
-            conn.commit(); cur.close(); conn.close(); return True
-        except Exception: return False
+    def delete_quick_reply(self, qr_id, tenant_id):
+         if not self._check_available(): return False
+         try:
+             conn = self.get_connection(); cur = conn.cursor()
+             cur.execute("DELETE FROM quick_replies WHERE id = %s AND tenant_id = %s", (qr_id, tenant_id))
+             conn.commit(); cur.close(); conn.close(); return True
+         except Exception: return False
 
     # ── User-Line Assignment ──────────────────────────────────────────
 
@@ -713,46 +763,48 @@ class Database:
             rows = cur.fetchall(); cur.close(); conn.close(); return [r[0] for r in rows]
         except Exception: return []
 
-    def get_contacts_for_user(self, user_id, role):
-        """Retorna contactos visibles para el usuario según su rol y líneas asignadas."""
-        if not self._check_available(): return []
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            if role in ("admin", "coordinator"):
-                cur.execute(
-                    """
-                    SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
-                           COALESCE(cs.status,'pending') AS status,
-                           COALESCE(cs.unread,0) AS unread
-                    FROM messages m
-                    LEFT JOIN conversation_status cs
-                          ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
-                    GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
-                    ORDER BY last_msg DESC
-                    """
-                )
-            else:
-                line_ids = self.get_user_lines(user_id)
-                if not line_ids:
-                    cur.close(); conn.close(); return []
-                placeholders = ",".join(["%s"] * len(line_ids))
-                cur.execute(
-                    f"""
-                    SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
-                           COALESCE(cs.status,'pending') AS status,
-                           COALESCE(cs.unread,0) AS unread
-                    FROM messages m
-                    LEFT JOIN conversation_status cs
-                          ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
-                    WHERE m.line_id IN ({placeholders})
-                    GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
-                    ORDER BY last_msg DESC
-                    """,
-                    line_ids
-                )
-            rows = cur.fetchall(); cur.close(); conn.close(); return rows
-        except Exception as e:
-            print(f"[DB] Error obteniendo contactos: {e}"); return []
+    def get_contacts_for_user(self, user_id, role, tenant_id):
+         """Retorna contactos visibles para el usuario según su rol, líneas asignadas y tenant_id."""
+         if not self._check_available(): return []
+         try:
+             conn = self.get_connection(); cur = conn.cursor()
+             if role in ("admin", "coordinator"):
+                 cur.execute(
+                     """
+                     SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
+                            COALESCE(cs.status,'pending') AS status,
+                            COALESCE(cs.unread,0) AS unread
+                     FROM messages m
+                     LEFT JOIN conversation_status cs
+                           ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
+                     WHERE m.tenant_id = %s
+                     GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
+                     ORDER BY last_msg DESC
+                     """,
+                     (tenant_id,)
+                 )
+             else:
+                 line_ids = self.get_user_lines(user_id)
+                 if not line_ids:
+                     cur.close(); conn.close(); return []
+                 placeholders = ",".join(["%s"] * len(line_ids))
+                 cur.execute(
+                     f"""
+                     SELECT m.wa_id, MAX(m.created_at) AS last_msg, m.line_id,
+                            COALESCE(cs.status,'pending') AS status,
+                            COALESCE(cs.unread,0) AS unread
+                     FROM messages m
+                     LEFT JOIN conversation_status cs
+                           ON cs.wa_id = m.wa_id AND cs.line_id IS NOT DISTINCT FROM m.line_id
+                     WHERE m.tenant_id = %s AND m.line_id IN ({placeholders})
+                     GROUP BY m.wa_id, m.line_id, cs.status, cs.unread
+                     ORDER BY last_msg DESC
+                     """,
+                     [tenant_id] + list(line_ids)
+                 )
+             rows = cur.fetchall(); cur.close(); conn.close(); return rows
+         except Exception as e:
+             print(f"[DB] Error obteniendo contactos: {e}"); return []
 
     # ── Conversation Status ────────────────────────────────────────────
 
@@ -812,6 +864,24 @@ class Database:
             conn.commit(); cur.close(); conn.close()
         except Exception as e:
             print(f"[DB] Error actualizando estado: {e}")
+
+    def assign_conversation(self, wa_id, line_id, agent_username, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO conversation_status (wa_id, line_id, assigned_to, tenant_id)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                DO UPDATE SET assigned_to = EXCLUDED.assigned_to, updated_at = NOW()
+                """,
+                (wa_id, line_id, agent_username, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True
+        except Exception as e:
+            print(f"[DB] Error asignando conversación: {e}")
+            return False
 
     def change_password(self, username, new_password):
         """Cambia la contraseña de un usuario."""
@@ -882,71 +952,48 @@ class Database:
         except Exception: return None
 
     # ── Contacts Directory ────────────────────────────────────────────
-
-    def get_all_contacts(self):
+    def get_all_contacts(self, tenant_id):
         if not self._check_available(): return []
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT wa_id, name, email, notes FROM contacts ORDER BY name")
+            cur.execute("SELECT wa_id, name, email, notes FROM contacts WHERE tenant_id = %s ORDER BY name", (tenant_id,))
             rows = cur.fetchall(); cur.close(); conn.close(); return rows
         except Exception as e:
             print(f"[DB] Error obteniendo todos los contactos: {e}")
             return []
 
-    def upsert_contact(self, wa_id, name, email, notes):
+    def upsert_contact(self, wa_id, name, email, notes, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
-                INSERT INTO contacts (wa_id, name, email, notes)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (wa_id)
+                INSERT INTO contacts (wa_id, name, email, notes, tenant_id)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (wa_id, tenant_id)
                 DO UPDATE SET name = EXCLUDED.name, email = EXCLUDED.email, notes = EXCLUDED.notes
                 """,
-                (wa_id, name, email, notes)
+                (wa_id, name, email, notes, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
             print(f"[DB] Error guardando contacto: {e}")
             return False
 
-    # ── Chat Assignation ──────────────────────────────────────────────
-
-    def assign_conversation(self, wa_id, line_id, agent_username):
+    def save_product(self, name, description, price, image_url, is_seasonal, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                """
-                INSERT INTO conversation_status (wa_id, line_id, assigned_to)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (wa_id, COALESCE(line_id, 0))
-                DO UPDATE SET assigned_to = EXCLUDED.assigned_to, updated_at = NOW()
-                """,
-                (wa_id, line_id, agent_username)
+                "INSERT INTO products (name, description, price, image_url, is_seasonal, tenant_id) VALUES (%s, %s, %s, %s, %s, %s)",
+                (name, description, price, image_url, is_seasonal, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
-            print(f"[DB] Error asignando conversación: {e}")
+            print(f"[DB] Error guardando producto: {e}")
             return False
 
-    # ── Catalog Products ──────────────────────────────────────────────
-
-    def create_product(self, name, description, price, image_url, is_seasonal=True):
-        if not self._check_available(): return False
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO products (name, description, price, image_url, is_seasonal) VALUES (%s, %s, %s, %s, %s)",
-                (name, description, price, image_url, is_seasonal)
-            )
-            conn.commit(); cur.close(); conn.close(); return True
-        except Exception as e:
-            print(f"[DB] Error creando producto: {e}")
-            return False
-
-    def update_product(self, product_id, name, description, price, image_url, is_seasonal):
+    def update_product(self, product_id, name, description, price, image_url, is_seasonal, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
@@ -954,33 +1001,33 @@ class Database:
                 """
                 UPDATE products 
                 SET name = %s, description = %s, price = %s, image_url = %s, is_seasonal = %s 
-                WHERE id = %s
+                WHERE id = %s AND tenant_id = %s
                 """,
-                (name, description, price, image_url, is_seasonal, product_id)
+                (name, description, price, image_url, is_seasonal, product_id, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
             print(f"[DB] Error actualizando producto: {e}")
             return False
 
-    def get_all_products(self, only_seasonal=False):
+    def get_all_products(self, tenant_id, only_seasonal=False):
         if not self._check_available(): return []
         try:
             conn = self.get_connection(); cur = conn.cursor()
             if only_seasonal:
-                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products WHERE is_seasonal = TRUE ORDER BY name")
+                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products WHERE is_seasonal = TRUE AND tenant_id = %s ORDER BY name", (tenant_id,))
             else:
-                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products ORDER BY name")
+                cur.execute("SELECT id, name, description, price, image_url, is_seasonal FROM products WHERE tenant_id = %s ORDER BY name", (tenant_id,))
             rows = cur.fetchall(); cur.close(); conn.close(); return rows
         except Exception as e:
             print(f"[DB] Error obteniendo productos: {e}")
             return []
 
-    def delete_product(self, product_id):
+    def delete_product(self, product_id, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("DELETE FROM products WHERE id = %s", (product_id,))
+            cur.execute("DELETE FROM products WHERE id = %s AND tenant_id = %s", (product_id, tenant_id))
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
             print(f"[DB] Error eliminando producto: {e}")
@@ -988,17 +1035,17 @@ class Database:
 
     # ── Sales Orders ──────────────────────────────────────────────────
 
-    def create_order(self, wa_id, agent_username, items, total_amount, shipping_address):
+    def create_order(self, wa_id, agent_username, items, total_amount, shipping_address, tenant_id):
         if not self._check_available(): return None
         try:
             import json
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
-                INSERT INTO orders (wa_id, agent_username, items, total_amount, shipping_address)
-                VALUES (%s, %s, %s, %s, %s) RETURNING id
+                INSERT INTO orders (wa_id, agent_username, items, total_amount, shipping_address, tenant_id)
+                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
                 """,
-                (wa_id, agent_username, json.dumps(items), total_amount, shipping_address)
+                (wa_id, agent_username, json.dumps(items), total_amount, shipping_address, tenant_id)
             )
             order_id = cur.fetchone()[0]
             conn.commit(); cur.close(); conn.close(); return order_id
@@ -1006,13 +1053,13 @@ class Database:
             print(f"[DB] Error creando pedido: {e}")
             return None
 
-    def update_order_status(self, order_id, new_status):
+    def update_order_status(self, order_id, new_status, tenant_id):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "UPDATE orders SET status = %s, updated_at = NOW() WHERE id = %s",
-                (new_status, order_id)
+                "UPDATE orders SET status = %s, updated_at = NOW() WHERE id = %s AND tenant_id = %s",
+                (new_status, order_id, tenant_id)
             )
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
