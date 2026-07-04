@@ -1059,12 +1059,13 @@ class Database:
         """Incrementa el contador de no-leídos al llegar un mensaje entrante."""
         if not self._check_available(): return
         try:
+            line_id = line_id or 1
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
                 INSERT INTO conversation_status (wa_id, line_id, status, unread)
                 VALUES (%s, %s, 'pending', 1)
-                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                ON CONFLICT (wa_id, line_id)
                 DO UPDATE SET unread = conversation_status.unread + 1,
                               status = CASE WHEN conversation_status.status = 'resolved'
                                            THEN 'pending' ELSE conversation_status.status END,
@@ -1080,12 +1081,13 @@ class Database:
         """Resetea el contador de no-leídos al abrir el chat."""
         if not self._check_available(): return
         try:
+            line_id = line_id or 1
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
                 INSERT INTO conversation_status (wa_id, line_id, unread)
                 VALUES (%s, %s, 0)
-                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                ON CONFLICT (wa_id, line_id)
                 DO UPDATE SET unread = 0, updated_at = NOW()
                 """,
                 (wa_id, line_id)
@@ -1098,12 +1100,13 @@ class Database:
         """Cambia el estado de una conversación: pending/active/resolved."""
         if not self._check_available(): return
         try:
+            line_id = line_id or 1
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
                 INSERT INTO conversation_status (wa_id, line_id, status)
                 VALUES (%s, %s, %s)
-                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                ON CONFLICT (wa_id, line_id)
                 DO UPDATE SET status = EXCLUDED.status, updated_at = NOW()
                 """,
                 (wa_id, line_id, status)
@@ -1115,12 +1118,13 @@ class Database:
     def assign_conversation(self, wa_id, line_id, agent_username, tenant_id):
         if not self._check_available(): return False
         try:
+            line_id = line_id or 1
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
                 INSERT INTO conversation_status (wa_id, line_id, assigned_to, tenant_id)
                 VALUES (%s, %s, %s, %s)
-                ON CONFLICT (wa_id, COALESCE(line_id, 0))
+                ON CONFLICT (wa_id, line_id)
                 DO UPDATE SET assigned_to = EXCLUDED.assigned_to, updated_at = NOW()
                 """,
                 (wa_id, line_id, agent_username, tenant_id)
