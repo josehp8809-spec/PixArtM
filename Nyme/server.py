@@ -1,63 +1,103 @@
 """
 server.py — Servidor de producción para Render.
 
-Monta el frontend estático DIRECTAMENTE sobre el FastAPI de Reflex,
-preservando su lifespan y event processor correctamente.
+Usa un middleware ASGI que envuelve la app de Reflex sin modificarla,
+preservando su lifespan y event processor, mientras sirve el frontend
+estático compilado para todas las rutas no-Reflex.
 """
-import os, sys
+import os, sys, mimetypes
 sys.path.insert(0, os.path.dirname(__file__))
 
 import uvicorn
-from starlette.staticfiles import StaticFiles
-from starlette.responses import FileResponse, HTMLResponse
-from starlette.requests import Request
+from starlette.types import ASGIApp, Scope, Receive, Send
+from starlette.responses import FileResponse, Response
 
-# ── 1. Importar la app de Reflex ──────────────────────────────────────────────
-#    IMPORTANTE: usar app._api (FastAPI) como app raíz para preservar el
-#    lifespan de Reflex que inicializa el event processor y el state manager.
+# ── 1. Importar la app de Reflex (preserva lifespan + event processor) ────────
 from nyme.nyme import app as reflex_app
-fastapi_app = reflex_app._api
+reflex_asgi = reflex_app._api
 
 # ── 2. Directorio del frontend compilado ──────────────────────────────────────
-BASE     = os.path.dirname(__file__)
+BASE      = os.path.dirname(__file__)
 BUILD_DIR = os.path.join(BASE, ".web", "build", "client")
 
 print(f"[Server] BUILD_DIR = {BUILD_DIR}")
 print(f"[Server] BUILD_DIR existe: {os.path.isdir(BUILD_DIR)}")
 
-# ── 3. Montar /assets de Vite sobre la FastAPI de Reflex ──────────────────────
-assets_dir = os.path.join(BUILD_DIR, "assets")
-if os.path.isdir(assets_dir):
-    fastapi_app.mount("/assets", StaticFiles(directory=assets_dir), name="vite_assets")
-    print(f"[Server] /assets montado desde {assets_dir}")
+# Rutas internas de Reflex que deben pasarse directamente al backend
+REFLEX_PREFIXES = ("/ping", "/_health", "/_event", "/webhook", "/backend", "/upload")
 
-# ── 4. Ruta catch-all para servir el SPA ──────────────────────────────────────
-@fastapi_app.api_route("/{path:path}", methods=["GET", "HEAD"])
-async def spa_catch_all(path: str = ""):
-    """Sirve páginas del frontend exportado; fallback a __spa-fallback.html."""
-    path = path.strip("/")
+# ── 3. Middleware ASGI que sirve el frontend estático ─────────────────────────
+class FrontendMiddleware:
+    """
+    Middleware ASGI que:
+    - Rutas de Reflex  → pasan directo al backend de Reflex
+    - WebSocket        → pasan directo al backend de Reflex
+    - Todo lo demás    → sirve archivos estáticos del frontend compilado
+    """
 
-    candidates = []
-    if path:
-        candidates.append(os.path.join(BUILD_DIR, path))            # archivo exacto
-        candidates.append(os.path.join(BUILD_DIR, path + ".html"))  # .html directo
-        candidates.append(os.path.join(BUILD_DIR, path, "index.html"))
+    def __init__(self, app: ASGIApp, build_dir: str) -> None:
+        self.app = app
+        self.build_dir = build_dir
 
-    candidates.append(os.path.join(BUILD_DIR, "__spa-fallback.html"))
-    candidates.append(os.path.join(BUILD_DIR, "index.html"))
+    def _is_reflex_route(self, path: str) -> bool:
+        for prefix in REFLEX_PREFIXES:
+            if path == prefix or path.startswith(prefix + "/"):
+                return True
+        return False
 
-    for c in candidates:
-        if os.path.isfile(c):
-            return FileResponse(c)
+    async def _serve_static(self, path: str, scope: Scope, receive: Receive, send: Send) -> bool:
+        """Intenta servir un archivo estático. Retorna True si lo sirvió."""
+        rel = path.lstrip("/")
+        candidates = []
+        if rel:
+            candidates.append(os.path.join(self.build_dir, rel))
+            candidates.append(os.path.join(self.build_dir, rel + ".html"))
+            candidates.append(os.path.join(self.build_dir, rel, "index.html"))
 
-    return HTMLResponse("<h1>Not Found</h1>", status_code=404)
+        # Fallback SPA
+        candidates.append(os.path.join(self.build_dir, "__spa-fallback.html"))
+        candidates.append(os.path.join(self.build_dir, "index.html"))
 
-# ── 5. Arrancar uvicorn con la FastAPI de Reflex (lifespan intacto) ───────────
+        for c in candidates:
+            if os.path.isfile(c):
+                response = FileResponse(c)
+                await response(scope, receive, send)
+                return True
+        return False
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "websocket":
+            # WebSocket siempre va al backend de Reflex
+            await self.app(scope, receive, send)
+            return
+
+        if scope["type"] == "http":
+            path = scope.get("path", "/")
+
+            # Rutas internas de Reflex → backend
+            if self._is_reflex_route(path):
+                await self.app(scope, receive, send)
+                return
+
+            # Todo lo demás → intentar servir frontend estático
+            served = await self._serve_static(path, scope, receive, send)
+            if not served:
+                # Último recurso: dejar que Reflex responda (dará 404 interno)
+                await self.app(scope, receive, send)
+            return
+
+        # Otros tipos (lifespan, etc.) → Reflex los maneja
+        await self.app(scope, receive, send)
+
+# ── 4. Construir la app final ─────────────────────────────────────────────────
+final_app = FrontendMiddleware(reflex_asgi, BUILD_DIR)
+
+# ── 5. Arrancar uvicorn ───────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
     print(f"[Server] Nyme iniciando en http://0.0.0.0:{port}")
     uvicorn.run(
-        fastapi_app,
+        final_app,
         host="0.0.0.0",
         port=port,
         log_level="info",
