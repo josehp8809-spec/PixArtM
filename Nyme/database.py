@@ -441,6 +441,45 @@ class Database:
             print(f"[DB] Error al obtener tenant por ID: {e}")
             return None
 
+    def get_all_tenants(self):
+        """Obtiene todas las empresas (tenants) activas como lista de tuplas."""
+        if not self._check_available():
+            return []
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id, name, is_active FROM tenants ORDER BY id ASC")
+            rows = cur.fetchall()
+            cur.close()
+            conn.close()
+            return rows
+        except Exception as e:
+            print(f"[DB] Error al obtener todos los tenants: {e}")
+            return []
+
+    def create_tenant(self, name):
+        """Crea una nueva empresa (tenant). Retorna (True, tenant_id) o (False, error_msg)."""
+        if not self._check_available():
+            return False, "Base de datos no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO tenants (name) VALUES (%s) RETURNING id",
+                (name,)
+            )
+            tenant_id = cur.fetchone()[0]
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, tenant_id
+        except psycopg2.errors.UniqueViolation:
+            return False, f"La empresa '{name}' ya está registrada"
+        except Exception as e:
+            print(f"[DB] Error creando tenant: {e}")
+            return False, str(e)
+
+
     def get_all_users(self, tenant_id):
         """Obtiene todos los usuarios de un tenant específico."""
         if not self._check_available():
