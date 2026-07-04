@@ -1,9 +1,11 @@
 import reflex as rx
 import os
 
-# En producción (Render) solo se expone un puerto (variable PORT, por defecto 10000).
-# Al usar --backend-only, no debemos definir frontend_port en el rxconfig.
-_port = int(os.getenv("PORT", "10000"))
+# En producción (Render):
+#   REFLEX_BACKEND_PORT = puerto interno donde Reflex escucha (ej. 8080)
+#   PORT               = puerto público de Render (ej. 10000)
+# En desarrollo: usamos PORT para todo.
+_port = int(os.getenv("REFLEX_BACKEND_PORT", os.getenv("PORT", "8080")))
 
 config = rx.Config(
     app_name="nyme",

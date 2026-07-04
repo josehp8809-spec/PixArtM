@@ -1,104 +1,143 @@
 """
-server.py — Servidor de producción para Render.
+server.py — Proxy + Frontend estático para Render.
 
-Usa un middleware ASGI que envuelve la app de Reflex sin modificarla,
-preservando su lifespan y event processor, mientras sirve el frontend
-estático compilado para todas las rutas no-Reflex.
+Arquitectura de dos procesos:
+  - Reflex backend (puerto 8080): maneja WebSocket de estado, event processor, API
+  - Este servidor (puerto $PORT):  sirve frontend HTML/JS y proxy al backend
+
+El frontend JS se conecta a wss://nyme-app.onrender.com/_event (puerto 443/public)
+→ Render lo dirige a este servidor (puerto 10000)
+→ Este servidor lo reenvía a ws://localhost:8080/_event (Reflex interno)
 """
-import os, sys, mimetypes
+import os, sys, asyncio
 sys.path.insert(0, os.path.dirname(__file__))
 
 import uvicorn
-from starlette.types import ASGIApp, Scope, Receive, Send
-from starlette.responses import FileResponse, Response
+import httpx
+from starlette.applications import Starlette
+from starlette.routing import Route, Mount, WebSocketRoute
+from starlette.staticfiles import StaticFiles
+from starlette.responses import FileResponse, HTMLResponse, Response
+from starlette.requests import Request
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
-# ── 1. Importar la app de Reflex (preserva lifespan + event processor) ────────
-from nyme.nyme import app as reflex_app
-reflex_asgi = reflex_app._api
+# ── Configuración ──────────────────────────────────────────────────────────────
+REFLEX_PORT  = int(os.getenv("REFLEX_BACKEND_PORT", "8080"))
+REFLEX_HTTP  = f"http://localhost:{REFLEX_PORT}"
+REFLEX_WS    = f"ws://localhost:{REFLEX_PORT}"
+BASE         = os.path.dirname(__file__)
+BUILD_DIR    = os.path.join(BASE, ".web", "build", "client")
 
-# ── 2. Directorio del frontend compilado ──────────────────────────────────────
-BASE      = os.path.dirname(__file__)
-BUILD_DIR = os.path.join(BASE, ".web", "build", "client")
+print(f"[Server] Reflex backend:  {REFLEX_HTTP}")
+print(f"[Server] Frontend build:  {BUILD_DIR} → existe: {os.path.isdir(BUILD_DIR)}")
 
-print(f"[Server] BUILD_DIR = {BUILD_DIR}")
-print(f"[Server] BUILD_DIR existe: {os.path.isdir(BUILD_DIR)}")
+# ── 1. Proxy HTTP (ping, health, webhook) ─────────────────────────────────────
+async def proxy_http(request: Request) -> Response:
+    path  = request.url.path
+    query = str(request.url.query)
+    url   = f"{REFLEX_HTTP}{path}" + (f"?{query}" if query else "")
+    headers = {k: v for k, v in request.headers.items()
+               if k.lower() not in ("host", "content-length")}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.request(
+                method=request.method, url=url,
+                headers=headers, content=await request.body(),
+            )
+            return Response(content=resp.content, status_code=resp.status_code,
+                            headers=dict(resp.headers))
+    except Exception as e:
+        return Response(content=f"Proxy error: {e}", status_code=502)
 
-# Rutas internas de Reflex que deben pasarse directamente al backend
-REFLEX_PREFIXES = ("/ping", "/_health", "/_event", "/webhook", "/backend", "/upload")
+# ── 2. Proxy WebSocket (_event) ────────────────────────────────────────────────
+async def proxy_websocket(websocket: WebSocket):
+    """Reenvía conexiones WebSocket al backend de Reflex."""
+    import websockets
+    await websocket.accept()
 
-# ── 3. Middleware ASGI que sirve el frontend estático ─────────────────────────
-class FrontendMiddleware:
-    """
-    Middleware ASGI que:
-    - Rutas de Reflex  → pasan directo al backend de Reflex
-    - WebSocket        → pasan directo al backend de Reflex
-    - Todo lo demás    → sirve archivos estáticos del frontend compilado
-    """
+    path  = websocket.url.path
+    query = str(websocket.url.query) if websocket.url.query else ""
+    ws_url = f"{REFLEX_WS}{path}" + (f"?{query}" if query else "")
 
-    def __init__(self, app: ASGIApp, build_dir: str) -> None:
-        self.app = app
-        self.build_dir = build_dir
+    try:
+        extra_headers = [(k, v) for k, v in websocket.headers.items()
+                         if k.lower() not in ("host", "connection", "upgrade",
+                                              "sec-websocket-key", "sec-websocket-version",
+                                              "sec-websocket-extensions")]
+        async with websockets.connect(ws_url, additional_headers=extra_headers) as backend:
 
-    def _is_reflex_route(self, path: str) -> bool:
-        for prefix in REFLEX_PREFIXES:
-            if path == prefix or path.startswith(prefix + "/"):
-                return True
-        return False
+            async def client_to_backend():
+                try:
+                    async for msg in websocket.iter_text():
+                        await backend.send(msg)
+                except (WebSocketDisconnect, Exception):
+                    pass
 
-    async def _serve_static(self, path: str, scope: Scope, receive: Receive, send: Send) -> bool:
-        """Intenta servir un archivo estático. Retorna True si lo sirvió."""
-        rel = path.lstrip("/")
-        candidates = []
-        if rel:
-            candidates.append(os.path.join(self.build_dir, rel))
-            candidates.append(os.path.join(self.build_dir, rel + ".html"))
-            candidates.append(os.path.join(self.build_dir, rel, "index.html"))
+            async def backend_to_client():
+                try:
+                    async for msg in backend:
+                        if websocket.client_state == WebSocketState.CONNECTED:
+                            text = msg if isinstance(msg, str) else msg.decode("utf-8", errors="replace")
+                            await websocket.send_text(text)
+                except Exception:
+                    pass
 
-        # Fallback SPA
-        candidates.append(os.path.join(self.build_dir, "__spa-fallback.html"))
-        candidates.append(os.path.join(self.build_dir, "index.html"))
+            await asyncio.gather(client_to_backend(), backend_to_client())
+    except Exception as e:
+        print(f"[WS Proxy] Error: {e}")
+    finally:
+        try:
+            await websocket.close()
+        except Exception:
+            pass
 
-        for c in candidates:
-            if os.path.isfile(c):
-                response = FileResponse(c)
-                await response(scope, receive, send)
-                return True
-        return False
+# ── 3. Frontend estático ───────────────────────────────────────────────────────
+async def serve_page(request: Request) -> Response:
+    path = request.path_params.get("path", "").strip("/")
+    candidates = []
+    if path:
+        candidates += [
+            os.path.join(BUILD_DIR, path),
+            os.path.join(BUILD_DIR, path + ".html"),
+            os.path.join(BUILD_DIR, path, "index.html"),
+        ]
+    candidates += [
+        os.path.join(BUILD_DIR, "__spa-fallback.html"),
+        os.path.join(BUILD_DIR, "index.html"),
+    ]
+    for c in candidates:
+        if os.path.isfile(c):
+            return FileResponse(c)
+    return HTMLResponse("<h1>Not Found</h1>", status_code=404)
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] == "websocket":
-            # WebSocket siempre va al backend de Reflex
-            await self.app(scope, receive, send)
-            return
+# ── 4. Rutas ────────────────────────────────────────────────────────────────────
+routes = [
+    # Proxy HTTP al backend de Reflex
+    Route("/ping",     endpoint=proxy_http, methods=["GET", "HEAD"]),
+    Route("/_health",  endpoint=proxy_http, methods=["GET", "HEAD"]),
+    Route("/webhook",  endpoint=proxy_http, methods=["GET", "POST"]),
+    Route("/upload",   endpoint=proxy_http, methods=["GET", "POST"]),
 
-        if scope["type"] == "http":
-            path = scope.get("path", "/")
+    # Proxy WebSocket al backend de Reflex
+    WebSocketRoute("/_event",            endpoint=proxy_websocket),
+    WebSocketRoute("/_event/{path:path}", endpoint=proxy_websocket),
+]
 
-            # Rutas internas de Reflex → backend
-            if self._is_reflex_route(path):
-                await self.app(scope, receive, send)
-                return
+# Archivos de assets de Vite
+assets_dir = os.path.join(BUILD_DIR, "assets")
+if os.path.isdir(assets_dir):
+    routes.append(Mount("/assets", app=StaticFiles(directory=assets_dir), name="assets"))
 
-            # Todo lo demás → intentar servir frontend estático
-            served = await self._serve_static(path, scope, receive, send)
-            if not served:
-                # Último recurso: dejar que Reflex responda (dará 404 interno)
-                await self.app(scope, receive, send)
-            return
+# SPA catch-all
+routes += [
+    Route("/{path:path}", endpoint=serve_page),
+    Route("/",            endpoint=serve_page),
+]
 
-        # Otros tipos (lifespan, etc.) → Reflex los maneja
-        await self.app(scope, receive, send)
+combined = Starlette(routes=routes)
 
-# ── 4. Construir la app final ─────────────────────────────────────────────────
-final_app = FrontendMiddleware(reflex_asgi, BUILD_DIR)
-
-# ── 5. Arrancar uvicorn ───────────────────────────────────────────────────────
+# ── 5. Arrancar uvicorn ────────────────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "10000"))
-    print(f"[Server] Nyme iniciando en http://0.0.0.0:{port}")
-    uvicorn.run(
-        final_app,
-        host="0.0.0.0",
-        port=port,
-        log_level="info",
-    )
+    print(f"[Server] Proxy+Frontend en http://0.0.0.0:{port}")
+    uvicorn.run(combined, host="0.0.0.0", port=port, log_level="info")
