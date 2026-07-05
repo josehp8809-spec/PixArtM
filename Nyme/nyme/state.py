@@ -1138,20 +1138,36 @@ class AppState(rx.State):
         self._refresh_messages()
         self._refresh_contacts()
 
+    # Detección de canal social (Messenger, Instagram, Web Chat)
+    @rx.var
+    def is_social_channel(self) -> bool:
+        """True si el contacto seleccionado es de Messenger, Instagram o Web Chat."""
+        if not self.selected_contact:
+            return False
+        return (
+            self.selected_contact.startswith("fb_") or
+            self.selected_contact.startswith("ig_") or
+            self.selected_contact.startswith("web_")
+        )
+
     # Detección de ventana de 24 horas
     @rx.var
     def is_24h_window_closed(self) -> bool:
         if not self.selected_contact:
             return False
+        # Los canales sociales (Messenger, Instagram, Web) no tienen ventana de 24h de WhatsApp
+        if (
+            self.selected_contact.startswith("fb_") or
+            self.selected_contact.startswith("ig_") or
+            self.selected_contact.startswith("web_")
+        ):
+            return False
         
         last_inbound_time = db.get_last_inbound_time(self.selected_contact, self.tenant_id)
         if not last_inbound_time:
-            # Si no hay mensajes entrantes previos, no hay ventana cerrada
             return False
             
         from datetime import datetime, timezone
-        # Comparar en UTC (asumiendo que last_inbound_time está en hora local o UTC)
-        # Para evitar problemas de timezone naive vs aware:
         now = datetime.now(last_inbound_time.tzinfo) if last_inbound_time.tzinfo else datetime.now()
         diff = now - last_inbound_time
         return diff.total_seconds() > (24 * 3600)

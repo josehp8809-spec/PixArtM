@@ -426,7 +426,7 @@ def _active_chat() -> rx.Component:
             
             # Condicionar por ventana de 24 horas y modo (las notas no están bloqueadas)
             rx.cond(
-                AppState.is_24h_window_closed & (AppState.chat_mode == "message") & (~AppState.selected_contact.startswith("web_")) & (~AppState.selected_contact.startswith("fb_")) & (~AppState.selected_contact.startswith("ig_")),
+                AppState.is_24h_window_closed & (AppState.chat_mode == "message") & ~AppState.is_social_channel,
                 # Banner de Ventana de 24 horas cerrada
                 rx.center(
                     rx.vstack(
