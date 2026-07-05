@@ -398,6 +398,9 @@ class Database:
              cur.close()
              conn.close()
              return [r[0] for r in rows]
+         except Exception as e:
+             print(f"[DB] Error obteniendo contactos: {e}")
+             return []
 
     def get_messages(self, wa_id, tenant_id):
          if not self._check_available():
