@@ -166,9 +166,6 @@ def message_bubble(msg: rx.Var) -> rx.Component:
     is_note = msg_type == "NOTE"
     is_in = msg["type"] == "INBOUND"
     body_str = msg["body"].to(str)
-    media_id_str = msg["media_id"].to(str)
-    has_media = (media_id_str != "") & (media_id_str != "None") & (media_id_str != "null")
-    is_audio = body_str.contains("[🎤 Audio]") | has_media
     
     # Burbuja de Nota Interna
     note_content = rx.box(
@@ -196,12 +193,12 @@ def message_bubble(msg: rx.Var) -> rx.Component:
     normal_content = rx.box(
         rx.vstack(
             rx.cond(
-                is_audio & has_media,
+                msg["is_audio"] & msg["has_media"],
                 rx.vstack(
                     rx.text("🎤 Mensaje de voz", size="1", color="#8e8e93"),
                     rx.button(
                         "📝 Transcribir con IA",
-                        on_click=AppState.transcribe_audio(media_id_str),
+                        on_click=AppState.transcribe_audio(msg["media_id"].to(str)),
                         size="1", variant="soft", color_scheme="blue",
                     ),
                     align_items="start", spacing="2",

@@ -342,16 +342,24 @@ class AppState(rx.State):
         if not self.selected_contact:
             return
         raw = db.get_messages(self.selected_contact, self.tenant_id)
-        self.messages = [
-            {
-                "type": m[0], "body": m[1],
+        self.messages = []
+        for m in raw:
+            body = m[1] or ""
+            media_id = m[5] if len(m) > 5 and m[5] else ""
+            media_url = m[6] if len(m) > 6 and m[6] else ""
+            is_audio = "[🎤 Audio]" in body or bool(media_id)
+            has_media = bool(media_id)
+            self.messages.append({
+                "type": m[0],
+                "body": body,
                 "time": m[2].strftime("%H:%M") if m[2] else "",
-                "agent": m[3] or "", "line_id": m[4] or 0,
-                "media_id": m[5] if len(m) > 5 else None,
-                "media_url": m[6] if len(m) > 6 else None,
-            }
-            for m in raw
-        ]
+                "agent": m[3] or "",
+                "line_id": m[4] or 0,
+                "media_id": media_id,
+                "media_url": media_url,
+                "is_audio": is_audio,
+                "has_media": has_media,
+            })
 
     def _refresh_internal(self):
         raw = db.get_internal_messages()

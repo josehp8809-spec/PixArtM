@@ -398,19 +398,15 @@ class Database:
              cur.close()
              conn.close()
              return [r[0] for r in rows]
-         except Exception as e:
-             print(f"[DB] Error obteniendo contactos: {e}")
-             return []
 
     def get_messages(self, wa_id, tenant_id):
          if not self._check_available():
              return []
          try:
-             conn = self.get_connection()
-             cur = conn.cursor()
+             conn = self.get_connection(); cur = conn.cursor()
              cur.execute(
                  """
-                 SELECT type, body, created_at, agent_username, line_id
+                 SELECT type, body, created_at, agent_username, line_id, media_id, media_url
                  FROM messages WHERE wa_id = %s AND tenant_id = %s ORDER BY created_at ASC
                  """,
                  (wa_id, tenant_id),
