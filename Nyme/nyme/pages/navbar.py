@@ -1,13 +1,14 @@
-"""Barra de navegación global premium para Nyme."""
+"""Barra de navegación global premium para Nyme (Branding Husky/Teal)."""
 import reflex as rx
 from nyme.state import AppState
 
 def navbar(active_page: str = "") -> rx.Component:
-    # Helper para dar estilos a los links según estén activos o no
+    # Helper para dar estilos a los links según estén activos o no (Teal Premium)
     def nav_link(label: str, icon: str, path: str) -> rx.Component:
         is_active = (active_page == path)
-        color = rx.cond(is_active, "#30d158", "#8e8e93")
-        bg = rx.cond(is_active, "rgba(48, 209, 88, 0.1)", "transparent")
+        color = rx.cond(is_active, "#0fa3b1", "#8e8e93")
+        bg = rx.cond(is_active, "rgba(15, 163, 177, 0.12)", "transparent")
+        border = rx.cond(is_active, "1px solid rgba(15, 163, 177, 0.25)", "1px solid transparent")
         
         return rx.link(
             rx.hstack(
@@ -15,10 +16,11 @@ def navbar(active_page: str = "") -> rx.Component:
                 rx.text(label, weight="medium", size="2"),
                 spacing="2",
                 align_items="center",
-                padding="8px 12px",
-                border_radius="8px",
+                padding="8px 14px",
+                border_radius="10px",
                 background=bg,
-                _hover={"background": "rgba(255,255,255,0.05)"},
+                border=border,
+                _hover={"background": "rgba(15, 163, 177, 0.06)", "transform": "translateY(-1px)"},
                 transition="all 0.2s ease",
             ),
             href=path,
@@ -32,16 +34,20 @@ def navbar(active_page: str = "") -> rx.Component:
 
     return rx.box(
         rx.hstack(
-            # Logo + Nombre
+            # Logo de Nyme + Nombre
             rx.link(
                 rx.hstack(
                     rx.image(
-                        src="https://img.icons8.com/fluency/48/whatsapp.png",
-                        width="28px", height="28px",
+                        src="/logo.png",
+                        width="34px",
+                        height="auto",
+                        border_radius="6px",
+                        box_shadow="0 0 10px rgba(15, 163, 177, 0.4)",
                     ),
-                    rx.heading("Nyme", size="5", color="white", weight="bold"),
+                    rx.heading("Nyme", size="5", color="white", weight="bold", letter_spacing="0.5px"),
                     spacing="2",
                     align_items="center",
+                    _hover={"opacity": "0.9"},
                 ),
                 href="/chat",
                 text_decoration="none",
@@ -54,12 +60,10 @@ def navbar(active_page: str = "") -> rx.Component:
                 nav_link("Directorio", "👥", "/contacts"),
                 nav_link("Equipo", "🏢", "/internal"),
                 nav_link("Ventas", "🛍️", "/orders"),
-                # Mostrar reportes solo a admin o coordinador
                 rx.cond(
                     is_admin_or_coord,
                     nav_link("Reportes", "📊", "/reports"),
                 ),
-                # Mostrar configuraciones solo a admin
                 rx.cond(
                     is_admin,
                     nav_link("Configuración", "⚙️", "/settings"),
@@ -70,10 +74,11 @@ def navbar(active_page: str = "") -> rx.Component:
             
             rx.spacer(),
 
+            # Información del perfil del usuario
             rx.hstack(
                 rx.vstack(
                     rx.text(AppState.full_name, color="white", weight="bold", size="2"),
-                    rx.text(AppState.role.to(str).capitalize() + " | " + AppState.tenant_name, color="#8e8e93", size="1"),
+                    rx.text(AppState.role.to(str).capitalize() + " | " + AppState.tenant_name, color="#0fa3b1", size="1", weight="medium"),
                     spacing="0",
                     align_items="end",
                 ),
@@ -83,6 +88,8 @@ def navbar(active_page: str = "") -> rx.Component:
                     color_scheme="red", 
                     size="1",
                     variant="soft",
+                    _hover={"transform": "scale(1.02)"},
+                    transition="all 0.2s ease",
                 ),
                 spacing="3",
                 align_items="center",
@@ -91,8 +98,10 @@ def navbar(active_page: str = "") -> rx.Component:
             align_items="center",
             padding="12px 24px",
         ),
-        background="#111111",
-        border_bottom="1px solid #2c2c2e",
+        background="rgba(18, 18, 18, 0.8)",
+        backdrop_filter="blur(12px)",
+        border_bottom="1px solid rgba(15, 163, 177, 0.15)",
+        box_shadow="0 4px 20px rgba(0, 0, 0, 0.3)",
         width="100%",
         z_index="999",
     )

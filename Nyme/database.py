@@ -287,6 +287,12 @@ class Database:
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS phone VARCHAR(50)")
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS website VARCHAR(300)")
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notes TEXT")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_name_1 VARCHAR(200)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_email_1 VARCHAR(200)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_phone_1 VARCHAR(50)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_name_2 VARCHAR(200)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_email_2 VARCHAR(200)")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS contact_phone_2 VARCHAR(50)")
 
             # Migraciones Fase 4: Canales de Facebook e Instagram
             cur.execute("ALTER TABLE lines ADD COLUMN IF NOT EXISTS channel_type VARCHAR(20) DEFAULT 'whatsapp'")
@@ -531,7 +537,7 @@ class Database:
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute("SELECT id, name, is_active, email, phone, website, notes FROM tenants ORDER BY id ASC")
+            cur.execute("SELECT id, name, is_active, email, phone, website, notes, contact_name_1, contact_email_1, contact_phone_1, contact_name_2, contact_email_2, contact_phone_2 FROM tenants ORDER BY id ASC")
             rows = cur.fetchall()
             cur.close()
             conn.close()
@@ -540,7 +546,7 @@ class Database:
             print(f"[DB] Error al obtener todos los tenants: {e}")
             return []
 
-    def create_tenant(self, name):
+    def create_tenant(self, name, email=None, phone=None, website=None, notes=None, contact_name_1=None, contact_email_1=None, contact_phone_1=None, contact_name_2=None, contact_email_2=None, contact_phone_2=None):
         """Crea una nueva empresa (tenant). Retorna (True, tenant_id) o (False, error_msg)."""
         if not self._check_available():
             return False, "Base de datos no disponible"
@@ -548,8 +554,9 @@ class Database:
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "INSERT INTO tenants (name) VALUES (%s) RETURNING id",
-                (name,)
+                "INSERT INTO tenants (name, email, phone, website, notes, contact_name_1, contact_email_1, contact_phone_1, contact_name_2, contact_email_2, contact_phone_2) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
+                (name, email or None, phone or None, website or None, notes or None, contact_name_1 or None, contact_email_1 or None, contact_phone_1 or None, contact_name_2 or None, contact_email_2 or None, contact_phone_2 or None)
             )
             tenant_id = cur.fetchone()[0]
             conn.commit()
@@ -562,7 +569,7 @@ class Database:
             print(f"[DB] Error creando tenant: {e}")
             return False, str(e)
 
-    def update_tenant(self, tenant_id, name, email, phone, website, notes):
+    def update_tenant(self, tenant_id, name, email, phone, website, notes, contact_name_1=None, contact_email_1=None, contact_phone_1=None, contact_name_2=None, contact_email_2=None, contact_phone_2=None):
         """Actualiza datos de una empresa existente."""
         if not self._check_available():
             return False, "Base de datos no disponible"
@@ -570,8 +577,12 @@ class Database:
             conn = self.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "UPDATE tenants SET name=%s, email=%s, phone=%s, website=%s, notes=%s WHERE id=%s",
-                (name, email or None, phone or None, website or None, notes or None, tenant_id)
+                "UPDATE tenants SET name=%s, email=%s, phone=%s, website=%s, notes=%s, "
+                "contact_name_1=%s, contact_email_1=%s, contact_phone_1=%s, "
+                "contact_name_2=%s, contact_email_2=%s, contact_phone_2=%s WHERE id=%s",
+                (name, email or None, phone or None, website or None, notes or None, 
+                 contact_name_1 or None, contact_email_1 or None, contact_phone_1 or None, 
+                 contact_name_2 or None, contact_email_2 or None, contact_phone_2 or None, tenant_id)
             )
             conn.commit()
             cur.close()

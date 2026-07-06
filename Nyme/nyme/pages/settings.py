@@ -82,8 +82,15 @@ class SettingsState(AppState):
 
     # Nueva empresa (Tenants)
     nt_name: str = ""
+    nt_contact_name_1: str = ""
+    nt_contact_email_1: str = ""
+    nt_contact_phone_1: str = ""
+    nt_contact_name_2: str = ""
+    nt_contact_email_2: str = ""
+    nt_contact_phone_2: str = ""
     nt_msg: str = ""
     all_tenants: list[dict] = []
+    
     # Edición de empresa
     et_id: int = 0
     et_name: str = ""
@@ -91,6 +98,12 @@ class SettingsState(AppState):
     et_phone: str = ""
     et_website: str = ""
     et_notes: str = ""
+    et_contact_name_1: str = ""
+    et_contact_email_1: str = ""
+    et_contact_phone_1: str = ""
+    et_contact_name_2: str = ""
+    et_contact_email_2: str = ""
+    et_contact_phone_2: str = ""
     et_msg: str = ""
     et_editing: bool = False
     # Edición de contraseña de usuario
@@ -135,23 +148,49 @@ class SettingsState(AppState):
             {
                 "id": t[0], "name": t[1], "active": bool(t[2]),
                 "email": t[3] or "", "phone": t[4] or "",
-                "website": t[5] or "", "notes": t[6] or ""
+                "website": t[5] or "", "notes": t[6] or "",
+                "contact_name_1": t[7] or "" if len(t) > 7 else "",
+                "contact_email_1": t[8] or "" if len(t) > 8 else "",
+                "contact_phone_1": t[9] or "" if len(t) > 9 else "",
+                "contact_name_2": t[10] or "" if len(t) > 10 else "",
+                "contact_email_2": t[11] or "" if len(t) > 11 else "",
+                "contact_phone_2": t[12] or "" if len(t) > 12 else ""
             }
             for t in raw
         ]
 
     def set_nt_name(self, v): self.nt_name = v
+    def set_nt_contact_name_1(self, v): self.nt_contact_name_1 = v
+    def set_nt_contact_email_1(self, v): self.nt_contact_email_1 = v
+    def set_nt_contact_phone_1(self, v): self.nt_contact_phone_1 = v
+    def set_nt_contact_name_2(self, v): self.nt_contact_name_2 = v
+    def set_nt_contact_email_2(self, v): self.nt_contact_email_2 = v
+    def set_nt_contact_phone_2(self, v): self.nt_contact_phone_2 = v
 
     def save_tenant(self):
         if not self.nt_name.strip():
             self.nt_msg = "❌ Nombre de empresa requerido."
             return
-        ok, res = db.create_tenant(self.nt_name.strip())
+        ok, res = db.create_tenant(
+            self.nt_name.strip(),
+            contact_name_1=self.nt_contact_name_1,
+            contact_email_1=self.nt_contact_email_1,
+            contact_phone_1=self.nt_contact_phone_1,
+            contact_name_2=self.nt_contact_name_2,
+            contact_email_2=self.nt_contact_email_2,
+            contact_phone_2=self.nt_contact_phone_2
+        )
         if ok:
             self.nt_msg = f"✅ Empresa '{self.nt_name.strip()}' creada (ID: {res})."
             admin_uname = f"admin_{self.nt_name.strip().lower().replace(' ', '')[:20]}"
             db.create_user(admin_uname, "Nyme_2026", f"Admin {self.nt_name.strip()}", "admin", res)
             self.nt_name = ""
+            self.nt_contact_name_1 = ""
+            self.nt_contact_email_1 = ""
+            self.nt_contact_phone_1 = ""
+            self.nt_contact_name_2 = ""
+            self.nt_contact_email_2 = ""
+            self.nt_contact_phone_2 = ""
             self._reload_tenants()
         else:
             self.nt_msg = f"❌ {res}"
@@ -166,6 +205,12 @@ class SettingsState(AppState):
             self.et_phone = t["phone"]
             self.et_website = t["website"]
             self.et_notes = t["notes"]
+            self.et_contact_name_1 = t.get("contact_name_1", "")
+            self.et_contact_email_1 = t.get("contact_email_1", "")
+            self.et_contact_phone_1 = t.get("contact_phone_1", "")
+            self.et_contact_name_2 = t.get("contact_name_2", "")
+            self.et_contact_email_2 = t.get("contact_email_2", "")
+            self.et_contact_phone_2 = t.get("contact_phone_2", "")
             self.et_editing = True
             self.et_msg = ""
 
@@ -178,12 +223,22 @@ class SettingsState(AppState):
     def set_et_phone(self, v): self.et_phone = v
     def set_et_website(self, v): self.et_website = v
     def set_et_notes(self, v): self.et_notes = v
+    def set_et_contact_name_1(self, v): self.et_contact_name_1 = v
+    def set_et_contact_email_1(self, v): self.et_contact_email_1 = v
+    def set_et_contact_phone_1(self, v): self.et_contact_phone_1 = v
+    def set_et_contact_name_2(self, v): self.et_contact_name_2 = v
+    def set_et_contact_email_2(self, v): self.et_contact_email_2 = v
+    def set_et_contact_phone_2(self, v): self.et_contact_phone_2 = v
 
     def save_tenant_edit(self):
         if not self.et_name.strip():
             self.et_msg = "❌ El nombre no puede estar vacío."
             return
-        ok, err = db.update_tenant(self.et_id, self.et_name.strip(), self.et_email, self.et_phone, self.et_website, self.et_notes)
+        ok, err = db.update_tenant(
+            self.et_id, self.et_name.strip(), self.et_email, self.et_phone, self.et_website, self.et_notes,
+            self.et_contact_name_1, self.et_contact_email_1, self.et_contact_phone_1,
+            self.et_contact_name_2, self.et_contact_email_2, self.et_contact_phone_2
+        )
         if ok:
             self.et_msg = "✅ Empresa actualizada."
             self._reload_tenants()
@@ -1508,153 +1563,222 @@ def settings_page() -> rx.Component:
                 # ── Empresas (Solo visible para Súper Tenant ID 1)
                 rx.tabs.content(
                     rx.vstack(
-                        rx.heading("🏢 Empresas (Tenants)", size="4", color="white"),
-                        rx.text("Registra y administra clientes comerciales en la plataforma Nyme.", color="#8e8e93", size="2"),
-
-                        # Formulario nueva empresa
-                        rx.box(
-                            rx.vstack(
-                                rx.heading("➕ Nueva Empresa", size="3", color="white"),
-                                rx.hstack(
-                                    rx.vstack(
-                                        rx.text("Nombre *", size="1", color="#8e8e93"),
-                                        rx.input(
-                                            placeholder="Ej: SubliArtM & Andili",
-                                            value=SettingsState.nt_name,
-                                            on_change=SettingsState.set_nt_name,
-                                            background="#1c1c1e", border="1px solid #3a3a3c",
-                                            color="white", width="100%",
-                                        ),
-                                        spacing="1", flex="1",
-                                    ),
-                                    rx.button(
-                                        "🏢 Registrar",
-                                        on_click=SettingsState.save_tenant,
-                                        color_scheme="green",
-                                        margin_top="18px",
-                                    ),
-                                    spacing="3", align_items="end", width="100%",
-                                ),
-                                rx.cond(
-                                    SettingsState.nt_msg != "",
-                                    rx.text(SettingsState.nt_msg, size="2", color="#30d158"),
-                                ),
-                                spacing="3", align_items="start",
-                            ),
-                            background="#111", border="1px solid #2c2c2e",
-                            border_radius="12px", padding="20px", width="100%",
-                        ),
-
-                        # Panel de edición (se muestra cuando et_editing == True)
-                        rx.cond(
-                            SettingsState.et_editing,
+                        rx.heading("🏢 Gestión de Empresas (Tenants)", size="4", color="white"),
+                        rx.text("Registra y administra clientes comerciales, administradores y parámetros de contacto de cada Tenant.", color="#8e8e93", size="2"),
+                        
+                        rx.grid(
+                            # Formulario Nueva Empresa
                             rx.box(
                                 rx.vstack(
-                                    rx.hstack(
-                                        rx.heading("✏️ Editar Empresa", size="3", color="white"),
-                                        rx.spacer(),
-                                        rx.button("✕ Cerrar", on_click=SettingsState.close_tenant_edit, size="1", variant="ghost", color="#8e8e93"),
+                                    rx.heading("➕ Nueva Empresa", size="3", color="white"),
+                                    rx.text("Registra los datos generales de la empresa cliente.", color="#8e8e93", size="1"),
+                                    rx.vstack(
+                                        rx.text("Nombre de la Empresa *", size="1", color="#8e8e93"),
+                                        rx.input(placeholder="Ej: SubliArtM & Andili", value=SettingsState.nt_name, on_change=SettingsState.set_nt_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                        spacing="1", width="100%"
                                     ),
-                                    rx.grid(
+                                    # Contacto Principal
+                                    rx.box(
                                         rx.vstack(
-                                            rx.text("Nombre", size="1", color="#8e8e93"),
+                                            rx.text("👤 Contacto Principal (Requerido)", weight="bold", size="2", color="#0fa3b1"),
+                                            rx.grid(
+                                                rx.vstack(
+                                                    rx.text("Nombre Completo", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="Juan Pérez", value=SettingsState.nt_contact_name_1, on_change=SettingsState.set_nt_contact_name_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                rx.vstack(
+                                                    rx.text("Correo Electrónico", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="juan@empresa.com", value=SettingsState.nt_contact_email_1, on_change=SettingsState.set_nt_contact_email_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                rx.vstack(
+                                                    rx.text("Teléfono de Contacto", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="+52 55 1234 5678", value=SettingsState.nt_contact_phone_1, on_change=SettingsState.set_nt_contact_phone_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                columns="3", spacing="2", width="100%"
+                                            ),
+                                            spacing="2", width="100%"
+                                        ),
+                                        background="#19191b", border="1px solid #2c2c2e", border_radius="10px", padding="12px", width="100%"
+                                    ),
+                                    # Contacto Secundario (Opcional)
+                                    rx.box(
+                                        rx.vstack(
+                                            rx.text("👥 Contacto Secundario (Opcional)", weight="bold", size="2", color="#8e8e93"),
+                                            rx.grid(
+                                                rx.vstack(
+                                                    rx.text("Nombre Completo", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="María Gómez", value=SettingsState.nt_contact_name_2, on_change=SettingsState.set_nt_contact_name_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                rx.vstack(
+                                                    rx.text("Correo Electrónico", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="maria@empresa.com", value=SettingsState.nt_contact_email_2, on_change=SettingsState.set_nt_contact_email_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                rx.vstack(
+                                                    rx.text("Teléfono de Contacto", size="1", color="#8e8e93"),
+                                                    rx.input(placeholder="+52 55 8765 4321", value=SettingsState.nt_contact_phone_2, on_change=SettingsState.set_nt_contact_phone_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                    spacing="1"
+                                                ),
+                                                columns="3", spacing="2", width="100%"
+                                            ),
+                                            spacing="2", width="100%"
+                                        ),
+                                        background="#19191b", border="1px solid #2c2c2e", border_radius="10px", padding="12px", width="100%"
+                                    ),
+                                    rx.button("🏢 Registrar Empresa", on_click=SettingsState.save_tenant, color_scheme="blue", width="100%"),
+                                    rx.cond(SettingsState.nt_msg != "", rx.text(SettingsState.nt_msg, size="2", color="#30d158")),
+                                    spacing="3", align_items="stretch", width="100%"
+                                ),
+                                background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                            ),
+                            
+                            # Panel de Edición (se muestra condicionalmente)
+                            rx.cond(
+                                SettingsState.et_editing,
+                                rx.box(
+                                    rx.vstack(
+                                        rx.hstack(
+                                            rx.heading("✏️ Editar Empresa", size="3", color="white"),
+                                            rx.spacer(),
+                                            rx.button("✕ Cerrar", on_click=SettingsState.close_tenant_edit, size="1", variant="ghost", color="#8e8e93"),
+                                        ),
+                                        rx.vstack(
+                                            rx.text("Nombre de la Empresa", size="1", color="#8e8e93"),
                                             rx.input(value=SettingsState.et_name, on_change=SettingsState.set_et_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                            spacing="1", width="100%",
+                                            spacing="1", width="100%"
                                         ),
-                                        rx.vstack(
-                                            rx.text("Email de contacto", size="1", color="#8e8e93"),
-                                            rx.input(placeholder="empresa@email.com", value=SettingsState.et_email, on_change=SettingsState.set_et_email, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                            spacing="1", width="100%",
+                                        # Contacto Principal
+                                        rx.box(
+                                            rx.vstack(
+                                                rx.text("👤 Contacto Principal", weight="bold", size="2", color="#0fa3b1"),
+                                                rx.grid(
+                                                    rx.vstack(
+                                                        rx.text("Nombre", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_name_1, on_change=SettingsState.set_et_contact_name_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    rx.vstack(
+                                                        rx.text("Correo", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_email_1, on_change=SettingsState.set_et_contact_email_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    rx.vstack(
+                                                        rx.text("Teléfono", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_phone_1, on_change=SettingsState.set_et_contact_phone_1, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    columns="3", spacing="2", width="100%"
+                                                ),
+                                                spacing="2", width="100%"
+                                            ),
+                                            background="#19191b", border="1px solid #2c2c2e", border_radius="10px", padding="12px", width="100%"
                                         ),
-                                        rx.vstack(
-                                            rx.text("Teléfono", size="1", color="#8e8e93"),
-                                            rx.input(placeholder="+52 55 1234 5678", value=SettingsState.et_phone, on_change=SettingsState.set_et_phone, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                            spacing="1", width="100%",
+                                        # Contacto Secundario
+                                        rx.box(
+                                            rx.vstack(
+                                                rx.text("👥 Contacto Secundario", weight="bold", size="2", color="#8e8e93"),
+                                                rx.grid(
+                                                    rx.vstack(
+                                                        rx.text("Nombre", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_name_2, on_change=SettingsState.set_et_contact_name_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    rx.vstack(
+                                                        rx.text("Correo", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_email_2, on_change=SettingsState.set_et_contact_email_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    rx.vstack(
+                                                        rx.text("Teléfono", size="1", color="#8e8e93"),
+                                                        rx.input(value=SettingsState.et_contact_phone_2, on_change=SettingsState.set_et_contact_phone_2, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    columns="3", spacing="2", width="100%"
+                                                ),
+                                                spacing="2", width="100%"
+                                            ),
+                                            background="#19191b", border="1px solid #2c2c2e", border_radius="10px", padding="12px", width="100%"
                                         ),
-                                        rx.vstack(
-                                            rx.text("Sitio web", size="1", color="#8e8e93"),
-                                            rx.input(placeholder="https://empresa.com", value=SettingsState.et_website, on_change=SettingsState.set_et_website, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                            spacing="1", width="100%",
+                                        rx.hstack(
+                                            rx.button("💾 Guardar Cambios", on_click=SettingsState.save_tenant_edit, color_scheme="blue"),
+                                            rx.button("🗑️ Eliminar", on_click=SettingsState.delete_tenant_action(SettingsState.et_id), color_scheme="red", variant="soft"),
+                                            spacing="3", width="100%"
                                         ),
-                                        columns="2", spacing="3", width="100%",
+                                        rx.cond(SettingsState.et_msg != "", rx.text(SettingsState.et_msg, size="2", color="#30d158")),
+                                        spacing="3", align_items="stretch", width="100%"
                                     ),
-                                    rx.vstack(
-                                        rx.text("Notas internas", size="1", color="#8e8e93"),
-                                        rx.text_area(
-                                            placeholder="Plan contratado, contacto responsable, observaciones...",
-                                            value=SettingsState.et_notes,
-                                            on_change=SettingsState.set_et_notes,
-                                            background="#1c1c1e", border="1px solid #3a3a3c",
-                                            color="white", width="100%", rows="3",
-                                        ),
-                                        spacing="1", width="100%",
-                                    ),
-                                    rx.hstack(
-                                        rx.button("💾 Guardar cambios", on_click=SettingsState.save_tenant_edit, color_scheme="blue"),
-                                        rx.button("🗑 Eliminar empresa", on_click=SettingsState.delete_tenant_action(SettingsState.et_id), color_scheme="red", variant="soft"),
-                                        spacing="3",
-                                    ),
-                                    rx.cond(SettingsState.et_msg != "", rx.text(SettingsState.et_msg, size="2", color="#30d158")),
-                                    spacing="3", align_items="start",
+                                    background="#0d1117", border="1px solid #0fa3b1", border_radius="12px", padding="20px", width="100%"
                                 ),
-                                background="#0d1117", border="1px solid #388bfd",
-                                border_radius="12px", padding="20px", width="100%",
+                                rx.box(
+                                    rx.center(
+                                        rx.text("Selecciona una empresa para editar sus datos de contacto y parámetros.", color="#636366", size="2"),
+                                        height="100%"
+                                    ),
+                                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                                )
                             ),
+                            columns="2", spacing="4", width="100%"
                         ),
-
+                        
+                        rx.divider(color="#2c2c2e", margin="16px 0"),
+                        
+                        # Listado de Empresas
                         rx.heading("Empresas registradas", size="3", color="white"),
-
-                        # Lista de empresas con cards detalladas
-                        rx.vstack(
-                            rx.foreach(
-                                SettingsState.all_tenants,
-                                lambda t: rx.hstack(
-                                    rx.vstack(
-                                        rx.hstack(
-                                            rx.text(t["name"].to(str), weight="bold", size="3", color="white"),
-                                            rx.badge(
-                                                rx.cond(t["active"].to(bool), "Activa", "Inactiva"),
-                                                color_scheme=rx.cond(t["active"].to(bool), "green", "gray"),
-                                                size="1",
+                        rx.cond(
+                            SettingsState.all_tenants.length() > 0,
+                            rx.vstack(
+                                rx.foreach(
+                                    SettingsState.all_tenants,
+                                    lambda t: rx.hstack(
+                                        rx.vstack(
+                                            rx.hstack(
+                                                rx.text("🏢 " + t["name"].to(str), weight="bold", size="3", color="white"),
+                                                rx.badge(rx.cond(t["active"].to(bool), "Activa", "Inactiva"), color_scheme=rx.cond(t["active"].to(bool), "green", "gray")),
+                                                spacing="2", align_items="center"
                                             ),
-                                            spacing="2", align_items="center",
+                                            rx.grid(
+                                                rx.cond(
+                                                    t["contact_name_1"].to(str) != "",
+                                                    rx.vstack(
+                                                        rx.text("Contacto Principal:", size="1", color="#0fa3b1", weight="bold"),
+                                                        rx.text("👤 " + t["contact_name_1"].to(str), size="1", color="white"),
+                                                        rx.text("📧 " + t["contact_email_1"].to(str) + " · 📞 " + t["contact_phone_1"].to(str), size="1", color="#8e8e93"),
+                                                        spacing="0", align_items="start"
+                                                    ),
+                                                    rx.text("Sin contacto principal", size="1", color="#636366")
+                                                ),
+                                                rx.cond(
+                                                    t["contact_name_2"].to(str) != "",
+                                                    rx.vstack(
+                                                        rx.text("Contacto Secundario:", size="1", color="#8e8e93", weight="bold"),
+                                                        rx.text("👤 " + t["contact_name_2"].to(str), size="1", color="white"),
+                                                        rx.text("📧 " + t["contact_email_2"].to(str) + " · 📞 " + t["contact_phone_2"].to(str), size="1", color="#8e8e93"),
+                                                        spacing="0", align_items="start"
+                                                    ),
+                                                    rx.text("Sin contacto secundario", size="1", color="#636366")
+                                                ),
+                                                columns="2", spacing="4", width="100%", margin_top="4px"
+                                            ),
+                                            spacing="1", align_items="start", flex="1"
                                         ),
                                         rx.hstack(
+                                            rx.button("✏️ Editar", on_click=SettingsState.open_tenant_edit(t["id"].to(int)), size="1", variant="soft", color_scheme="blue"),
                                             rx.cond(
-                                                t["email"].to(str) != "",
-                                                rx.text("📧 " + t["email"].to(str), size="1", color="#8e8e93"),
+                                                t["id"].to(int) != 1,
+                                                rx.button("🗑️", on_click=SettingsState.delete_tenant_action(t["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
                                             ),
-                                            rx.cond(
-                                                t["phone"].to(str) != "",
-                                                rx.text("📞 " + t["phone"].to(str), size="1", color="#8e8e93"),
-                                            ),
-                                            rx.cond(
-                                                t["website"].to(str) != "",
-                                                rx.text("🌐 " + t["website"].to(str), size="1", color="#0A84FF"),
-                                            ),
-                                            spacing="4", flex_wrap="wrap",
+                                            spacing="2", align_items="center"
                                         ),
-                                        rx.cond(
-                                            t["notes"].to(str) != "",
-                                            rx.text("📝 " + t["notes"].to(str), size="1", color="#636366", font_style="italic"),
-                                        ),
-                                        spacing="1", align_items="start", flex="1",
-                                    ),
-                                    rx.button(
-                                        "✏️ Editar",
-                                        on_click=SettingsState.open_tenant_edit(t["id"].to(int)),
-                                        size="1", variant="soft", color_scheme="blue",
-                                        align_self="start",
-                                    ),
-                                    padding="14px",
-                                    border="1px solid #2c2c2e",
-                                    border_radius="10px",
-                                    width="100%",
-                                    align_items="start",
-                                    spacing="3",
+                                        padding="16px", border="1px solid #2c2c2e", border_radius="10px", width="100%", background="#111"
+                                    )
                                 ),
+                                width="100%", spacing="2"
                             ),
-                            width="100%", spacing="2",
+                            rx.text("No hay empresas registradas.", color="#636366", size="2")
                         ),
 
                         spacing="4", align_items="start", width="100%",
