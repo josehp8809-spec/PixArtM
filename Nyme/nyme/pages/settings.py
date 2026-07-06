@@ -114,6 +114,7 @@ class SettingsState(AppState):
 
     # Formularios Fase 2
     selected_ai_line_name: str = "Todas las líneas"
+    def set_selected_ai_line_name(self, v): self.selected_ai_line_name = v
     
     @rx.var
     def line_options_ai(self) -> list[str]:
