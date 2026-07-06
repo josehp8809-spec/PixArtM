@@ -115,6 +115,29 @@ class SettingsState(AppState):
     # Formularios Fase 2
     selected_ai_line_name: str = "Todas las líneas"
     def set_selected_ai_line_name(self, v): self.selected_ai_line_name = v
+
+    # ── Constructor de Flujos Conversacionales (Flows) ──
+    flows: list[dict] = []
+    new_flow_name: str = ""
+    new_flow_steps: list[dict] = []
+    flow_msg: str = ""
+    step_text: str = ""
+    step_action: str = "none"
+    step_action_val: str = ""
+
+    def set_new_flow_name(self, v): self.new_flow_name = v
+    def set_step_text(self, v): self.step_text = v
+    def set_step_action(self, v): self.step_action = v
+    def set_step_action_val(self, v): self.step_action_val = v
+
+    # ── Fuentes de Conocimiento (RAG) ──
+    selected_knowledge_agent_id: int = 0
+    selected_knowledge_agent_name: str = ""
+    new_knowledge_url: str = ""
+    agent_knowledge: list[dict] = []
+    knowledge_msg: str = ""
+    is_knowledge_modal_open: bool = False
+
     def set_new_knowledge_url(self, v): self.new_knowledge_url = v
 
     @rx.var
