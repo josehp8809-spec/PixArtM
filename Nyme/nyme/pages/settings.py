@@ -116,6 +116,14 @@ class SettingsState(AppState):
     selected_ai_line_name: str = "Todas las líneas"
     def set_selected_ai_line_name(self, v): self.selected_ai_line_name = v
     
+    # ── Constructor de Flujos Conversacionales (Flows) ──
+    flows: list[dict] = []
+    new_flow_name: str = ""
+    new_flow_steps: list[dict] = []
+    flow_msg: str = ""
+    step_text: str = ""
+    step_action: str = "none"
+    step_action_val: str = ""
     @rx.var
     def line_options_ai(self) -> list[str]:
         return ["Todas las líneas"] + [l["name"] for l in self.all_lines]
@@ -503,15 +511,6 @@ class SettingsState(AppState):
                 self.knowledge_msg = f"❌ Error al guardar {filename}: {err}"
                 
         self._refresh_knowledge()
-
-    # ── Constructor de Flujos Conversacionales (Flows) ──
-    flows: list[dict] = []
-    new_flow_name: str = ""
-    new_flow_steps: list[dict] = []
-    flow_msg: str = ""
-    step_text: str = ""
-    step_action: str = "none"
-    step_action_val: str = ""
 
     def _refresh_flows(self):
         self.flows = db.get_flows(self.tenant_id)
