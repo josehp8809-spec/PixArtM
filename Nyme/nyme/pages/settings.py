@@ -9,6 +9,44 @@ from database import db
 from whatsapp_client import wa_client
 from gemini_client import gemini
 
+# ── Funciones Auxiliares de Extracción de Texto para RAG ──
+def extract_text_from_pdf(file_path: str) -> str:
+    try:
+        from pypdf import PdfReader
+        reader = PdfReader(file_path)
+        text = ""
+        for page in reader.pages:
+            t = page.extract_text()
+            if t:
+                text += t + "\n"
+        return text.strip()
+    except Exception as e:
+        print(f"[PDF Extract] Error leyendo {file_path}: {e}")
+        return ""
+
+def extract_text_from_url(url: str) -> str:
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        res = requests.get(url, headers=headers, timeout=10)
+        if res.status_code != 200:
+            return ""
+        soup = BeautifulSoup(res.text, "html.parser")
+        
+        # Eliminar scripts y estilos que no aportan
+        for element in soup(["script", "style", "nav", "footer", "header"]):
+            element.decompose()
+            
+        text = soup.get_text(separator="\n")
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        return "\n".join(lines)
+    except Exception as e:
+        print(f"[URL Extract] Error leyendo {url}: {e}")
+        return ""
+
 
 class SettingsState(AppState):
     # Nueva línea/canal
@@ -309,19 +347,180 @@ class SettingsState(AppState):
         db.delete_quick_reply(qr_id, self.tenant_id)
         self._load_core_data()
 
-    # ── Fase 2 Agentes IA ──────────────────────────────────────────────
-    def set_selected_ai_line_name(self, v): 
-        self.selected_ai_line_name = v
+    # ── Fuentes de Conocimiento (RAG) ──
+    selected_knowledge_agent_id: int = 0
+    selected_knowledge_agent_name: str = ""
+    new_knowledge_url: str = ""
+    agent_knowledge: list[dict] = []
+    knowledge_msg: str = ""
+    is_knowledge_modal_open: bool = False
 
-    def save_ai_agent_settings(self):
-        line_id = 0
-        if self.selected_ai_line_name != "Todas las líneas":
-            for l in self.all_lines:
-                if l["name"] == self.selected_ai_line_name:
-                    line_id = l["id"]
-                    break
-        self.new_agent_line_id = line_id
-        self.create_ai_agent()
+    def toggle_knowledge_modal(self, agent_id: int, agent_name: str):
+        self.selected_knowledge_agent_id = agent_id
+        self.selected_knowledge_agent_name = agent_name
+        self.new_knowledge_url = ""
+        self.knowledge_msg = ""
+        self._refresh_knowledge()
+        self.is_knowledge_modal_open = not self.is_knowledge_modal_open
+
+    def close_knowledge_modal(self):
+        self.is_knowledge_modal_open = False
+
+    def _refresh_knowledge(self):
+        if self.selected_knowledge_agent_id > 0:
+            self.agent_knowledge = db.get_agent_knowledge(self.selected_knowledge_agent_id, self.tenant_id)
+        else:
+            self.agent_knowledge = []
+
+    def delete_knowledge(self, knowledge_id: int):
+        if db.delete_agent_knowledge(knowledge_id, self.tenant_id):
+            self.knowledge_msg = "🗑️ Fuente eliminada del conocimiento."
+            self._refresh_knowledge()
+        else:
+            self.knowledge_msg = "❌ Error al borrar fuente."
+
+    def add_knowledge_url(self):
+        url = self.new_knowledge_url.strip()
+        if not url:
+            self.knowledge_msg = "❌ URL requerida."
+            return
+        if not (url.startswith("http://") or url.startswith("https://")):
+            self.knowledge_msg = "❌ URL inválida (debe empezar con http/https)."
+            return
+            
+        self.knowledge_msg = "⏳ Extrayendo contenido web..."
+        content = extract_text_from_url(url)
+        if not content:
+            self.knowledge_msg = "❌ No se pudo extraer texto de la URL."
+            return
+            
+        name = url.replace("https://", "").replace("http://", "").split("/")[0] + " (Web)"
+        ok, err = db.create_agent_knowledge(self.selected_knowledge_agent_id, "url", name, content, self.tenant_id)
+        if ok:
+            self.knowledge_msg = "✅ URL agregada con éxito."
+            self.new_knowledge_url = ""
+            self._refresh_knowledge()
+        else:
+            self.knowledge_msg = f"❌ Error: {err}"
+
+    async def handle_knowledge_upload(self, files: list[rx.UploadFile]):
+        if self.selected_knowledge_agent_id <= 0:
+            self.knowledge_msg = "❌ Ningún agente seleccionado."
+            return
+            
+        for file in files:
+            content_bytes = await file.read()
+            filename = file.filename
+            
+            temp_path = os.path.join("uploaded_files", filename)
+            os.makedirs("uploaded_files", exist_ok=True)
+            with open(temp_path, "wb") as f:
+                f.write(content_bytes)
+                
+            text = ""
+            if filename.lower().endswith(".pdf"):
+                self.knowledge_msg = f"⏳ Procesando PDF: {filename}..."
+                text = extract_text_from_pdf(temp_path)
+            elif filename.lower().endswith(".txt"):
+                self.knowledge_msg = f"⏳ Procesando TXT: {filename}..."
+                try:
+                    text = content_bytes.decode("utf-8")
+                except Exception:
+                    try:
+                        text = content_bytes.decode("latin-1")
+                    except Exception:
+                        text = ""
+                        
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+                
+            if not text.strip():
+                self.knowledge_msg = f"❌ No se pudo extraer texto de {filename}."
+                continue
+                
+            ok, err = db.create_agent_knowledge(self.selected_knowledge_agent_id, "file", filename, text, self.tenant_id)
+            if ok:
+                self.knowledge_msg = f"✅ Archivo {filename} agregado al conocimiento."
+            else:
+                self.knowledge_msg = f"❌ Error al guardar {filename}: {err}"
+                
+        self._refresh_knowledge()
+
+    # ── Constructor de Flujos Conversacionales (Flows) ──
+    flows: list[dict] = []
+    new_flow_name: str = ""
+    new_flow_steps: list[dict] = []
+    flow_msg: str = ""
+    step_text: str = ""
+    step_action: str = "none"
+    step_action_val: str = ""
+
+    def _refresh_flows(self):
+        self.flows = db.get_flows(self.tenant_id)
+
+    def set_new_flow_name(self, v): self.new_flow_name = v
+    def set_step_text(self, v): self.step_text = v
+    def set_step_action(self, v): self.step_action = v
+    def set_step_action_val(self, v): self.step_action_val = v
+
+    def add_step_to_editing(self):
+        txt = self.step_text.strip()
+        if not txt:
+            self.flow_msg = "❌ El mensaje del paso es requerido."
+            return
+        
+        step_id = len(self.new_flow_steps) + 1
+        new_step = {
+            "id": step_id,
+            "text": txt,
+            "action": self.step_action,
+            "action_value": self.step_action_val.strip() if self.step_action != "none" else ""
+        }
+        self.new_flow_steps.append(new_step)
+        self.step_text = ""
+        self.step_action = "none"
+        self.step_action_val = ""
+        self.flow_msg = "➕ Paso añadido al borrador del flujo."
+
+    def clear_editing_steps(self):
+        self.new_flow_steps = []
+        self.flow_msg = "🧹 Borrador limpiado."
+
+    def create_conversational_flow(self):
+        name = self.new_flow_name.strip()
+        if not name:
+            self.flow_msg = "❌ El nombre del flujo es obligatorio."
+            return
+        if not self.new_flow_steps:
+            self.flow_msg = "❌ Debes añadir al menos un paso al flujo."
+            return
+            
+        ok, err = db.create_flow(name, self.new_flow_steps, self.tenant_id)
+        if ok:
+            self.flow_msg = f"✅ Flujo '{name}' creado exitosamente."
+            self.new_flow_name = ""
+            self.new_flow_steps = []
+            self._refresh_flows()
+        else:
+            self.flow_msg = f"❌ Error: {err}"
+
+    def delete_conversational_flow(self, flow_id: int):
+        if db.delete_flow(flow_id, self.tenant_id):
+            self.flow_msg = "🗑️ Flujo conversacional eliminado."
+            self._refresh_flows()
+        else:
+            self.flow_msg = "❌ Error al borrar flujo."
+
+    # Gancho on_mount_settings extendido
+    def on_mount_settings(self):
+        self.require_auth()
+        self._reload_users()
+        self._load_core_data()
+        self._refresh_flows()
+        if self.tenant_id == 1:
+            self._reload_tenants()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -547,6 +746,107 @@ def product_row(p: rx.Var) -> rx.Component:
         border="1px solid #2c2c2e",
         border_radius="10px",
         width="100%",
+    )
+
+
+def knowledge_base_modal() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.dialog.title("📖 Base de Conocimiento — " + SettingsState.selected_knowledge_agent_name, color="white", size="4"),
+                    rx.spacer(),
+                    rx.dialog.close(
+                        rx.button("✕", variant="ghost", size="1", on_click=SettingsState.close_knowledge_modal)
+                    ),
+                    width="100%", align_items="center"
+                ),
+                rx.text("Entrena a tu agente IA agregando PDFs, TXTs o URLs de sitios web. La IA usará esta información para contestar de manera precisa.", color="#8e8e93", size="2"),
+                
+                rx.divider(color="#2c2c2e", margin_y="8px"),
+                
+                # Cargar Archivos
+                rx.heading("📁 Cargar Archivos (PDF / TXT)", size="2", color="white"),
+                rx.upload(
+                    rx.vstack(
+                        rx.text("Arrastra archivos aquí o haz clic para seleccionar", color="#8e8e93", size="2"),
+                        rx.text("(Soporta .pdf, .txt)", color="#636366", size="1"),
+                        align_items="center",
+                        padding="20px",
+                        border="2px dashed #3a3a3c",
+                        border_radius="10px",
+                        cursor="pointer",
+                        width="100%",
+                        _hover={"background": "#1c1c1e"}
+                    ),
+                    id="knowledge_uploader",
+                    multiple=True,
+                    accept={
+                        "application/pdf": [".pdf"],
+                        "text/plain": [".txt"]
+                    },
+                    on_drop=SettingsState.handle_knowledge_upload(rx.upload_files(upload_id="knowledge_uploader")),
+                    width="100%"
+                ),
+                
+                # Cargar URL
+                rx.heading("🌐 Agregar Sitio Web (URL)", size="2", color="white", margin_top="8px"),
+                rx.hstack(
+                    rx.input(
+                        placeholder="Ej: https://miempresa.com/faq",
+                        value=SettingsState.new_knowledge_url,
+                        on_change=SettingsState.set_new_knowledge_url,
+                        background="#1c1c1e", border="1px solid #3a3a3c", color="white",
+                        flex="1"
+                    ),
+                    rx.button("🔗 Agregar", on_click=SettingsState.add_knowledge_url, color_scheme="blue"),
+                    width="100%"
+                ),
+                
+                rx.cond(
+                    SettingsState.knowledge_msg != "",
+                    rx.text(SettingsState.knowledge_msg, size="2", color="#30d158")
+                ),
+                
+                rx.divider(color="#2c2c2e", margin_y="8px"),
+                
+                # Lista de fuentes actuales
+                rx.heading("Fuentes actuales", size="2", color="white"),
+                rx.cond(
+                    SettingsState.agent_knowledge.length() > 0,
+                    rx.scroll_area(
+                        rx.vstack(
+                            rx.foreach(
+                                SettingsState.agent_knowledge,
+                                lambda k: rx.hstack(
+                                    rx.vstack(
+                                        rx.text(k["name"].to(str), weight="bold", size="2", color="white"),
+                                        rx.text("Tipo: " + k["source_type"].to(str) + " · Creado: " + k["created_at"].to(str), size="1", color="#8e8e93"),
+                                        spacing="0", align_items="start"
+                                    ),
+                                    rx.spacer(),
+                                    rx.button("🗑️", on_click=SettingsState.delete_knowledge(k["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                    width="100%", padding="8px", border_bottom="1px solid #2c2c2e"
+                                )
+                            ),
+                            width="100%"
+                        ),
+                        height="200px", width="100%"
+                    ),
+                    rx.text("El agente no tiene fuentes de conocimiento agregadas.", color="#636366", size="2")
+                ),
+                
+                spacing="3",
+                width="100%",
+                align_items="stretch"
+            ),
+            background="#111",
+            border="1px solid #2c2c2e",
+            border_radius="16px",
+            padding="24px",
+            max_width="550px"
+        ),
+        open=SettingsState.is_knowledge_modal_open
     )
 
 
@@ -905,6 +1205,13 @@ def settings_page() -> rx.Component:
                                             spacing="1", align_items="start"
                                         ),
                                         rx.spacer(),
+                                        rx.button(
+                                            "📖 Fuentes de Conocimiento",
+                                            on_click=SettingsState.toggle_knowledge_modal(a["id"].to(int), a["name"].to(str)),
+                                            size="1",
+                                            variant="soft",
+                                            color_scheme="blue"
+                                        ),
                                         rx.button("🗑️", on_click=SettingsState.delete_ai_agent(a["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
                                         padding="14px",
                                         border="1px solid #2c2c2e",
@@ -1005,107 +1312,193 @@ def settings_page() -> rx.Component:
                     value="templates", padding="24px 32px"
                 ),
 
-                # ── Automatizaciones (Workflows - Fase 3) ──────────────────
+                # ── Automatizaciones y Constructor de Flujos (Fase 3) ────────────────
                 rx.tabs.content(
                     rx.vstack(
                         rx.heading("⚙️ Flujos de Trabajo y Automatizaciones", size="4", color="white"),
-                        rx.text("Define reglas automáticas If/Then basadas en palabras clave recibidas en tus chats.", color="#8e8e93", size="2"),
+                        rx.text("Automatiza tus canales de mensajería creando reglas rápidas o flujos conversacionales interactivos paso a paso al estilo de Respond.io.", color="#8e8e93", size="2"),
                         
-                        # Formulario de Creación
-                        rx.box(
+                        rx.grid(
+                            # LADO IZQUIERDO: Reglas de Automatización Lineales
                             rx.vstack(
-                                rx.heading("Crear Nueva Regla de Automatización", size="3", color="white"),
-                                rx.grid(
+                                rx.box(
                                     rx.vstack(
-                                        rx.text("Nombre de la Regla", size="1", color="#8e8e93"),
-                                        rx.input(placeholder="Ej: Auto-Respuesta Precios", on_change=SettingsState.set_new_wf_name, value=SettingsState.new_wf_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                        spacing="1"
-                                    ),
-                                    rx.vstack(
-                                        rx.text("Trigger (Evento)", size="1", color="#8e8e93"),
-                                        rx.select(
-                                            ["message_received"],
-                                            value=SettingsState.new_wf_trigger,
-                                            on_change=SettingsState.set_new_wf_trigger,
-                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        rx.heading("1. Reglas Rápidas (If/Then)", size="3", color="white"),
+                                        rx.text("Respuestas o acciones automáticas cuando un mensaje contiene palabras clave.", color="#8e8e93", size="1"),
+                                        rx.vstack(
+                                            rx.text("Nombre de la Regla", size="1", color="#8e8e93"),
+                                            rx.input(placeholder="Ej: Auto-Respuesta Precios", on_change=SettingsState.set_new_wf_name, value=SettingsState.new_wf_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                            spacing="1", width="100%"
                                         ),
-                                        spacing="1"
-                                    ),
-                                    rx.vstack(
-                                        rx.text("Condición", size="1", color="#8e8e93"),
-                                        rx.select(
-                                            ["body_contains"],
-                                            value=SettingsState.new_wf_cond_field,
-                                            on_change=SettingsState.set_new_wf_cond_field,
-                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        rx.grid(
+                                            rx.vstack(
+                                                rx.text("Palabra Clave", size="1", color="#8e8e93"),
+                                                rx.input(placeholder="Ej: precio", on_change=SettingsState.set_new_wf_cond_val, value=SettingsState.new_wf_cond_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                spacing="1"
+                                            ),
+                                            rx.vstack(
+                                                rx.text("Acción", size="1", color="#8e8e93"),
+                                                rx.select(
+                                                    ["reply", "assign", "set_lifecycle"],
+                                                    value=SettingsState.new_wf_action_type,
+                                                    on_change=SettingsState.set_new_wf_action_type,
+                                                    background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                                ),
+                                                spacing="1"
+                                            ),
+                                            columns="2", spacing="2", width="100%"
                                         ),
-                                        spacing="1"
-                                    ),
-                                    rx.vstack(
-                                        rx.text("Palabra Clave", size="1", color="#8e8e93"),
-                                        rx.input(placeholder="Ej: precio (en minúsculas)", on_change=SettingsState.set_new_wf_cond_val, value=SettingsState.new_wf_cond_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                        spacing="1"
-                                    ),
-                                    rx.vstack(
-                                        rx.text("Acción a Ejecutar", size="1", color="#8e8e93"),
-                                        rx.select(
-                                            ["reply", "assign", "set_lifecycle"],
-                                            value=SettingsState.new_wf_action_type,
-                                            on_change=SettingsState.set_new_wf_action_type,
-                                            background="#1c1c1e", color="white", border="1px solid #3a3a3c", width="100%"
+                                        rx.vstack(
+                                            rx.text("Valor de la Acción", size="1", color="#8e8e93"),
+                                            rx.input(placeholder="Ej: El costo es $50 / admin / Lead", on_change=SettingsState.set_new_wf_action_val, value=SettingsState.new_wf_action_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                            spacing="1", width="100%"
                                         ),
-                                        spacing="1"
+                                        rx.button("⚙️ Guardar Regla", on_click=SettingsState.create_workflow, color_scheme="blue", width="100%"),
+                                        rx.cond(SettingsState.wf_msg != "", rx.text(SettingsState.wf_msg, size="2", color="#30d158")),
+                                        spacing="3", align_items="stretch", width="100%"
                                     ),
-                                    rx.vstack(
-                                        rx.text("Valor de la Acción", size="1", color="#8e8e93"),
-                                        rx.input(placeholder="Ej: El costo es $50 / admin / Lead", on_change=SettingsState.set_new_wf_action_val, value=SettingsState.new_wf_action_val, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                                        spacing="1"
-                                    ),
-                                    columns="3", spacing="3", width="100%"
+                                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
                                 ),
-                                rx.button("⚙️ Guardar Regla", on_click=SettingsState.create_workflow, color_scheme="blue", width="200px"),
-                                rx.cond(SettingsState.wf_msg != "", rx.text(SettingsState.wf_msg, size="2", color="#30d158")),
-                                spacing="3", align_items="start", width="100%"
+                                spacing="3", width="100%"
                             ),
-                            background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                            
+                            # LADO DERECHO: Constructor de Flujos Conversacionales Secuenciales
+                            rx.vstack(
+                                rx.box(
+                                    rx.vstack(
+                                        rx.heading("2. Flujos Conversacionales Paso a Paso", size="3", color="white"),
+                                        rx.text("Guía y califica a tus clientes de forma secuencial al iniciar el chat.", color="#8e8e93", size="1"),
+                                        rx.vstack(
+                                            rx.text("Nombre del Flujo", size="1", color="#8e8e93"),
+                                            rx.input(placeholder="Ej: Bienvenida y Calificación", value=SettingsState.new_flow_name, on_change=SettingsState.set_new_flow_name, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                                            spacing="1", width="100%"
+                                        ),
+                                        rx.box(
+                                            rx.vstack(
+                                                rx.text("Añadir paso al borrador", weight="bold", size="2", color="#0a84ff"),
+                                                rx.text("Mensaje a enviar:", size="1", color="#8e8e93"),
+                                                rx.text_area(placeholder="Ej: ¡Hola! ¿Cuál es tu nombre completo?", value=SettingsState.step_text, on_change=SettingsState.set_step_text, background="#1a1a1c", border="1px solid #3a3a3c", color="white", rows="2", width="100%"),
+                                                rx.grid(
+                                                    rx.vstack(
+                                                        rx.text("Acción al responder", size="1", color="#8e8e93"),
+                                                        rx.select(
+                                                            ["none", "ask_name", "ask_email", "assign_agent", "end_flow"],
+                                                            value=SettingsState.step_action,
+                                                            on_change=SettingsState.set_step_action,
+                                                            background="#1a1a1c", color="white", border="1px solid #3a3a3c", width="100%"
+                                                        ),
+                                                        spacing="1"
+                                                    ),
+                                                    rx.vstack(
+                                                        rx.text("Valor Acción (opcional)", size="1", color="#8e8e93"),
+                                                        rx.input(placeholder="Ej: admin / agente1", value=SettingsState.step_action_val, on_change=SettingsState.set_step_action_val, background="#1a1a1c", border="1px solid #3a3a3c", color="white", width="100%"),
+                                                        spacing="1"
+                                                    ),
+                                                    columns="2", spacing="2", width="100%"
+                                                ),
+                                                rx.hstack(
+                                                    rx.button("➕ Añadir Paso", on_click=SettingsState.add_step_to_editing, color_scheme="green", size="1"),
+                                                    rx.button("🧹 Limpiar", on_click=SettingsState.clear_editing_steps, variant="outline", size="1"),
+                                                    spacing="2"
+                                                ),
+                                                spacing="2", width="100%"
+                                            ),
+                                            background="#1c1c1e", border="1px solid #3a3a3c", border_radius="10px", padding="12px", width="100%"
+                                        ),
+                                        # Vista previa de pasos
+                                        rx.text("Pasos del flujo actual:", size="1", color="#8e8e93"),
+                                        rx.cond(
+                                            SettingsState.new_flow_steps.length() > 0,
+                                            rx.vstack(
+                                                rx.foreach(
+                                                    SettingsState.new_flow_steps,
+                                                    lambda s: rx.hstack(
+                                                        rx.badge(s["id"].to_string(), color_scheme="blue", radius="full"),
+                                                        rx.vstack(
+                                                            rx.text(s["text"].to(str), size="2", color="white", line_clamp=1),
+                                                            rx.text("Acción: " + s["action"].to(str) + rx.cond(s["action_value"].to(str) != "", " (" + s["action_value"].to(str) + ")", ""), size="1", color="#8e8e93"),
+                                                            spacing="0", align_items="start"
+                                                        ),
+                                                        width="100%", padding="4px", border_bottom="1px solid #2c2c2e"
+                                                    )
+                                                ),
+                                                width="100%"
+                                            ),
+                                            rx.text("Borrador vacío. Agrega pasos arriba.", color="#636366", size="1")
+                                        ),
+                                        rx.button("🚀 Guardar y Publicar Flujo", on_click=SettingsState.create_conversational_flow, color_scheme="blue", width="100%"),
+                                        rx.cond(SettingsState.flow_msg != "", rx.text(SettingsState.flow_msg, size="2", color="#30d158")),
+                                        spacing="3", align_items="stretch", width="100%"
+                                    ),
+                                    background="#111", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%"
+                                ),
+                                spacing="3", width="100%"
+                            ),
+                            columns="2", spacing="4", width="100%"
                         ),
                         
                         rx.divider(color="#2c2c2e", margin="16px 0"),
                         
-                        # Lista de Workflows
-                        rx.heading("Automatizaciones activas", size="3", color="white"),
-                        rx.cond(
-                            SettingsState.workflows.length() > 0,
+                        # Lista de Automatizaciones y Flujos Activos
+                        rx.grid(
                             rx.vstack(
-                                rx.foreach(
-                                    SettingsState.workflows,
-                                    lambda w: rx.hstack(
-                                        rx.vstack(
-                                            rx.text("⚙️ " + w["name"].to(str), weight="bold", size="3", color="white"),
-                                            rx.text(
-                                                rx.match(
-                                                    w["action_type"].to(str),
-                                                    ("reply", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', responder automáticamente: '" + w["action_value"].to(str) + "'"),
-                                                    ("assign", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', asignar chat a: @" + w["action_value"].to(str)),
-                                                    ("set_lifecycle", "Si el mensaje contiene '" + w["condition_value"].to(str) + "', cambiar etapa CRM a: " + w["action_value"].to(str)),
-                                                    "Acción desconocida"
+                                rx.heading("Automatizaciones lineales activas", size="3", color="white"),
+                                rx.cond(
+                                    SettingsState.workflows.length() > 0,
+                                    rx.vstack(
+                                        rx.foreach(
+                                            SettingsState.workflows,
+                                            lambda w: rx.hstack(
+                                                rx.vstack(
+                                                    rx.text("⚙️ " + w["name"].to(str), weight="bold", size="2", color="white"),
+                                                    rx.text(
+                                                        rx.match(
+                                                            w["action_type"].to(str),
+                                                            ("reply", "Si contiene '" + w["condition_value"].to(str) + "', responder: '" + w["action_value"].to(str) + "'"),
+                                                            ("assign", "Si contiene '" + w["condition_value"].to(str) + "', asignar a: @" + w["action_value"].to(str)),
+                                                            ("set_lifecycle", "Si contiene '" + w["condition_value"].to(str) + "', etapa CRM: " + w["action_value"].to(str)),
+                                                            "Acción desconocida"
+                                                        ),
+                                                        size="1", color="#8e8e93"
+                                                    ),
+                                                    spacing="0", align_items="start"
                                                 ),
-                                                size="2", color="#8e8e93"
-                                            ),
-                                            spacing="1", align_items="start"
+                                                rx.spacer(),
+                                                rx.button("🗑️", on_click=SettingsState.delete_workflow(w["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                                padding="10px", border="1px solid #2c2c2e", border_radius="8px", width="100%", background="#111"
+                                            )
                                         ),
-                                        rx.spacer(),
-                                        rx.button("🗑️", on_click=SettingsState.delete_workflow(w["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
-                                        padding="14px",
-                                        border="1px solid #2c2c2e",
-                                        border_radius="10px",
-                                        width="100%",
-                                        background="#111"
-                                    )
+                                        width="100%", spacing="2"
+                                    ),
+                                    rx.text("No tienes reglas lineales creadas.", color="#636366", size="2")
                                 ),
-                                width="100%", spacing="2"
+                                width="100%", spacing="3"
                             ),
-                            rx.text("No tienes flujos de trabajo creados.", color="#636366", size="2")
+                            rx.vstack(
+                                rx.heading("Flujos paso a paso activos", size="3", color="white"),
+                                rx.cond(
+                                    SettingsState.flows.length() > 0,
+                                    rx.vstack(
+                                        rx.foreach(
+                                            SettingsState.flows,
+                                            lambda f: rx.hstack(
+                                                rx.vstack(
+                                                    rx.text("🚀 " + f["name"].to(str), weight="bold", size="2", color="white"),
+                                                    rx.text("Pasos totales: " + f["steps"].length().to_string(), size="1", color="#8e8e93"),
+                                                    spacing="0", align_items="start"
+                                                ),
+                                                rx.spacer(),
+                                                rx.button("🗑️", on_click=SettingsState.delete_conversational_flow(f["id"].to(int)), size="1", variant="ghost", color="#ff453a"),
+                                                padding="10px", border="1px solid #2c2c2e", border_radius="8px", width="100%", background="#111"
+                                            )
+                                        ),
+                                        width="100%", spacing="2"
+                                    ),
+                                    rx.text("No tienes flujos paso a paso creados.", color="#636366", size="2")
+                                ),
+                                width="100%", spacing="3"
+                            ),
+                            columns="2", spacing="4", width="100%"
                         ),
                         spacing="4", align_items="start", width="100%"
                     ),
@@ -1275,6 +1668,7 @@ def settings_page() -> rx.Component:
             spacing="0",
             width="100%",
         ),
+        knowledge_base_modal(),
         background="#000000",
         spacing="0",
         min_height="100vh",

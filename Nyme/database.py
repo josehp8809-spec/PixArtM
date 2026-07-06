@@ -302,12 +302,10 @@ class Database:
                 cur.execute(
                     f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id) DEFAULT 1"
                 )
-                # Llenar registros anteriores huérfanos con el tenant 1
                 cur.execute(f"UPDATE {table} SET tenant_id = 1 WHERE tenant_id IS NULL")
             
             # Cambiar clave primaria de contacts a compuesta (wa_id, tenant_id)
             try:
-                # Verificar si ya es compuesta buscando en las restricciones
                 cur.execute("""
                     SELECT a.attname
                     FROM pg_index i
@@ -320,6 +318,38 @@ class Database:
                     cur.execute("ALTER TABLE contacts ADD PRIMARY KEY (wa_id, tenant_id)")
             except Exception as pk_err:
                 print(f"[DB] Advertencia migrando clave primaria de contacts: {pk_err}")
+
+            # ── Nuevas Tablas RAG de Agentes IA y Constructor de Flujos ──
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS ai_agent_knowledge (
+                    id          SERIAL PRIMARY KEY,
+                    agent_id    INTEGER REFERENCES ai_agents(id) ON DELETE CASCADE,
+                    source_type VARCHAR(20) NOT NULL,
+                    name        VARCHAR(255) NOT NULL,
+                    content     TEXT NOT NULL,
+                    created_at  TIMESTAMP DEFAULT NOW(),
+                    tenant_id   INTEGER REFERENCES tenants(id) DEFAULT 1
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS flow_builder (
+                    id          SERIAL PRIMARY KEY,
+                    name        VARCHAR(100) NOT NULL,
+                    steps       JSONB NOT NULL,
+                    is_active   BOOLEAN DEFAULT TRUE,
+                    created_at  TIMESTAMP DEFAULT NOW(),
+                    tenant_id   INTEGER REFERENCES tenants(id) DEFAULT 1
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS conversation_flow_state (
+                    wa_id           VARCHAR(20) PRIMARY KEY,
+                    flow_id         INTEGER REFERENCES flow_builder(id) ON DELETE CASCADE,
+                    current_step    INTEGER DEFAULT 0,
+                    collected_data  JSONB DEFAULT '{}'::jsonb,
+                    updated_at      TIMESTAMP DEFAULT NOW()
+                )
+            """)
 
             conn.commit()
             cur.close()
@@ -1602,6 +1632,157 @@ class Database:
             conn.commit(); cur.close(); conn.close(); return True
         except Exception as e:
             print(f"[DB] Error borrando flujo de trabajo: {e}")
+            return False
+
+    # ── CRUD RAG de Agentes IA (Fuentes de Conocimiento) ─────────────────
+    def create_agent_knowledge(self, agent_id, source_type, name, content, tenant_id):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO ai_agent_knowledge (agent_id, source_type, name, content, tenant_id) VALUES (%s, %s, %s, %s, %s)",
+                (agent_id, source_type, name, content, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True, None
+        except Exception as e:
+            print(f"[DB] Error creando fuente de conocimiento: {e}")
+            return False, str(e)
+
+    def get_agent_knowledge(self, agent_id, tenant_id):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, agent_id, source_type, name, content, created_at FROM ai_agent_knowledge WHERE agent_id = %s AND tenant_id = %s ORDER BY id DESC",
+                (agent_id, tenant_id)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0], "agent_id": r[1], "source_type": r[2], "name": r[3],
+                    "content": r[4], "created_at": r[5].strftime("%Y-%m-%d %H:%M") if r[5] else ""
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo fuentes de conocimiento: {e}")
+            return []
+
+    def delete_agent_knowledge(self, knowledge_id, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM ai_agent_knowledge WHERE id = %s AND tenant_id = %s", (knowledge_id, tenant_id))
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error borrando fuente de conocimiento: {e}")
+            return False
+
+    # ── CRUD Constructor de Flujos (Flows) ──────────────────────────────
+    def create_flow(self, name, steps, tenant_id):
+        if not self._check_available(): return False, "DB no disponible"
+        import json
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            steps_json = json.dumps(steps)
+            cur.execute(
+                "INSERT INTO flow_builder (name, steps, is_active, tenant_id) VALUES (%s, %s, TRUE, %s)",
+                (name, steps_json, tenant_id)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True, None
+        except Exception as e:
+            print(f"[DB] Error creando flujo: {e}")
+            return False, str(e)
+
+    def get_flows(self, tenant_id):
+        if not self._check_available(): return []
+        import json
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, name, steps, is_active, created_at FROM flow_builder WHERE tenant_id = %s ORDER BY id DESC",
+                (tenant_id,)
+            )
+            rows = cur.fetchall(); cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0], "name": r[1],
+                    "steps": json.loads(r[2]) if isinstance(r[2], str) else r[2],
+                    "is_active": bool(r[3]), "created_at": r[4].strftime("%Y-%m-%d %H:%M") if r[4] else ""
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo flujos: {e}")
+            return []
+
+    def delete_flow(self, flow_id, tenant_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM flow_builder WHERE id = %s AND tenant_id = %s", (flow_id, tenant_id))
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error borrando flujo: {e}")
+            return False
+
+    # ── Estado del Flujo Conversacional ──────────────────────────────────
+    def get_flow_state(self, wa_id):
+        if not self._check_available(): return None
+        import json
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT flow_id, current_step, collected_data FROM conversation_flow_state WHERE wa_id = %s",
+                (wa_id,)
+            )
+            row = cur.fetchone(); cur.close(); conn.close()
+            if not row:
+                return None
+            return {
+                "flow_id": row[0],
+                "current_step": row[1],
+                "collected_data": json.loads(row[2]) if isinstance(row[2], str) else row[2]
+            }
+        except Exception as e:
+            print(f"[DB] Error obteniendo estado del flujo: {e}")
+            return None
+
+    def save_flow_state(self, wa_id, flow_id, current_step, collected_data):
+        if not self._check_available(): return False
+        import json
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            collected_json = json.dumps(collected_data)
+            cur.execute(
+                """
+                INSERT INTO conversation_flow_state (wa_id, flow_id, current_step, collected_data, updated_at)
+                VALUES (%s, %s, %s, %s, NOW())
+                ON CONFLICT (wa_id)
+                DO UPDATE SET flow_id = EXCLUDED.flow_id, current_step = EXCLUDED.current_step,
+                              collected_data = EXCLUDED.collected_data, updated_at = NOW()
+                """,
+                (wa_id, flow_id, current_step, collected_json)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error guardando estado del flujo: {e}")
+            return False
+
+    def delete_flow_state(self, wa_id):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM conversation_flow_state WHERE wa_id = %s", (wa_id,))
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error borrando estado del flujo: {e}")
             return False
 
 db = Database()

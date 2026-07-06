@@ -199,6 +199,123 @@ async def webhook_get(request: Request):
         return PlainTextResponse(challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
 
+async def run_conversational_flows(wa_id: str, line_id: int, line: dict, body_text: str, tenant_id: int, channel_type: str) -> bool:
+    """
+    Ejecuta el motor de flujos conversacionales interactivos paso a paso.
+    Retorna True si el mensaje fue procesado por un flujo, y False en caso contrario.
+    """
+    from database import db
+    from whatsapp_client import wa_client
+    
+    state = db.get_flow_state(wa_id)
+    flows = db.get_flows(tenant_id)
+    
+    active_flows = [f for f in flows if f.get("is_active")]
+    if not active_flows and not state:
+        return False
+
+    flow = None
+    if state:
+        for f in active_flows:
+            if f["id"] == state["flow_id"]:
+                flow = f
+                break
+        if not flow:
+            db.delete_flow_state(wa_id)
+            return False
+    else:
+        flow = active_flows[0]
+        state = {
+            "flow_id": flow["id"],
+            "current_step": 0,
+            "collected_data": {}
+        }
+        db.save_flow_state(wa_id, flow["id"], 0, {})
+        
+        first_step = flow["steps"][0]
+        msg_text = first_step["text"]
+        
+        sent = False
+        if channel_type == "whatsapp":
+            r = wa_client.send_text_message(line, wa_id, msg_text)
+            sent = bool(r)
+        else:
+            from meta_client import meta_client
+            r = meta_client.send_message(line, wa_id, msg_text)
+            sent = bool(r)
+            
+        if sent:
+            db.save_message(
+                wa_id, "OUTBOUND_REPLY", msg_text,
+                agent_username=f"[Flujo: {flow['name']}]",
+                line_id=line_id, tenant_id=tenant_id,
+                channel_type=channel_type
+            )
+            return True
+        return False
+
+    current_step_idx = state["current_step"]
+    steps = flow["steps"]
+    
+    if current_step_idx >= len(steps):
+        db.delete_flow_state(wa_id)
+        return False
+        
+    current_step_def = steps[current_step_idx]
+    action = current_step_def.get("action", "none")
+    action_val = current_step_def.get("action_value", "")
+    collected_data = state["collected_data"] or {}
+    
+    if action == "ask_name":
+        collected_data["name"] = body_text
+        db.upsert_contact(wa_id, body_text, collected_data.get("email", ""), "Contacto de Flujo", tenant_id)
+    elif action == "ask_email":
+        collected_data["email"] = body_text
+        contact_name = collected_data.get("name", "Contacto de Flujo")
+        db.upsert_contact(wa_id, contact_name, body_text, "Contacto de Flujo", tenant_id)
+    elif action == "assign_agent":
+        if action_val:
+            db.assign_conversation(wa_id, line_id, action_val, tenant_id)
+    elif action == "end_flow":
+        db.delete_flow_state(wa_id)
+        return False
+
+    next_step_idx = current_step_idx + 1
+    if next_step_idx < len(steps):
+        next_step_def = steps[next_step_idx]
+        msg_text = next_step_def["text"]
+        
+        next_action = next_step_def.get("action", "none")
+        next_val = next_step_def.get("action_value", "")
+        if next_action == "assign_agent" and next_val:
+            db.assign_conversation(wa_id, line_id, next_val, tenant_id)
+            
+        db.save_flow_state(wa_id, flow["id"], next_step_idx, collected_data)
+        
+        sent = False
+        if channel_type == "whatsapp":
+            r = wa_client.send_text_message(line, wa_id, msg_text)
+            sent = bool(r)
+        else:
+            from meta_client import meta_client
+            r = meta_client.send_message(line, wa_id, msg_text)
+            sent = bool(r)
+            
+        if sent:
+            db.save_message(
+                wa_id, "OUTBOUND_REPLY", msg_text,
+                agent_username=f"[Flujo: {flow['name']}]",
+                line_id=line_id, tenant_id=tenant_id,
+                channel_type=channel_type
+            )
+            if next_action == "end_flow":
+                db.delete_flow_state(wa_id)
+            return True
+    else:
+        db.delete_flow_state(wa_id)
+        
+    return False
+
 
 async def webhook_post(request: Request):
     from database import db
@@ -246,14 +363,14 @@ async def webhook_post(request: Request):
                         db.save_message(wa_id, "INBOUND", body_text, line_id=line_id, tenant_id=tenant_id, channel_type="whatsapp")
                         db.mark_conversation_unread(wa_id, line_id)
 
-                        # Disparar respondedor de IA automático y workflows
+                        # Disparar respondedor de IA automático y workflows (condicionado a flujos conversacionales)
                         if t == "text" and line_id:
-                            asyncio.create_task(
-                                run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
-                            )
-                            asyncio.create_task(
-                                execute_workflows_for_message(wa_id, line_id, line, body_text, tenant_id)
-                            )
+                            async def run_whatsapp_logic():
+                                flow_processed = await run_conversational_flows(wa_id, line_id, line, body_text, tenant_id, "whatsapp")
+                                if not flow_processed:
+                                    await run_ai_agent_responder(wa_id, line_id, line, body_text, tenant_id)
+                                    await execute_workflows_for_message(wa_id, line_id, line, body_text, tenant_id)
+                            asyncio.create_task(run_whatsapp_logic())
 
                         if first and line and line.get("welcome_active") and line.get("welcome_message"):
                             r = wa_client.send_text_message(line, wa_id, line["welcome_message"])
@@ -335,14 +452,14 @@ async def webhook_post(request: Request):
                     )
                     db.mark_conversation_unread(contact_wa_id, line_id)
 
-                    # Disparar IA y Workflows para redes sociales
+                    # Disparar IA y Workflows para redes sociales (condicionado a flujos conversacionales)
                     if body_text and not body_text.startswith("["):
-                        asyncio.create_task(
-                            run_ai_agent_responder(contact_wa_id, line_id, channel, body_text, tenant_id)
-                        )
-                        asyncio.create_task(
-                            execute_workflows_for_message(contact_wa_id, line_id, channel, body_text, tenant_id)
-                        )
+                        async def run_social_logic():
+                            flow_processed = await run_conversational_flows(contact_wa_id, line_id, channel, body_text, tenant_id, channel_type)
+                            if not flow_processed:
+                                await run_ai_agent_responder(contact_wa_id, line_id, channel, body_text, tenant_id)
+                                await execute_workflows_for_message(contact_wa_id, line_id, channel, body_text, tenant_id)
+                        asyncio.create_task(run_social_logic())
 
                     # Mensaje de bienvenida
                     first = db.is_first_contact(contact_wa_id, line_id)
@@ -436,13 +553,35 @@ async def run_ai_agent_responder(wa_id: str, line_id: int, line: dict, incoming_
     # 3. Obtener el historial reciente del chat
     history = db.get_messages(wa_id, tenant_id)
     
-    # 4. Generar respuesta con Gemini
-    ai_reply = gemini.generate_agent_reply(agent["system_prompt"], history)
+    # 4. Obtener e inyectar conocimiento del agente (RAG)
+    knowledge_list = db.get_agent_knowledge(agent["id"], tenant_id)
+    knowledge_context = ""
+    if knowledge_list:
+        knowledge_context = "\n\n[CONOCIMIENTO OFICIAL DE LA EMPRESA (Usa esto para responder)]\n"
+        for k in knowledge_list:
+            knowledge_context += f"\n--- Fuente: {k['name']} ---\n{k['content']}\n"
+        knowledge_context += "\n------------------------------------------------------\n"
+        knowledge_context += "Responde al cliente de forma natural usando únicamente la información de arriba. Si la pregunta no se puede contestar con esa información, indícale de forma muy cortés que lo vas a comunicar con un asesor humano (no inventes información)."
+    
+    system_prompt = agent["system_prompt"] + knowledge_context
+
+    # 5. Generar respuesta con Gemini
+    ai_reply = gemini.generate_agent_reply(system_prompt, history)
     if ai_reply:
-        # 5. Enviar la respuesta por WhatsApp vía API de Meta
-        r = wa_client.send_text_message(line, wa_id, ai_reply)
-        if r:
-            # 6. Guardar en BD
+        # 6. Enviar la respuesta usando el canal correcto (WhatsApp o Messenger/Instagram)
+        channel_type = line.get("channel_type", "whatsapp")
+        sent = False
+        
+        if channel_type == "whatsapp":
+            r = wa_client.send_text_message(line, wa_id, ai_reply)
+            sent = bool(r)
+        else:
+            from meta_client import meta_client
+            r = meta_client.send_message(line, wa_id, ai_reply)
+            sent = bool(r)
+            
+        if sent:
+            # 7. Guardar en BD
             db.save_message(
                 wa_id, "OUTBOUND_REPLY", ai_reply,
                 agent_username=f"[IA] {agent['name']}",
