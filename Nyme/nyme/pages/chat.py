@@ -670,7 +670,10 @@ def chat_page() -> rx.Component:
             rx.cond(AppState.selected_contact != "", orders_sidebar()),
             spacing="0", width="100%", height="100%", overflow="hidden"
         ),
-        rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.reset_sound_tick, display="none"),
+        rx.box(
+            rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.reset_sound_tick),
+            display="none"
+        ),
         background="#000",
         spacing="0",
         width="100%",
