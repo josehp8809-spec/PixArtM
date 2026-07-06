@@ -1234,7 +1234,7 @@ def settings_page() -> rx.Component:
                                     ),
                                     spacing="1", width="100%"
                                 ),
-                                rx.button("🤖 Guardar Agente IA", on_click=SettingsState.save_ai_agent_settings, color_scheme="blue", width="200px"),
+                                rx.button("🤖 Guardar Agente IA", on_click=SettingsState.create_ai_agent, color_scheme="blue", width="200px"),
                                 rx.cond(SettingsState.agent_msg != "", rx.text(SettingsState.agent_msg, size="2", color="#30d158")),
                                 spacing="3", align_items="start", width="100%"
                             ),
