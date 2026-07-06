@@ -115,15 +115,8 @@ class SettingsState(AppState):
     # Formularios Fase 2
     selected_ai_line_name: str = "Todas las líneas"
     def set_selected_ai_line_name(self, v): self.selected_ai_line_name = v
-    
-    # ── Constructor de Flujos Conversacionales (Flows) ──
-    flows: list[dict] = []
-    new_flow_name: str = ""
-    new_flow_steps: list[dict] = []
-    flow_msg: str = ""
-    step_text: str = ""
-    step_action: str = "none"
-    step_action_val: str = ""
+    def set_new_knowledge_url(self, v): self.new_knowledge_url = v
+
     @rx.var
     def line_options_ai(self) -> list[str]:
         return ["Todas las líneas"] + [l["name"] for l in self.all_lines]
@@ -410,14 +403,6 @@ class SettingsState(AppState):
     def delete_qr(self, qr_id: int):
         db.delete_quick_reply(qr_id, self.tenant_id)
         self._load_core_data()
-
-    # ── Fuentes de Conocimiento (RAG) ──
-    selected_knowledge_agent_id: int = 0
-    selected_knowledge_agent_name: str = ""
-    new_knowledge_url: str = ""
-    agent_knowledge: list[dict] = []
-    knowledge_msg: str = ""
-    is_knowledge_modal_open: bool = False
 
     def toggle_knowledge_modal(self, agent_id: int, agent_name: str):
         self.selected_knowledge_agent_id = agent_id
@@ -1539,7 +1524,7 @@ def settings_page() -> rx.Component:
                                             lambda f: rx.hstack(
                                                 rx.vstack(
                                                     rx.text("🚀 " + f["name"].to(str), weight="bold", size="2", color="white"),
-                                                    rx.text("Pasos totales: " + f["steps"].length().to_string(), size="1", color="#8e8e93"),
+                                                    rx.text("Pasos totales: " + f["steps"].to(list).length().to(str), size="1", color="#8e8e93"),
                                                     spacing="0", align_items="start"
                                                 ),
                                                 rx.spacer(),
