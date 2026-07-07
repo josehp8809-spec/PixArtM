@@ -371,6 +371,7 @@ class Database:
         if not self._check_available():
             return False
         conn = None
+        # Step 1: Guardar el mensaje en la tabla messages
         try:
             conn = self.get_connection()
             cur = conn.cursor()
@@ -378,22 +379,10 @@ class Database:
                 "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id, channel_type, sender_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (wa_id, msg_type, body, agent_username, line_id, tenant_id, channel_type, sender_name),
             )
-            
-            # Intentar insertar en quota_logs de forma independiente para que fallos ahí no aborten el mensaje
-            if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
-                try:
-                    cur.execute(
-                        "INSERT INTO quota_logs (type, agent_username, tenant_id) VALUES (%s, %s, %s)",
-                        (msg_type, agent_username, tenant_id),
-                    )
-                except Exception as quota_err:
-                    print(f"[DB] Advertencia insertando log de cuota: {quota_err}")
-                    # No hacemos raise para que el mensaje sí se guarde
-                    
             conn.commit()
             cur.close()
             conn.close()
-            return True
+            conn = None  # Marcado como cerrado
         except Exception as e:
             if conn:
                 try:
@@ -401,8 +390,33 @@ class Database:
                     conn.close()
                 except Exception:
                     pass
-            print(f"[DB] Error guardando mensaje: {e}")
+            print(f"[DB] Error guardando mensaje en tabla messages: {e}")
             return False
+
+        # Step 2: Intentar registrar la cuota de forma independiente si aplica
+        if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
+            quota_conn = None
+            try:
+                quota_conn = self.get_connection()
+                quota_cur = quota_conn.cursor()
+                quota_cur.execute(
+                    "INSERT INTO quota_logs (type, agent_username, tenant_id) VALUES (%s, %s, %s)",
+                    (msg_type, agent_username, tenant_id),
+                )
+                quota_conn.commit()
+                quota_cur.close()
+                quota_conn.close()
+            except Exception as quota_err:
+                print(f"[DB] Advertencia insertando log de cuota de forma independiente: {quota_err}")
+                if quota_conn:
+                    try:
+                        quota_conn.rollback()
+                        quota_conn.close()
+                    except Exception:
+                        pass
+                # No retornamos False aquí, porque el mensaje en messages ya se commiteó con éxito en el Step 1
+
+        return True
 
     def get_quota_usage(self, tenant_id):
          if not self._check_available():

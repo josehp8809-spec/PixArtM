@@ -157,6 +157,9 @@
 }
 
 /* ── Ocultar insignia "Built with Reflex" ────────────────────────── */
-#__reflex-badge, .__reflex-badge, #reflex-badge, [class*="reflex-badge"] {
+#__reflex-badge, .__reflex-badge, #reflex-badge, [class*="reflex-badge"], a[href*="reflex.dev"], img[src*="reflex"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }

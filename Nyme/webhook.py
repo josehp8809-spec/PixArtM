@@ -147,7 +147,8 @@ async def receive_message(request: Request):
                     contact_wa_id = f"{prefix}{sender_id}"
                     message_data = messaging_event["message"]
 
-                    if message_data.get("is_echo") or str(sender_id) == str(page_id):
+                    is_echo_flag = message_data.get("is_echo") is True or message_data.get("is_echo") == "true"
+                    if is_echo_flag or (page_id and str(sender_id).strip() == str(page_id).strip()):
                         continue
 
                     body_text = message_data.get("text", "")
