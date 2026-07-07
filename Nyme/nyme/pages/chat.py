@@ -184,9 +184,7 @@ def message_bubble(msg: rx.Var) -> rx.Component:
         border="1px solid #FFD60A",
         border_radius="12px",
         padding="12px",
-        margin_y="4px",
-        width="90%",
-        align_self="center", # Se centra en la pantalla
+        width="100%",
     )
 
     # Burbuja Normal (Inbound/Outbound)
@@ -212,7 +210,13 @@ def message_bubble(msg: rx.Var) -> rx.Component:
         class_name=rx.cond(is_in, "bubble-in", "bubble-out"),
     )
 
-    return rx.cond(is_note, note_content, normal_content)
+    return rx.hstack(
+        rx.cond(is_note, note_content, normal_content),
+        width="100%",
+        justify=rx.cond(is_note, "center", rx.cond(is_in, "start", "end")),
+        padding_x="12px",
+        margin_y="4px",
+    )
 
 def quick_reply_btn(qr: rx.Var) -> rx.Component:
     shortcut = qr["shortcut"].to(str)
@@ -515,7 +519,7 @@ def _active_chat() -> rx.Component:
             width="100%", position="relative", class_name="input-row",
         ),
 
-        background="#000", width="100%", height="100dvh", spacing="0", overflow="hidden",
+        background="#000", width="100%", height="100%", spacing="0", overflow="hidden",
     )
 
 def order_draft_item(item: dict) -> rx.Component:
@@ -666,9 +670,26 @@ def chat_page() -> rx.Component:
         navbar("/chat"),
         rx.hstack(
             contacts_panel(), 
-            rx.box(rx.cond(AppState.selected_contact != "", _active_chat(), rx.center(rx.vstack(rx.text("💬", size="9"), rx.heading("Nyme", size="7", color="white"), rx.text("Selecciona una conversación", color="#8e8e93")), height="100%", background="#000")), flex="1", height="100%"), 
+            rx.box(
+                rx.cond(
+                    AppState.selected_contact != "", 
+                    _active_chat(), 
+                    rx.center(
+                        rx.vstack(
+                            rx.text("💬", size="9"), 
+                            rx.heading("Nyme", size="7", color="white"), 
+                            rx.text("Selecciona una conversación", color="#8e8e93")
+                        ), 
+                        height="100%", 
+                        background="#000"
+                    )
+                ), 
+                flex="1", 
+                height="100%",
+                class_name=rx.cond(AppState.mobile_view == "contacts", "chat-panel hidden-mobile", "chat-panel")
+            ), 
             rx.cond(AppState.selected_contact != "", orders_sidebar()),
-            spacing="0", width="100%", height="100%", overflow="hidden"
+            spacing="0", width="100%", flex="1", overflow="hidden"
         ),
         rx.box(
             rx.audio(url="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3", playing=AppState.play_sound_tick > 0, on_ended=AppState.reset_sound_tick),
