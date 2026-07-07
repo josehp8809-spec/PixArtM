@@ -368,27 +368,41 @@ class Database:
     # ── Messages ──────────────────────────────────────────────────────
 
     def save_message(self, wa_id, msg_type, body, agent_username=None, line_id=None, tenant_id=1, channel_type='whatsapp', sender_name=None):
-         if not self._check_available():
-             return False
-         try:
-             conn = self.get_connection()
-             cur = conn.cursor()
-             cur.execute(
-                 "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id, channel_type, sender_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                 (wa_id, msg_type, body, agent_username, line_id, tenant_id, channel_type, sender_name),
-             )
-             if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
-                 cur.execute(
-                     "INSERT INTO quota_logs (type, agent_username, tenant_id) VALUES (%s, %s, %s)",
-                     (msg_type, agent_username, tenant_id),
-                 )
-             conn.commit()
-             cur.close()
-             conn.close()
-             return True
-         except Exception as e:
-             print(f"[DB] Error guardando mensaje: {e}")
-             return False
+        if not self._check_available():
+            return False
+        conn = None
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO messages (wa_id, type, body, agent_username, line_id, tenant_id, channel_type, sender_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (wa_id, msg_type, body, agent_username, line_id, tenant_id, channel_type, sender_name),
+            )
+            
+            # Intentar insertar en quota_logs de forma independiente para que fallos ahí no aborten el mensaje
+            if msg_type in ("OUTBOUND_INIT", "OUTBOUND_REPLY"):
+                try:
+                    cur.execute(
+                        "INSERT INTO quota_logs (type, agent_username, tenant_id) VALUES (%s, %s, %s)",
+                        (msg_type, agent_username, tenant_id),
+                    )
+                except Exception as quota_err:
+                    print(f"[DB] Advertencia insertando log de cuota: {quota_err}")
+                    # No hacemos raise para que el mensaje sí se guarde
+                    
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True
+        except Exception as e:
+            if conn:
+                try:
+                    conn.rollback()
+                    conn.close()
+                except Exception:
+                    pass
+            print(f"[DB] Error guardando mensaje: {e}")
+            return False
 
     def get_quota_usage(self, tenant_id):
          if not self._check_available():

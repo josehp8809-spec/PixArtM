@@ -147,8 +147,7 @@ async def receive_message(request: Request):
                     contact_wa_id = f"{prefix}{sender_id}"
                     message_data = messaging_event["message"]
 
-                    # Saltar si es un mensaje enviado por nuestra propia app/página
-                    if message_data.get("is_echo"):
+                    if message_data.get("is_echo") or str(sender_id) == str(page_id):
                         continue
 
                     body_text = message_data.get("text", "")

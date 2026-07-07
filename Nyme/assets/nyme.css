@@ -155,3 +155,8 @@
         padding: 16px !important;
     }
 }
+
+/* ── Ocultar insignia "Built with Reflex" ────────────────────────── */
+#__reflex-badge, .__reflex-badge, #reflex-badge, [class*="reflex-badge"] {
+    display: none !important;
+}
