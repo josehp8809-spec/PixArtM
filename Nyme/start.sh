@@ -21,4 +21,4 @@ fi
 
 # Correr el backend de Reflex en el puerto asignado.
 # Como el backend es el que expone el puerto, el WebSocket /_event se conectará de inmediato y de forma nativa.
-python -m reflex run --backend-only --loglevel info
+python -u -m reflex run --backend-only --loglevel info
