@@ -126,7 +126,8 @@ class Database:
                 id SERIAL PRIMARY KEY,
                 type VARCHAR(20) DEFAULT 'OUTBOUND_INIT',
                 agent_username VARCHAR(50),
-                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                tenant_id INTEGER REFERENCES tenants(id) DEFAULT 1
             )
             """,
             # 8. Settings (Configuración)
@@ -303,7 +304,7 @@ class Database:
             cur.execute("ALTER TABLE contacts ADD COLUMN IF NOT EXISTS channel_type VARCHAR(20) DEFAULT 'whatsapp'")
             
             # Migraciones Multi-tenant: Agregar tenant_id con valor por defecto 1 a todas las tablas principales
-            tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines"]
+            tables_to_migrate = ["users", "lines", "contacts", "messages", "orders", "products", "quick_replies", "conversation_status", "user_lines", "quota_logs"]
             for table in tables_to_migrate:
                 cur.execute(
                     f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id) DEFAULT 1"
