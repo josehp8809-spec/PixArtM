@@ -185,9 +185,13 @@ def _verify_sig(payload: bytes, sig_header: str) -> bool:
     if not APP_SECRET:
         return True
     if not sig_header or not sig_header.startswith("sha256="):
+        print(f"[Webhook _verify_sig] Cabecera de firma vacía o formato inválido: {sig_header}")
         return False
     expected = hmac.new(APP_SECRET.encode(), payload, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, sig_header[7:])
+    result = hmac.compare_digest(expected, sig_header[7:])
+    if not result:
+        print(f"[Webhook _verify_sig] Mismatch de firma. Esperada: {expected}, Recibida: {sig_header[7:]}")
+    return result
 
 
 async def webhook_get(request: Request):
@@ -323,12 +327,15 @@ async def webhook_post(request: Request):
 
     raw  = await request.body()
     sig  = request.headers.get("X-Hub-Signature-256", "")
+    print(f"[Webhook POST] Solicitud recibida. X-Hub-Signature-256: {sig}")
     if not _verify_sig(raw, sig):
+        print(f"[Webhook POST] ❌ Firma SHA256 inválida o rechazada. APP_SECRET configurado: {bool(APP_SECRET)}")
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     try:
         body = json.loads(raw)
         obj_type = body.get("object")
+        print(f"[Webhook POST] Cuerpo decodificado correctamente. object: {obj_type}")
         if obj_type not in ("whatsapp_business_account", "page", "instagram"):
             return JSONResponse({"status": "ignored"})
 
@@ -362,6 +369,7 @@ async def webhook_post(request: Request):
                         first = db.is_first_contact(wa_id, line_id) if line_id else False
                         db.save_message(wa_id, "INBOUND", body_text, line_id=line_id, tenant_id=tenant_id, channel_type="whatsapp")
                         db.mark_conversation_unread(wa_id, line_id)
+                        print(f"[Webhook POST] 📩 Mensaje WhatsApp de +{wa_id} guardado para line_id {line_id} (tenant {tenant_id}): {body_text[:60]}")
 
                         # Disparar respondedor de IA automático y workflows (condicionado a flujos conversacionales)
                         if t == "text" and line_id:
@@ -477,6 +485,9 @@ async def webhook_post(request: Request):
                             )
         return JSONResponse({"status": "ok"})
     except Exception as e:
+        import traceback
+        print(f"[Webhook POST] ❌ Error procesando el webhook: {e}")
+        traceback.print_exc()
         return JSONResponse({"status": "error", "detail": str(e)})
 
 async def execute_workflows_for_message(wa_id: str, line_id: int, line: dict, text: str, tenant_id: int):
