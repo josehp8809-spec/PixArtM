@@ -49,6 +49,12 @@ def extract_text_from_url(url: str) -> str:
 
 
 class SettingsState(AppState):
+    # Variables para Onboarding de Facebook/Instagram (Opción 2)
+    fb_discovered_channels: list[dict] = []
+    fb_modal_open: bool = False
+    fb_loading: bool = False
+    fb_status_msg: str = ""
+
     # Nueva línea/canal
     nl_name: str = ""
     nl_phone_id: str = ""
@@ -148,12 +154,116 @@ class SettingsState(AppState):
     def tenant_options_for_user(self) -> list[str]:
         return [t["name"] for t in self.all_tenants]
 
+    @rx.var
+    def facebook_login_url(self) -> str:
+        client_id = os.getenv("META_APP_ID", "")
+        redirect_uri = os.getenv("META_REDIRECT_URI", "")
+        return f"https://www.facebook.com/v19.0/dialog/oauth?client_id={client_id}&redirect_uri={redirect_uri}&scope=pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages&response_type=code"
+
     def on_mount_settings(self):
         self.require_auth()
         self._reload_users()
         self._load_core_data()
         if self.tenant_id == 1:
             self._reload_tenants()
+        
+        # Procesar código de OAuth de Facebook si viene en los parámetros de la URL
+        code = self.router.page.params.get("code")
+        if code:
+            return self.process_facebook_oauth_code(code)
+
+    def process_facebook_oauth_code(self, code: str):
+        self.fb_loading = True
+        self.fb_status_msg = "Conectando con Facebook..."
+        self.fb_modal_open = True
+        yield
+        
+        # Leer credenciales del entorno
+        client_id = os.getenv("META_APP_ID")
+        client_secret = os.getenv("META_APP_SECRET")
+        redirect_uri = os.getenv("META_REDIRECT_URI")
+        
+        if not client_id or not client_secret or not redirect_uri:
+            self.fb_status_msg = "❌ Error: Configuración de Meta App incompleta en el servidor (.env)."
+            self.fb_loading = False
+            return
+            
+        from nyme.onboarding import meta_onboarding
+        # Intercambiar código por token de larga duración
+        user_token = meta_onboarding.exchange_code_for_long_lived_token(
+            client_id, client_secret, redirect_uri, code
+        )
+        
+        if not user_token:
+            self.fb_status_msg = "❌ Error al autenticar con Facebook. Intente nuevamente."
+            self.fb_loading = False
+            return
+            
+        # Obtener páginas de Facebook e Instagram asociadas
+        pages = meta_onboarding.get_pages_and_instagrams(user_token)
+        if not pages:
+            self.fb_status_msg = "⚠️ No se encontraron páginas de Facebook o cuentas de Instagram vinculadas en esta cuenta."
+            self.fb_loading = False
+            return
+            
+        self.fb_discovered_channels = pages
+        self.fb_status_msg = f"✅ Se encontraron {len(pages)} canales disponibles. Seleccione los que desea activar:"
+        self.fb_loading = False
+
+    def activate_discovered_channel(self, channel_data: dict, activate_instagram: bool = False):
+        self.fb_loading = True
+        self.fb_status_msg = "Suscribiendo canal en Meta..."
+        yield
+        
+        from nyme.onboarding import meta_onboarding
+        
+        page_id = channel_data["page_id"]
+        access_token = channel_data["access_token"]
+        name = channel_data["name"]
+        
+        # Suscribir la app a la página
+        subscribed = meta_onboarding.subscribe_app_to_page(page_id, access_token)
+        if not subscribed:
+            self.fb_status_msg = f"❌ Error al suscribir la app a la página {name}."
+            self.fb_loading = False
+            return
+            
+        # Registrar o actualizar en base de datos
+        if activate_instagram:
+            if not channel_data.get("instagram_id"):
+                self.fb_status_msg = "❌ Error: No hay cuenta de Instagram vinculada a esta página."
+                self.fb_loading = False
+                return
+                
+            ig_id = channel_data["instagram_id"]
+            ig_name = f"{channel_data['instagram_username']} (Instagram)"
+            ok, err = db.upsert_facebook_line(
+                name=ig_name,
+                page_id=ig_id,
+                access_token=access_token,
+                tenant_id=self.tenant_id,
+                channel_type="instagram"
+            )
+        else:
+            ok, err = db.upsert_facebook_line(
+                name=f"{name} (Messenger)",
+                page_id=page_id,
+                access_token=access_token,
+                tenant_id=self.tenant_id,
+                channel_type="messenger"
+            )
+            
+        if ok:
+            self.fb_status_msg = f"✅ Canal '{name}' activado con éxito."
+            self._load_core_data()
+        else:
+            self.fb_status_msg = f"❌ Error guardando el canal: {err}"
+            
+        self.fb_loading = False
+
+    def close_fb_modal(self):
+        self.fb_modal_open = False
+        return rx.redirect("/settings")
 
     def _reload_users(self):
         raw = db.get_users_by_tenant(self.tenant_id)
@@ -913,6 +1023,66 @@ def knowledge_base_modal() -> rx.Component:
     )
 
 
+def facebook_onboarding_modal() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.heading("🔌 Conectar Canales de Facebook / Instagram", size="4", color="white"),
+                    rx.spacer(),
+                    rx.button("❌ Cerrar", on_click=SettingsState.close_fb_modal, size="1", variant="ghost"),
+                    width="100%", align_items="center"
+                ),
+                
+                rx.text(SettingsState.fb_status_msg, size="2", color="white"),
+                
+                rx.cond(
+                    SettingsState.fb_loading,
+                    rx.center(rx.spinner(size="3"), width="100%", padding="20px"),
+                    rx.vstack(
+                        rx.foreach(
+                            SettingsState.fb_discovered_channels,
+                            lambda p: rx.hstack(
+                                rx.vstack(
+                                    rx.text(p["name"].to(str), size="2", weight="bold", color="white"),
+                                    rx.cond(
+                                        p["has_instagram"],
+                                        rx.text("📸 Instagram: @" + p["instagram_username"].to(str), size="1", color="#d62976"),
+                                        rx.text("Sin cuenta de Instagram vinculada", size="1", color="#8e8e93")
+                                    ),
+                                    spacing="0", align_items="start"
+                                ),
+                                rx.spacer(),
+                                rx.hstack(
+                                    rx.button(
+                                        "Activar Messenger",
+                                        on_click=lambda: SettingsState.activate_discovered_channel(p, False),
+                                        size="1", color_scheme="blue"
+                                    ),
+                                    rx.cond(
+                                        p["has_instagram"],
+                                        rx.button(
+                                            "Activar Instagram",
+                                            on_click=lambda: SettingsState.activate_discovered_channel(p, True),
+                                            size="1", color_scheme="pink"
+                                        )
+                                    ),
+                                    spacing="2"
+                                ),
+                                width="100%", padding="12px", border_bottom="1px solid #2c2c2e", align_items="center"
+                            )
+                        ),
+                        width="100%", spacing="2"
+                    )
+                ),
+                spacing="4", width="100%"
+            ),
+            background="#111113", border="1px solid #2c2c2e", max_width="550px", border_radius="12px", padding="24px"
+        ),
+        open=SettingsState.fb_modal_open,
+    )
+
+
 def settings_page() -> rx.Component:
     return rx.vstack(
         navbar("/settings"),
@@ -993,6 +1163,31 @@ def settings_page() -> rx.Component:
                     rx.vstack(
                         rx.heading("Canales de Comunicación Activos", size="4", color="white"),
                         rx.text("Configura múltiples líneas de WhatsApp o cuentas de Facebook e Instagram para esta empresa.", size="2", color="#8e8e93"),
+                        
+                        # Bloque premium de conexión autogestionada (Opción 2)
+                        rx.box(
+                            rx.hstack(
+                                rx.vstack(
+                                    rx.text("🔗 Conectar Facebook e Instagram automáticamente", size="3", weight="bold", color="white"),
+                                    rx.text("Inicia sesión con tu cuenta de Facebook para vincular tus páginas de Messenger o Instagram Business sin configuraciones manuales.", size="2", color="#8e8e93"),
+                                    spacing="1", align_items="start"
+                                ),
+                                rx.spacer(),
+                                rx.link(
+                                    rx.button(
+                                        "🔌 Conectar Facebook", 
+                                        color_scheme="blue", 
+                                        variant="solid",
+                                        cursor="pointer"
+                                    ),
+                                    href=SettingsState.facebook_login_url,
+                                    is_external=True
+                                ),
+                                width="100%", align_items="center", spacing="4"
+                            ),
+                            background="#1c1c1e", border="1px solid #2c2c2e", border_radius="12px", padding="20px", width="100%", margin_bottom="12px", margin_top="8px"
+                        ),
+
                         rx.foreach(SettingsState.all_lines.to(list[dict]), line_row),
                         
                         rx.divider(color="#2c2c2e"),
@@ -1801,6 +1996,7 @@ def settings_page() -> rx.Component:
             width="100%",
         ),
         knowledge_base_modal(),
+        facebook_onboarding_modal(),
         background="#000000",
         spacing="0",
         min_height="100vh",

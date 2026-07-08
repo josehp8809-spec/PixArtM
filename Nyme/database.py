@@ -944,6 +944,50 @@ class Database:
             conn.commit(); cur.close(); conn.close(); return True, ""
         except Exception as e: return False, str(e)
 
+    def upsert_facebook_line(self, name, page_id, access_token, tenant_id, channel_type='messenger'):
+        """Inserta o actualiza un canal de Facebook Messenger o Instagram para un tenant."""
+        if not self._check_available():
+            return False, "DB no disponible"
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            # Buscar si ya existe una línea con este page_id para el tenant
+            cur.execute(
+                "SELECT id FROM lines WHERE page_id = %s AND tenant_id = %s",
+                (page_id, tenant_id)
+            )
+            row = cur.fetchone()
+            if row:
+                # Actualizar existente
+                line_id = row[0]
+                cur.execute(
+                    "UPDATE lines SET name=%s, access_token=%s, channel_type=%s, is_active=TRUE WHERE id=%s",
+                    (name, access_token, channel_type, line_id)
+                )
+                conn.commit()
+                cur.close()
+                conn.close()
+                return True, "Canal actualizado con éxito"
+            else:
+                # Crear nuevo
+                cur.close()
+                conn.close()
+                # Usar create_line interna
+                return self.create_line(
+                    name=name,
+                    phone_number_id=None,
+                    access_token=access_token,
+                    welcome_message="¡Hola! Bienvenido a nuestro canal.",
+                    welcome_active=True,
+                    color="#0a3055" if channel_type == 'messenger' else "#d62976",
+                    tenant_id=tenant_id,
+                    channel_type=channel_type,
+                    page_id=page_id,
+                    app_id=None
+                )
+        except Exception as e:
+            return False, str(e)
+
     def get_all_lines(self, tenant_id):
         if not self._check_available(): return []
         try:
