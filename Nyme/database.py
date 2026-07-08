@@ -1623,7 +1623,7 @@ class Database:
                 )
                 SELECT AVG(EXTRACT(EPOCH FROM (next_created_at - created_at)) / 60)
                 FROM inbound_msgs
-                WHERE type = 'INBOUND' AND next_type LIKE 'OUTBOUND%'
+                WHERE type = 'INBOUND' AND next_type LIKE 'OUTBOUND%%'
                 """,
                 (tenant_id,)
             )
@@ -1665,7 +1665,7 @@ class Database:
                 """
                 SELECT agent_username, COUNT(*) 
                 FROM messages 
-                WHERE tenant_id = %s AND type LIKE 'OUTBOUND%' AND agent_username IS NOT NULL AND agent_username != ''
+                WHERE tenant_id = %s AND type LIKE 'OUTBOUND%%' AND agent_username IS NOT NULL AND agent_username != ''
                 GROUP BY agent_username 
                 ORDER BY COUNT(*) DESC 
                 LIMIT 5
