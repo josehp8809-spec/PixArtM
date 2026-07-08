@@ -944,6 +944,25 @@ class Database:
             conn.commit(); cur.close(); conn.close(); return True, ""
         except Exception as e: return False, str(e)
 
+    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type='whatsapp', page_id=None, app_id=None):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s, tenant_id=%s, channel_type=%s, page_id=%s, app_id=%s WHERE id=%s",
+                (name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type, page_id, app_id, line_id)
+            )
+            conn.commit(); cur.close(); conn.close(); return True, ""
+        except Exception as e: return False, str(e)
+
+    def delete_line(self, line_id):
+        if not self._check_available(): return False, "DB no disponible"
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("DELETE FROM lines WHERE id = %s", (line_id,))
+            conn.commit(); cur.close(); conn.close(); return True, ""
+        except Exception as e: return False, str(e)
+
     def upsert_facebook_line(self, name, page_id, access_token, tenant_id, channel_type='messenger'):
         """Inserta o actualiza un canal de Facebook Messenger o Instagram para un tenant."""
         if not self._check_available():
@@ -1031,16 +1050,6 @@ class Database:
             return dict(zip(keys, row))
         except Exception: return None
 
-    def update_line(self, line_id, name, phone_number_id, access_token, welcome_message, welcome_active, color, tenant_id, channel_type='whatsapp', page_id=None, app_id=None):
-        if not self._check_available(): return False
-        try:
-            conn = self.get_connection(); cur = conn.cursor()
-            cur.execute(
-                "UPDATE lines SET name=%s, phone_number_id=%s, access_token=%s, welcome_message=%s, welcome_active=%s, color=%s, channel_type=%s, page_id=%s, app_id=%s WHERE id=%s AND tenant_id=%s",
-                (name, phone_number_id, access_token, welcome_message, welcome_active, color, channel_type, page_id, app_id, line_id, tenant_id)
-            )
-            conn.commit(); cur.close(); conn.close(); return True
-        except Exception: return False
 
     def toggle_line_active(self, line_id, active, tenant_id):
          if not self._check_available(): return False

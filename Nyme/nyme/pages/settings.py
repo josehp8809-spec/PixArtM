@@ -66,6 +66,9 @@ class SettingsState(AppState):
     nl_page_id: str = ""
     nl_app_id: str = ""
     nl_msg: str = ""
+    editing_line_id: int = 0
+    nl_tenant_id: int = 0
+    selected_line_tenant_name: str = "SaaS Global"
 
     # Nuevo usuario
     nu_username: str = ""
@@ -399,6 +402,58 @@ class SettingsState(AppState):
     def set_nl_channel_type(self, v): self.nl_channel_type = v
     def set_nl_page_id(self, v): self.nl_page_id = v
     def set_nl_app_id(self, v): self.nl_app_id = v
+    def set_selected_line_tenant_name(self, v): self.selected_line_tenant_name = v
+
+    def start_edit_line(self, line: dict):
+        self.editing_line_id = line["id"]
+        self.nl_name = line["name"]
+        self.nl_phone_id = line["phone_number_id"]
+        self.nl_token = line["access_token"]
+        self.nl_welcome = line["welcome_message"]
+        self.nl_welcome_on = line["welcome_active"]
+        self.nl_color = line["color"]
+        self.nl_channel_type = line["channel_type"]
+        self.nl_page_id = line["page_id"]
+        self.nl_app_id = line["app_id"]
+        
+        line_db = db.get_line_by_id(line["id"], self.tenant_id)
+        if line_db:
+            l_tenant_id = line_db.get("tenant_id", self.tenant_id)
+            if self.tenant_id == 1:
+                t = next((x for x in self.all_tenants if x["id"] == l_tenant_id), None)
+                if t:
+                    self.selected_line_tenant_name = t["name"]
+                else:
+                    self.selected_line_tenant_name = "SaaS Global"
+            else:
+                self.selected_line_tenant_name = self.tenant_name
+        else:
+            self.selected_line_tenant_name = self.tenant_name
+        self.nl_msg = "✏️ Editando canal."
+
+    def cancel_edit_line(self):
+        self.editing_line_id = 0
+        self.nl_name = ""
+        self.nl_phone_id = ""
+        self.nl_token = ""
+        self.nl_welcome = ""
+        self.nl_welcome_on = True
+        self.nl_color = "#0A84FF"
+        self.nl_channel_type = "whatsapp"
+        self.nl_page_id = ""
+        self.nl_app_id = ""
+        self.selected_line_tenant_name = self.tenant_name
+        self.nl_msg = ""
+
+    def delete_line_action(self, line_id: int):
+        ok, err = db.delete_line(line_id)
+        if ok:
+            self.nl_msg = "🗑️ Canal eliminado."
+            if self.editing_line_id == line_id:
+                self.cancel_edit_line()
+            self._load_core_data()
+        else:
+            self.nl_msg = f"❌ {err}"
 
     def save_line(self):
         if not self.nl_name or not self.nl_token:
@@ -418,17 +473,39 @@ class SettingsState(AppState):
                 return
             p_id = ""  # No se usa para Messenger/Instagram
 
-        ok, err = db.create_line(
-            self.nl_name, p_id, self.nl_token,
-            self.nl_welcome, self.nl_welcome_on, self.nl_color,
-            self.tenant_id, self.nl_channel_type, page_id, self.nl_app_id
-        )
-        if ok:
-            self.nl_msg = "✅ Canal creado."
-            self.nl_name = self.nl_phone_id = self.nl_token = self.nl_welcome = self.nl_page_id = self.nl_app_id = ""
-            self._load_core_data()
+        target_tenant_id = self.tenant_id
+        if self.tenant_id == 1 and self.selected_line_tenant_name:
+            tenant = next((t for t in self.all_tenants if t["name"] == self.selected_line_tenant_name), None)
+            if tenant:
+                target_tenant_id = tenant["id"]
+
+        if self.editing_line_id > 0:
+            # Edición
+            ok, err = db.update_line(
+                self.editing_line_id,
+                self.nl_name, p_id, self.nl_token,
+                self.nl_welcome, self.nl_welcome_on, self.nl_color,
+                target_tenant_id, self.nl_channel_type, page_id, self.nl_app_id
+            )
+            if ok:
+                self.nl_msg = "✅ Canal actualizado."
+                self.cancel_edit_line()
+                self._load_core_data()
+            else:
+                self.nl_msg = f"❌ {err}"
         else:
-            self.nl_msg = f"❌ {err}"
+            # Creación
+            ok, err = db.create_line(
+                self.nl_name, p_id, self.nl_token,
+                self.nl_welcome, self.nl_welcome_on, self.nl_color,
+                target_tenant_id, self.nl_channel_type, page_id, self.nl_app_id
+            )
+            if ok:
+                self.nl_msg = "✅ Canal creado."
+                self.cancel_edit_line()
+                self._load_core_data()
+            else:
+                self.nl_msg = f"❌ {err}"
 
     def toggle_line(self, line_id: int, active: bool):
         db.toggle_line_active(line_id, not active, self.tenant_id)
@@ -694,6 +771,7 @@ class SettingsState(AppState):
         self._refresh_flows()
         if self.tenant_id == 1:
             self._reload_tenants()
+        self.selected_line_tenant_name = self.tenant_name
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -766,6 +844,16 @@ def line_row(line: rx.Var) -> rx.Component:
             rx.cond(is_active, "Desactivar", "Activar"),
             on_click=SettingsState.toggle_line(line_id, is_active),
             size="1", variant="ghost",
+        ),
+        rx.button(
+            "✏️",
+            on_click=SettingsState.start_edit_line(line),
+            size="1", variant="ghost",
+        ),
+        rx.button(
+            "🗑️",
+            on_click=SettingsState.delete_line_action(line_id),
+            size="1", variant="ghost", color="#ff453a",
         ),
         padding="12px",
         border="1px solid #2c2c2e",
@@ -1192,7 +1280,14 @@ def settings_page() -> rx.Component:
                         
                         rx.divider(color="#2c2c2e"),
                         
-                        rx.heading("Agregar nuevo canal", size="4", color="white"),
+                        rx.heading(
+                            rx.cond(
+                                SettingsState.editing_line_id.to(int) > 0,
+                                "✏️ Editar canal",
+                                "➕ Agregar nuevo canal"
+                            ),
+                            size="4", color="white"
+                        ),
                         rx.grid(
                             rx.vstack(
                                 rx.text("Tipo de Canal *", size="1", color="#8e8e93"),
@@ -1224,6 +1319,23 @@ def settings_page() -> rx.Component:
                             
                             _field("Mensaje de bienvenida", placeholder="¡Hola! Bienvenido a nuestro canal oficial. ¿En qué te ayudamos?", value=SettingsState.nl_welcome, on_change=SettingsState.set_nl_welcome),
                             
+                            rx.cond(
+                                SettingsState.tenant_id == 1,
+                                rx.vstack(
+                                    rx.text("Asociar a Empresa (Tenant)", size="1", color="#8e8e93"),
+                                    rx.select(
+                                        SettingsState.tenant_options_for_user.to(list[str]),
+                                        value=SettingsState.selected_line_tenant_name,
+                                        on_change=SettingsState.set_selected_line_tenant_name,
+                                        background="#1c1c1e", color="white",
+                                        border="1px solid #3a3a3c",
+                                        width="100%"
+                                    ),
+                                    spacing="1",
+                                    width="100%"
+                                )
+                            ),
+                            
                             columns="2", spacing="3", width="100%",
                         ),
                         
@@ -1240,7 +1352,27 @@ def settings_page() -> rx.Component:
                             background="#1c1c1e", border="1px solid #3a3a3c", border_radius="10px", padding="14px", width="100%"
                         ),
 
-                        rx.button("💾 Guardar Canal", on_click=SettingsState.save_line, color_scheme="blue"),
+                        rx.hstack(
+                            rx.button(
+                                rx.cond(
+                                    SettingsState.editing_line_id.to(int) > 0,
+                                    "💾 Actualizar Canal",
+                                    "💾 Guardar Canal"
+                                ),
+                                on_click=SettingsState.save_line,
+                                color_scheme="blue"
+                            ),
+                            rx.cond(
+                                SettingsState.editing_line_id.to(int) > 0,
+                                rx.button(
+                                    "✕ Cancelar",
+                                    on_click=SettingsState.cancel_edit_line,
+                                    color_scheme="gray",
+                                    variant="soft"
+                                )
+                            ),
+                            spacing="2"
+                        ),
                         rx.cond(SettingsState.nl_msg != "", rx.text(SettingsState.nl_msg, size="2")),
                         spacing="4", align_items="start", width="100%",
                     ),
