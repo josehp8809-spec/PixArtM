@@ -21,6 +21,24 @@ class WhatsAppClient:
             "Content-Type": "application/json",
         }
 
+    def _clean_number(self, number):
+        """Limpia el número de teléfono, especialmente eliminando el '1' para móviles de México (inbound 521 -> outbound 52)."""
+        if not number:
+            return ""
+        # Guardar prefijo fb_ o ig_ si existiera (aunque esto es solo para WhatsApp, por seguridad)
+        prefix = ""
+        if number.startswith("fb_"):
+            prefix = "fb_"
+            number = number[3:]
+        elif number.startswith("ig_"):
+            prefix = "ig_"
+            number = number[3:]
+            
+        cleaned = "".join(c for c in number if c.isdigit())
+        if cleaned.startswith("521") and len(cleaned) == 13:
+            cleaned = "52" + cleaned[3:]
+        return prefix + cleaned
+
     # ── Media Handling ────────────────────────────────────────────────────────
 
     def get_media_url(self, line, media_id):
@@ -69,6 +87,7 @@ class WhatsAppClient:
         """Envía un mensaje usando un dict de línea con phone_number_id y access_token."""
         if not line:
             return None
+        recipient_number = self._clean_number(recipient_number)
         url     = self._build_url(line["phone_number_id"])
         headers = self._headers(line["access_token"])
         payload = {
@@ -90,6 +109,7 @@ class WhatsAppClient:
             return None
 
     def send_image_message(self, line, recipient_number, media_id, caption=""):
+        recipient_number = self._clean_number(recipient_number)
         url     = self._build_url(line["phone_number_id"])
         headers = self._headers(line["access_token"])
         payload = {
@@ -104,6 +124,7 @@ class WhatsAppClient:
         except Exception: return None
 
     def send_document_message(self, line, recipient_number, media_id, filename, caption=""):
+        recipient_number = self._clean_number(recipient_number)
         url     = self._build_url(line["phone_number_id"])
         headers = self._headers(line["access_token"])
         payload = {

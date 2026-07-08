@@ -2,7 +2,7 @@
 nyme.py — Punto de entrada principal del app Reflex.
 El webhook de Meta se monta como ruta de la API interna de Reflex.
 """
-import sys, os
+import sys, os, asyncio
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from database import db
