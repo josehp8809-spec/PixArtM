@@ -590,7 +590,7 @@ class AppState(rx.State):
                 # Canal Chat Web
                 db.save_message(
                     self.selected_contact, "OUTBOUND_REPLY", text,
-                    agent_username=self.username, line_id=0,
+                    agent_username=self.username, line_id=self.selected_line_id,
                     tenant_id=self.tenant_id
                 )
             else:
@@ -1600,8 +1600,11 @@ class AppState(rx.State):
         if not msg_text or not self.visitor_wa_id:
             return
 
-        db.save_message(self.visitor_wa_id, "INBOUND", msg_text, line_id=0, tenant_id=1)
-        db.mark_conversation_unread(self.visitor_wa_id, 0)
+        lines = db.get_all_lines(1)
+        valid_line_id = lines[0][0] if lines else 1
+
+        db.save_message(self.visitor_wa_id, "INBOUND", msg_text, line_id=valid_line_id, tenant_id=1)
+        db.mark_conversation_unread(self.visitor_wa_id, valid_line_id)
         self.visitor_new_message = ""
         self.load_visitor_messages()
 
@@ -1609,10 +1612,10 @@ class AppState(rx.State):
         import asyncio
         from nyme.nyme import run_ai_agent_responder, execute_workflows_for_message
         asyncio.create_task(
-            run_ai_agent_responder(self.visitor_wa_id, 0, {}, msg_text, 1)
+            run_ai_agent_responder(self.visitor_wa_id, valid_line_id, {}, msg_text, 1)
         )
         asyncio.create_task(
-            execute_workflows_for_message(self.visitor_wa_id, 0, {}, msg_text, 1)
+            execute_workflows_for_message(self.visitor_wa_id, valid_line_id, {}, msg_text, 1)
         )
 
     @rx.event(background=True)

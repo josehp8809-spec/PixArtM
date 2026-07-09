@@ -842,16 +842,20 @@ async def webchat_send(request: Request):
             return JSONResponse({"status": "error", "message": "Missing arguments"}, status_code=400)
             
         db.upsert_contact(wa_id, name, "", "Origen: Chat Web", tenant_id)
-        db.save_message(wa_id, "INBOUND", body, line_id=0, tenant_id=tenant_id)
-        db.mark_conversation_unread(wa_id, 0)
+        
+        lines = db.get_all_lines(tenant_id)
+        valid_line_id = lines[0][0] if lines else 1
+        
+        db.save_message(wa_id, "INBOUND", body, line_id=valid_line_id, tenant_id=tenant_id)
+        db.mark_conversation_unread(wa_id, valid_line_id)
         
         # Disparar respondedor de IA automático para chat web
         import asyncio
         asyncio.create_task(
-            run_ai_agent_responder(wa_id, 0, {}, body, tenant_id)
+            run_ai_agent_responder(wa_id, valid_line_id, {}, body, tenant_id)
         )
         asyncio.create_task(
-            execute_workflows_for_message(wa_id, 0, {}, body, tenant_id)
+            execute_workflows_for_message(wa_id, valid_line_id, {}, body, tenant_id)
         )
         
         return JSONResponse({"status": "ok"})
