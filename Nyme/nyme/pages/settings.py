@@ -1186,10 +1186,14 @@ def pre_registration_row(req: dict) -> rx.Component:
                 rx.vstack(
                     rx.hstack(
                         rx.heading(req["company_name"], size="3", color="white"),
-                        rx.badge(
-                            rx.cond(req["selected_plan"] == "Enterprise", "Enterprise", req["selected_plan"] + " - " + req["billing_frequency"] + " (" + req["ai_mode"] + ")"),
-                            color_scheme="blue",
-                            variant="soft"
+                        rx.badge(req["selected_plan"], color_scheme="blue", variant="solid"),
+                        rx.cond(
+                            req["selected_plan"] != "Enterprise",
+                            rx.hstack(
+                                rx.badge(req["billing_frequency"], color_scheme="green", variant="soft"),
+                                rx.badge(req["ai_mode"], color_scheme="purple", variant="soft"),
+                                spacing="1"
+                            )
                         ),
                         spacing="2",
                         align_items="center"
