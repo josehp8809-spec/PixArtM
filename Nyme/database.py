@@ -1983,10 +1983,11 @@ class Database:
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (contact_email) DO NOTHING
                 """,
-                (company_name, contact_name, contact_email, contact_phone, notes, selected_plan, billing_frequency, ai_mode)
+                (company_name, contact_name, contact_email.lower().strip(), contact_phone, notes, selected_plan, billing_frequency, ai_mode)
             )
+            inserted = cur.rowcount > 0
             conn.commit(); cur.close(); conn.close()
-            return True
+            return inserted
         except Exception as e:
             print(f"[DB] Error guardando pre-registro: {e}")
             return False

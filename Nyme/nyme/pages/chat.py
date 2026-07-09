@@ -389,6 +389,15 @@ def _active_chat() -> rx.Component:
                 on_change=AppState.set_conv_status,
                 background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
             ),
+            # Botón rápido para Archivar
+            rx.button(
+                "📥 Archivar",
+                on_click=AppState.archive_conversation,
+                color_scheme="green",
+                variant="solid",
+                size="1",
+                cursor="pointer",
+            ),
             padding="12px 16px", border_bottom="1px solid #2c2c2e", background="#111", width="100%", align_items="center", spacing="3"
         ),
 
@@ -659,7 +668,7 @@ def orders_sidebar() -> rx.Component:
                 default_value="draft",
                 width="100%"
             ),
-            spacing="3", padding="12px", width="300px", height="100dvh", background="#111", border_left="1px solid #2c2c2e"
+            spacing="3", padding="12px", width="300px", height="100%", background="#111", border_left="1px solid #2c2c2e"
         ),
         class_name="hidden-mobile"
     )
