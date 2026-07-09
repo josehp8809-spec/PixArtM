@@ -1225,20 +1225,7 @@ def pre_registration_row(req: dict) -> rx.Component:
             # Formulario de Aprobación en línea
             rx.vstack(
                 rx.divider(color="rgba(255, 255, 255, 0.08)", margin="10px 0"),
-                rx.text("Configura el usuario inicial de esta empresa:", size="2", color="#0fa3b1", weight="bold"),
-                rx.grid(
-                    rx.vstack(
-                        rx.text("Usuario inicial *", size="1", color="#8e8e93"),
-                        rx.input(placeholder="admin_empresa", on_change=AppState.set_approve_username, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                        spacing="1"
-                    ),
-                    rx.vstack(
-                        rx.text("Contraseña inicial *", size="1", color="#8e8e93"),
-                        rx.input(placeholder="••••••••", type="password", on_change=AppState.set_approve_password, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
-                        spacing="1"
-                    ),
-                    columns="2", spacing="3", width="100%"
-                ),
+                rx.text("La aprobación generará automáticamente el usuario administrador (Nombre + primera letra del apellido) y una contraseña temporal segura, notificando al cliente por correo.", size="2", color="#8e8e93"),
                 rx.cond(
                     AppState.approve_error != "",
                     rx.callout(AppState.approve_error, color="red", variant="soft", width="100%", margin_top="10px")

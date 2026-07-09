@@ -834,6 +834,21 @@ class Database:
         except Exception:
             return False
 
+    def check_username_exists(self, username):
+        """Verifica si un nombre de usuario específico existe en la base de datos."""
+        if not self._check_available():
+            return False
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM users WHERE username = %s", (username.lower().strip(),))
+            count = cur.fetchone()[0]
+            cur.close()
+            conn.close()
+            return count > 0
+        except Exception:
+            return False
+
     # ── Settings ──────────────────────────────────────────────────────
 
     def get_setting(self, key, default=None):

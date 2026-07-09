@@ -1480,18 +1480,41 @@ class AppState(rx.State):
         self.approve_error = ""
         self.approve_success = ""
         
-        if not self.approve_username.strip():
-            self.approve_error = "El usuario inicial es obligatorio."
-            return
-        if not self.approve_password.strip() or len(self.approve_password) < 6:
-            self.approve_error = "La contraseña debe tener al menos 6 caracteres."
-            return
-
         # Buscar los detalles del preregistro
         req = next((r for r in self.pending_registrations if r["id"] == req_id), None)
         if not req:
             self.approve_error = "Solicitud no encontrada."
             return
+
+        # Generar credenciales automáticamente
+        import unicodedata
+        import re
+        import random
+        import secrets
+        import string
+
+        # 1. Generar Nombre de Usuario Único (Nombre + primera letra del apellido)
+        contact_name = req["contact_name"]
+        cleaned = unicodedata.normalize('NFKD', contact_name).encode('ASCII', 'ignore').decode('utf-8')
+        cleaned = re.sub(r'[^a-zA-Z\s]', '', cleaned).strip().lower()
+        parts = cleaned.split()
+        if len(parts) >= 2:
+            base_user = parts[0] + parts[1][0]
+        elif len(parts) == 1:
+            base_user = parts[0]
+        else:
+            base_user = "admin"
+            
+        if len(base_user) < 3 and len(parts) >= 2:
+            base_user = parts[0] + parts[1]
+            
+        generated_username = base_user
+        while db.check_username_exists(generated_username):
+            generated_username = f"{base_user}{random.randint(10, 99)}"
+
+        # 2. Generar Contraseña Legible y Segura
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        generated_password = "".join(secrets.choice(chars) for _ in range(10))
 
         # 1. Crear el Tenant
         success_t, tenant_res = db.create_tenant(
@@ -1518,8 +1541,8 @@ class AppState(rx.State):
 
         # 2. Crear el Usuario Admin
         success_u, user_res = db.create_user(
-            self.approve_username.strip().lower(),
-            self.approve_password,
+            generated_username,
+            generated_password,
             req["contact_name"],
             "admin",
             new_tenant_id
@@ -1531,9 +1554,21 @@ class AppState(rx.State):
         # 3. Marcar el preregistro como aprobado
         db.update_pre_registration_status(req_id, "approved")
         
-        self.approve_success = f"✅ Empresa '{req['company_name']}' activada con éxito. Usuario: {self.approve_username}"
-        self.approve_username = ""
-        self.approve_password = ""
+        # 4. Enviar Correo de Activación
+        from nyme.email_client import send_welcome_email
+        email_sent = send_welcome_email(
+            to_email=req["contact_email"],
+            company_name=req["company_name"],
+            contact_name=req["contact_name"],
+            username=generated_username,
+            password=generated_password,
+            plan_name=req.get("selected_plan", "Starter"),
+            billing_frequency=req.get("billing_frequency", "monthly"),
+            ai_mode=req.get("ai_mode", "BYOK")
+        )
+
+        mail_status = "Correo enviado con accesos." if email_sent else "No se pudo enviar el correo (SMTP no configurado). Guarda los accesos de abajo."
+        self.approve_success = f"✅ Empresa '{req['company_name']}' activada con éxito. Usuario: {generated_username} | Contraseña: {generated_password} ({mail_status})"
         self.load_pending_registrations()
 
     @rx.event
