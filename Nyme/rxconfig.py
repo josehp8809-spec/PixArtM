@@ -10,4 +10,5 @@ config = rx.Config(
     app_name="nyme",
     backend_port=_port,
     api_url=os.getenv("RENDER_EXTERNAL_URL", f"http://localhost:{_port}"),
+    show_reflex_badge=False,
 )
