@@ -581,7 +581,7 @@ async def run_ai_agent_responder(wa_id: str, line_id: int, line: dict, incoming_
     system_prompt = agent["system_prompt"] + knowledge_context
 
     # 5. Generar respuesta con Gemini
-    ai_reply = gemini.generate_agent_reply(system_prompt, history)
+    ai_reply = gemini.generate_agent_reply(system_prompt, history, tenant_id=tenant_id)
     if ai_reply:
         # 6. Enviar la respuesta usando el canal correcto (WhatsApp o Messenger/Instagram)
         channel_type = line.get("channel_type", "whatsapp")

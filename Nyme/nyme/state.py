@@ -634,7 +634,8 @@ class AppState(rx.State):
             products_list = list(self.products)
         result = gemini.suggest_reply(
             [(m["type"], m["body"], None, m["agent"]) for m in self.messages],
-            products=products_list
+            products=products_list,
+            tenant_id=self.tenant_id
         )
         async with self:
             self.loading_ai = False
@@ -649,7 +650,7 @@ class AppState(rx.State):
             return
         async with self:
             self.loading_ai = True
-        translated = gemini.translate(last_inbound["body"])
+        translated = gemini.translate(last_inbound["body"], tenant_id=self.tenant_id)
         async with self:
             self.loading_ai = False
             self.ai_result = translated or "No se pudo traducir."
@@ -736,7 +737,7 @@ class AppState(rx.State):
         audio_data = wa_client.download_media(line, media_url)
         
         # 3. Transcribir con Gemini
-        transcription = gemini.transcribe_audio(audio_data)
+        transcription = gemini.transcribe_audio(audio_data, tenant_id=self.tenant_id)
         
         async with self:
             self.loading_ai = False
@@ -1047,7 +1048,7 @@ class AppState(rx.State):
         """
         
         try:
-            model = gemini._get_model()
+            model = gemini._get_model(self.tenant_id)
             if model:
                 response = model.generate_content(prompt)
                 res_text = response.text.strip()

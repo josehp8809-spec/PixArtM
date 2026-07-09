@@ -83,6 +83,10 @@ class SettingsState(AppState):
     gemini_key: str = ""
     gemini_msg: str = ""
 
+    @rx.var
+    def is_gemini_configured(self) -> bool:
+        return gemini.is_configured_for_tenant(self.tenant_id)
+
     # Quick reply form
     qr_shortcut: str = ""
     qr_title: str = ""
@@ -587,8 +591,10 @@ class SettingsState(AppState):
         if not self.gemini_key.strip():
             self.gemini_msg = "❌ Ingresa la API Key."
             return
-        db.set_setting("gemini_api_key", self.gemini_key.strip())
-        gemini.reload()
+        if self.tenant_id == 1:
+            db.set_setting("gemini_api_key", self.gemini_key.strip())
+        else:
+            db.update_tenant_gemini_key(self.tenant_id, self.gemini_key.strip())
         self.gemini_msg = "✅ API Key guardada."
         self.gemini_key = ""
 
@@ -1263,7 +1269,10 @@ def settings_page() -> rx.Component:
                     rx.tabs.trigger("⚙️ Automatizaciones", value="workflows"),
                     rx.tabs.trigger("⚡ Atajos", value="qr"),
                     rx.tabs.trigger("🛍️ Catálogo", value="catalog"),
-                    rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
+                    rx.cond(
+                        SettingsState.role == "admin",
+                        rx.tabs.trigger("🤖 Gemini AI", value="gemini"),
+                    ),
                     rx.tabs.trigger("🔑 Mi Cuenta", value="account"),
                     rx.cond(
                         SettingsState.tenant_id == 1,
@@ -1580,7 +1589,16 @@ def settings_page() -> rx.Component:
                 rx.tabs.content(
                     rx.vstack(
                         rx.heading("🤖 Gemini AI", size="4", color="white"),
-                        rx.text("La API Key se comparte para todos los usuarios del tenant.", color="#8e8e93", size="2"),
+                        rx.text("Configura la API Key de Gemini dedicada para tu empresa. Si no se configura, el sistema usará la del SaaS Global por defecto.", color="#8e8e93", size="2"),
+                        rx.hstack(
+                            rx.text("Estado de configuración: ", color="#8e8e93", size="2"),
+                            rx.cond(
+                                SettingsState.is_gemini_configured,
+                                rx.badge("Activa", color_scheme="green"),
+                                rx.badge("No configurada (Usando Global)", color_scheme="gray")
+                            ),
+                            align_items="center"
+                        ),
                         _field("API Key de Gemini", type="password", placeholder="AIza...", on_change=SettingsState.set_gemini_key),
                         rx.button("💾 Guardar", on_click=SettingsState.save_gemini, color_scheme="blue"),
                         rx.cond(SettingsState.gemini_msg != "", rx.text(SettingsState.gemini_msg, size="2")),

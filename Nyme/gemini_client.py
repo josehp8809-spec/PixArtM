@@ -5,12 +5,18 @@ load_dotenv()
 
 
 class GeminiClient:
-    """Cliente compartido de Gemini AI. La API Key se guarda en la DB (settings)
-    o como variable de entorno GEMINI_API_KEY como fallback."""
+    def reload(self):
+        pass
 
-    def _get_api_key(self):
+    def _get_api_key(self, tenant_id=None):
         try:
             from database import db
+            # Buscar api key propia del tenant si no es SaaS Global (Tenant 1)
+            if tenant_id and tenant_id != 1:
+                key = db.get_tenant_gemini_key(tenant_id)
+                if key:
+                    return key
+            # Fallback a la key global
             key = db.get_setting("gemini_api_key")
             if key:
                 return key
@@ -18,10 +24,10 @@ class GeminiClient:
             pass
         return os.getenv("GEMINI_API_KEY", "")
 
-    def _get_model(self):
+    def _get_model(self, tenant_id=None):
         try:
             import google.generativeai as genai
-            api_key = self._get_api_key()
+            api_key = self._get_api_key(tenant_id)
             if not api_key:
                 return None
             genai.configure(api_key=api_key)
@@ -30,13 +36,16 @@ class GeminiClient:
             print(f"[Gemini] Error inicializando modelo: {e}")
             return None
 
+    def is_configured_for_tenant(self, tenant_id=None):
+        return bool(self._get_api_key(tenant_id))
+
     @property
     def is_configured(self):
         return bool(self._get_api_key())
 
-    def translate(self, text, target_lang="español"):
+    def translate(self, text, target_lang="español", tenant_id=None):
         """Traduce el texto al idioma destino."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:
@@ -50,10 +59,10 @@ class GeminiClient:
             print(f"[Gemini] Error traduciendo: {e}")
             return None
 
-    def analyze_sentiment(self, messages):
+    def analyze_sentiment(self, messages, tenant_id=None):
         """Analiza el sentimiento de una conversación completa.
         Retorna dict: {sentiment, urgent, reason} o None si falla."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:
@@ -79,9 +88,9 @@ class GeminiClient:
             print(f"[Gemini] Error analizando sentimiento: {e}")
             return None
 
-    def generate_agent_feedback(self, agent_username, messages, sentiments_summary):
+    def generate_agent_feedback(self, agent_username, messages, sentiments_summary, tenant_id=None):
         """Genera feedback narrativo sobre el desempeño de un agente."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:
@@ -119,9 +128,9 @@ class GeminiClient:
             print(f"[Gemini] Error generando feedback: {e}")
             return None
 
-    def detect_language(self, text):
+    def detect_language(self, text, tenant_id=None):
         """Detecta el idioma del texto."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return "desconocido"
         try:
@@ -135,9 +144,9 @@ class GeminiClient:
         except Exception:
             return "desconocido"
 
-    def suggest_reply(self, history, products=None):
+    def suggest_reply(self, history, products=None, tenant_id=None):
         """Genera una sugerencia de respuesta basada en el historial del chat."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:
@@ -166,9 +175,9 @@ class GeminiClient:
             print(f"[Gemini] Error sugiriendo respuesta: {e}")
             return None
 
-    def improve_text(self, text):
+    def improve_text(self, text, tenant_id=None):
         """Mejora ortografía y tono del texto del agente."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:
@@ -185,9 +194,9 @@ class GeminiClient:
             print(f"[Gemini] Error mejorando texto: {e}")
             return None
 
-    def transcribe_audio(self, audio_data: bytes) -> str:
+    def transcribe_audio(self, audio_data: bytes, tenant_id=None) -> str:
         """Usa Gemini para transcribir audio (multimodal)."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model or not audio_data:
             return "IA no configurada o audio vacío."
         try:
@@ -204,9 +213,9 @@ class GeminiClient:
             print(f"[Gemini] Error transcribiendo audio: {e}")
             return "Error al procesar el audio con la IA."
 
-    def generate_agent_reply(self, system_prompt, conversation_history):
+    def generate_agent_reply(self, system_prompt, conversation_history, tenant_id=None):
         """Genera respuesta automática para el cliente usando el prompt del sistema del agente."""
-        model = self._get_model()
+        model = self._get_model(tenant_id)
         if not model:
             return None
         try:

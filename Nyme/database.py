@@ -390,6 +390,9 @@ class Database:
                 )
             """)
 
+            # Agregar columna gemini_api_key a la tabla tenants si no existe
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS gemini_api_key TEXT;")
+
             conn.commit()
             cur.close()
             conn.close()
@@ -521,7 +524,7 @@ class Database:
 
     # ── Users ─────────────────────────────────────────────────────────
 
-    ROLE_LIMITS = {"admin": 2, "coordinator": 3, "agent": 10}
+    ROLE_LIMITS = {"admin": 3, "coordinator": 3, "agent": 10}
 
     def create_user(self, username, password, full_name, role, tenant_id):
         """Crea usuario con hash bcrypt vinculado a un tenant_id."""
@@ -835,6 +838,30 @@ class Database:
             return True
         except Exception as e:
             print(f"[DB] Error guardando setting: {e}")
+            return False
+
+    def get_tenant_gemini_key(self, tenant_id):
+        if not self._check_available() or not tenant_id:
+            return None
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("SELECT gemini_api_key FROM tenants WHERE id = %s", (tenant_id,))
+            row = cur.fetchone(); cur.close(); conn.close()
+            return row[0] if row else None
+        except Exception as e:
+            print(f"[DB] Error al obtener la api key de gemini del tenant {tenant_id}: {e}")
+            return None
+
+    def update_tenant_gemini_key(self, tenant_id, key):
+        if not self._check_available() or not tenant_id:
+            return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute("UPDATE tenants SET gemini_api_key = %s WHERE id = %s", (key, tenant_id))
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error al actualizar la api key de gemini del tenant {tenant_id}: {e}")
             return False
 
     # ── Reports ───────────────────────────────────────────────────────
