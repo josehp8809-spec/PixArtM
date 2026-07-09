@@ -35,6 +35,7 @@ class AppState(rx.State):
     login_username: str = ""
     login_password: str = ""
     login_error: str = ""
+    landing_lang: str = "es"
 
     # ── Datos cargados ────────────────────────────────────────────────────────
     contacts: list[dict]      = []
@@ -187,14 +188,21 @@ class AppState(rx.State):
         self.tenant_name = ""
         self.selected_contact = ""
         self.contacts = self.messages = self.all_lines = self.quick_replies = []
-        return rx.redirect("/")
+        return rx.redirect("/login")
 
     def reset_sound_tick(self):
         self.play_sound_tick = 0
 
     def require_auth(self):
         if not self.authenticated:
-            return rx.redirect("/")
+            return rx.redirect("/login")
+
+    @rx.event
+    def toggle_landing_lang(self):
+        if self.landing_lang == "es":
+            self.landing_lang = "en"
+        else:
+            self.landing_lang = "es"
 
     # ─────────────────────────────────────────────────────────────────────────
     # DATOS BASE
