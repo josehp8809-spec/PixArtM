@@ -279,6 +279,7 @@ def landing_page() -> rx.Component:
             width="100%",
             align_items="center"
         ),
+        rx.script(src="/webchat"),
         background_color="#000000",
         min_height="100vh",
         spacing="0",

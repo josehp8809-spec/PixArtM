@@ -253,6 +253,38 @@ class Database:
                 is_active       BOOLEAN DEFAULT TRUE,
                 tenant_id       INTEGER REFERENCES tenants(id) DEFAULT 1
             )
+            """,
+            # 20. Pre-registrations (Pre-registros de SaaS)
+            """
+            CREATE TABLE IF NOT EXISTS pre_registrations (
+                id SERIAL PRIMARY KEY,
+                company_name VARCHAR(200) NOT NULL,
+                contact_name VARCHAR(200) NOT NULL,
+                contact_email VARCHAR(200) UNIQUE NOT NULL,
+                contact_phone VARCHAR(50),
+                notes TEXT,
+                status VARCHAR(20) DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            # 21. Support Rooms (Salas de soporte técnico)
+            """
+            CREATE TABLE IF NOT EXISTS support_rooms (
+                id SERIAL PRIMARY KEY,
+                tenant_id INTEGER UNIQUE REFERENCES tenants(id) ON DELETE CASCADE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+            """,
+            # 22. Support Messages (Mensajes de soporte técnico)
+            """
+            CREATE TABLE IF NOT EXISTS support_messages (
+                id SERIAL PRIMARY KEY,
+                room_id INTEGER REFERENCES support_rooms(id) ON DELETE CASCADE,
+                sender_username VARCHAR(100) NOT NULL,
+                sender_tenant_id INTEGER REFERENCES tenants(id) ON DELETE CASCADE,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
             """
         ]
         try:
@@ -1866,6 +1898,168 @@ class Database:
         except Exception as e:
             print(f"[DB] Error guardando estado del flujo: {e}")
             return False
+
+    # ── Auto-Registro de Empresas ───────────────────────────────────────────
+    def save_pre_registration(self, company_name, contact_name, contact_email, contact_phone, notes):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO pre_registrations (company_name, contact_name, contact_email, contact_phone, notes)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (contact_email) DO NOTHING
+                """,
+                (company_name, contact_name, contact_email, contact_phone, notes)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error guardando pre-registro: {e}")
+            return False
+
+    def get_pre_registrations(self, status="pending"):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "SELECT id, company_name, contact_name, contact_email, contact_phone, notes, status, created_at FROM pre_registrations WHERE status = %s ORDER BY created_at DESC",
+                (status,)
+            )
+            rows = cur.fetchall()
+            cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0],
+                    "company_name": r[1],
+                    "contact_name": r[2],
+                    "contact_email": r[3],
+                    "contact_phone": r[4],
+                    "notes": r[5],
+                    "status": r[6],
+                    "created_at": r[7].strftime("%Y-%m-%d %H:%M:%S") if r[7] else ""
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo pre-registros: {e}")
+            return []
+
+    def update_pre_registration_status(self, req_id, status):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                "UPDATE pre_registrations SET status = %s WHERE id = %s",
+                (status, req_id)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error actualizando estado de pre-registro: {e}")
+            return False
+
+    # ── Chat de Soporte Técnico ─────────────────────────────────────────────
+    def get_or_create_support_room(self, tenant_id):
+        if not self._check_available(): return None
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            # Buscar si ya existe
+            cur.execute("SELECT id FROM support_rooms WHERE tenant_id = %s", (tenant_id,))
+            row = cur.fetchone()
+            if row:
+                room_id = row[0]
+            else:
+                # Crear nueva
+                cur.execute(
+                    "INSERT INTO support_rooms (tenant_id) VALUES (%s) RETURNING id",
+                    (tenant_id,)
+                )
+                room_id = cur.fetchone()[0]
+                conn.commit()
+            cur.close(); conn.close()
+            return room_id
+        except Exception as e:
+            print(f"[DB] Error en get_or_create_support_room: {e}")
+            return None
+
+    def save_support_message(self, room_id, sender_username, sender_tenant_id, message):
+        if not self._check_available(): return False
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO support_messages (room_id, sender_username, sender_tenant_id, message)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (room_id, sender_username, sender_tenant_id, message)
+            )
+            conn.commit(); cur.close(); conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error guardando mensaje de soporte: {e}")
+            return False
+
+    def get_support_messages(self, room_id):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            cur.execute(
+                """
+                SELECT id, room_id, sender_username, sender_tenant_id, message, created_at 
+                FROM support_messages 
+                WHERE room_id = %s 
+                ORDER BY created_at ASC
+                """,
+                (room_id,)
+            )
+            rows = cur.fetchall()
+            cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0],
+                    "room_id": r[1],
+                    "sender_username": r[2],
+                    "sender_tenant_id": r[3],
+                    "message": r[4],
+                    "created_at": r[5].strftime("%H:%M") if r[5] else ""
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo mensajes de soporte: {e}")
+            return []
+
+    def get_all_support_rooms(self):
+        if not self._check_available(): return []
+        try:
+            conn = self.get_connection(); cur = conn.cursor()
+            # Obtener salas de soporte junto al nombre del tenant correspondiente
+            cur.execute(
+                """
+                SELECT r.id, r.tenant_id, t.name, 
+                       (SELECT message FROM support_messages WHERE room_id = r.id ORDER BY created_at DESC LIMIT 1) as last_msg,
+                       (SELECT created_at FROM support_messages WHERE room_id = r.id ORDER BY created_at DESC LIMIT 1) as last_time
+                FROM support_rooms r
+                JOIN tenants t ON r.tenant_id = t.id
+                ORDER BY last_time DESC NULLS LAST
+                """
+            )
+            rows = cur.fetchall()
+            cur.close(); conn.close()
+            return [
+                {
+                    "id": r[0],
+                    "tenant_id": r[1],
+                    "tenant_name": r[2],
+                    "last_message": r[3] if r[3] else "Sin mensajes",
+                    "last_time": r[4].strftime("%Y-%m-%d %H:%M:%S") if r[4] else ""
+                }
+                for r in rows
+            ]
+        except Exception as e:
+            print(f"[DB] Error obteniendo salas de soporte: {e}")
+            return []
 
     def delete_flow_state(self, wa_id):
         if not self._check_available(): return False

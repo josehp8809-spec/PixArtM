@@ -60,6 +60,7 @@ def navbar(active_page: str = "") -> rx.Component:
                 nav_link("Directorio", "👥", "/contacts"),
                 nav_link("Equipo", "🏢", "/internal"),
                 nav_link("Ventas", "🛍️", "/orders"),
+                nav_link("Soporte", "🛠️", "/support"),
                 rx.cond(
                     is_admin_or_coord,
                     nav_link("Reportes", "📊", "/reports"),

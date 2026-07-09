@@ -37,6 +37,31 @@ class AppState(rx.State):
     login_error: str = ""
     landing_lang: str = "es"
 
+    # ── Auto-Registro ─────────────────────────────────────────────────────────
+    reg_company_name: str = ""
+    reg_contact_name: str = ""
+    reg_contact_email: str = ""
+    reg_contact_phone: str = ""
+    reg_notes: str = ""
+    reg_success: bool = False
+    reg_error: str = ""
+
+    # ── Aprobación de Registro ───────────────────────────────────────────────
+    pending_registrations: list[dict] = []
+    approve_username: str = ""
+    approve_password: str = ""
+    approve_error: str = ""
+    approve_success: str = ""
+
+    # ── Soporte Técnico ──────────────────────────────────────────────────────
+    support_messages: list[dict] = []
+    support_new_message: str = ""
+    support_room_id: int = 0
+    show_support_chat: bool = False
+    support_rooms_list: list[dict] = []
+    active_support_room_id: int = 0
+    active_support_tenant_name: str = ""
+
     # ── Datos cargados ────────────────────────────────────────────────────────
     contacts: list[dict]      = []
     messages: list[dict]      = []
@@ -1286,5 +1311,175 @@ class AppState(rx.State):
             self.wf_msg = f"✅ ¡Importación masiva exitosa! {count} contactos añadidos."
         self._refresh_contact_list()
         self._refresh_contacts()
+
+    # Setters manuales para Auto-Registro y Soporte
+    def set_reg_company_name(self, val: str): self.reg_company_name = val
+    def set_reg_contact_name(self, val: str): self.reg_contact_name = val
+    def set_reg_contact_email(self, val: str): self.reg_contact_email = val
+    def set_reg_contact_phone(self, val: str): self.reg_contact_phone = val
+    def set_reg_notes(self, val: str): self.reg_notes = val
+    def set_approve_username(self, val: str): self.approve_username = val
+    def set_approve_password(self, val: str): self.approve_password = val
+    def set_support_new_message(self, val: str): self.support_new_message = val
+    def handle_support_key(self, key: str):
+        if key == "Enter":
+            return self.send_support_message()
+
+    # ── Auto-Registro ─────────────────────────────────────────────────────────
+    @rx.event
+    def reset_registration_form(self):
+        self.reg_company_name = ""
+        self.reg_contact_name = ""
+        self.reg_contact_email = ""
+        self.reg_contact_phone = ""
+        self.reg_notes = ""
+        self.reg_success = False
+        self.reg_error = ""
+
+    @rx.event
+    def submit_registration(self):
+        self.reg_error = ""
+        self.reg_success = False
+        
+        if not self.reg_company_name.strip():
+            self.reg_error = "El nombre de la empresa es obligatorio."
+            return
+        if not self.reg_contact_name.strip():
+            self.reg_error = "El nombre de contacto es obligatorio."
+            return
+        if not self.reg_contact_email.strip() or "@" not in self.reg_contact_email:
+            self.reg_error = "Por favor ingresa un correo electrónico válido."
+            return
+
+        res = db.save_pre_registration(
+            self.reg_company_name.strip(),
+            self.reg_contact_name.strip(),
+            self.reg_contact_email.strip(),
+            self.reg_contact_phone.strip(),
+            self.reg_notes.strip()
+        )
+        if res:
+            self.reg_success = True
+            self.reg_company_name = ""
+            self.reg_contact_name = ""
+            self.reg_contact_email = ""
+            self.reg_contact_phone = ""
+            self.reg_notes = ""
+        else:
+            self.reg_error = "Este correo electrónico ya se encuentra registrado o hubo un error."
+
+    # ── Aprobación de Registro ───────────────────────────────────────────────
+    @rx.event
+    def load_pending_registrations(self):
+        self.pending_registrations = db.get_pre_registrations("pending")
+        self.approve_error = ""
+        self.approve_success = ""
+
+    @rx.event
+    def approve_registration(self, req_id: int):
+        self.approve_error = ""
+        self.approve_success = ""
+        
+        if not self.approve_username.strip():
+            self.approve_error = "El usuario inicial es obligatorio."
+            return
+        if not self.approve_password.strip() or len(self.approve_password) < 6:
+            self.approve_error = "La contraseña debe tener al menos 6 caracteres."
+            return
+
+        # Buscar los detalles del preregistro
+        req = next((r for r in self.pending_registrations if r["id"] == req_id), None)
+        if not req:
+            self.approve_error = "Solicitud no encontrada."
+            return
+
+        # 1. Crear el Tenant
+        success_t, tenant_res = db.create_tenant(
+            req["company_name"],
+            email=req["contact_email"],
+            phone=req["contact_phone"],
+            contact_name_1=req["contact_name"],
+            contact_email_1=req["contact_email"],
+            contact_phone_1=req["contact_phone"]
+        )
+        if not success_t:
+            self.approve_error = f"Error creando empresa: {tenant_res}"
+            return
+            
+        new_tenant_id = tenant_res
+
+        # 2. Crear el Usuario Admin
+        success_u, user_res = db.create_user(
+            self.approve_username.strip().lower(),
+            self.approve_password,
+            req["contact_name"],
+            "admin",
+            new_tenant_id
+        )
+        if not success_u:
+            self.approve_error = f"Empresa creada (ID {new_tenant_id}), pero falló creación de usuario: {user_res}"
+            return
+
+        # 3. Marcar el preregistro como aprobado
+        db.update_pre_registration_status(req_id, "approved")
+        
+        self.approve_success = f"✅ Empresa '{req['company_name']}' activada con éxito. Usuario: {self.approve_username}"
+        self.approve_username = ""
+        self.approve_password = ""
+        self.load_pending_registrations()
+
+    @rx.event
+    def reject_registration(self, req_id: int):
+        db.update_pre_registration_status(req_id, "rejected")
+        self.load_pending_registrations()
+
+    # ── Chat de Soporte Técnico ─────────────────────────────────────────────
+    @rx.event
+    def toggle_support_chat(self):
+        self.show_support_chat = not self.show_support_chat
+        if self.show_support_chat:
+            self.load_support_chat()
+
+    @rx.event
+    def load_support_chat(self):
+        # Para clientes (no SaaS Global): cargar su propia sala de soporte
+        if self.tenant_id > 1:
+            room_id = db.get_or_create_support_room(self.tenant_id)
+            if room_id:
+                self.support_room_id = room_id
+                self.support_messages = db.get_support_messages(room_id)
+        # Para Superadmin (SaaS Global): cargar todas las salas activas de soporte
+        elif self.tenant_id == 1:
+            self.support_rooms_list = db.get_all_support_rooms()
+            if self.active_support_room_id > 0:
+                self.support_messages = db.get_support_messages(self.active_support_room_id)
+
+    @rx.event
+    def send_support_message(self):
+        msg_text = self.support_new_message.strip()
+        if not msg_text:
+            return
+            
+        room_to_send = self.support_room_id if self.tenant_id > 1 else self.active_support_room_id
+        if not room_to_send:
+            return
+
+        success = db.save_support_message(
+            room_to_send,
+            self.username or "Asesor",
+            self.tenant_id,
+            msg_text
+        )
+        if success:
+            self.support_new_message = ""
+            self.support_messages = db.get_support_messages(room_to_send)
+            if self.tenant_id == 1:
+                self.support_rooms_list = db.get_all_support_rooms()
+
+    @rx.event
+    def select_support_room(self, room_id: int, tenant_name: str):
+        self.active_support_room_id = room_id
+        self.active_support_tenant_name = tenant_name
+        self.support_messages = db.get_support_messages(room_id)
 
 

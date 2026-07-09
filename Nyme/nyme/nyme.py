@@ -19,6 +19,8 @@ from nyme.pages.orders import orders_page
 from nyme.pages.navbar import navbar as premium_navbar
 from nyme.pages.landing import landing_page
 from nyme.pages.documents import privacy_page, terms_page, data_deletion_page, instructions_page
+from nyme.pages.register import register_page
+from nyme.pages.support import support_page
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Navbar compartida
@@ -616,6 +618,8 @@ app = rx.App(
 
 app.add_page(landing_page,       route="/",          title="Nyme — Inteligencia Omnicanal")
 app.add_page(login_page,         route="/login",     title="Nyme — Iniciar Sesión")
+app.add_page(register_page,      route="/register",  title="Nyme — Registrarse")
+app.add_page(support_page,       route="/support",   title="Nyme — Soporte Técnico")
 app.add_page(privacy_page,       route="/privacy",   title="Nyme — Política de Privacidad")
 app.add_page(terms_page,         route="/terms",     title="Nyme — Términos del Servicio")
 app.add_page(data_deletion_page, route="/data-deletion", title="Nyme — Eliminación de Datos")
@@ -694,7 +698,7 @@ async def webchat_widget(request: Request):
             clientWaId = 'web_' + Math.random().toString(36).substring(2, 10);
             localStorage.setItem('nyme_client_wa_id', clientWaId);
         }
-        var clientName = localStorage.getItem('nyme_client_name') || 'Visitante Web';
+        var clientName = localStorage.getItem('nyme_client_name');
 
         // Crear elementos UI
         var trigger = document.createElement('div');
@@ -709,20 +713,57 @@ async def webchat_widget(request: Request):
                 <span>PixArtM Soporte</span>
                 <span id="nyme-chat-close" style="cursor:pointer;">✕</span>
             </div>
-            <div id="nyme-chat-body"></div>
-            <div id="nyme-chat-footer">
-                <input type="text" id="nyme-chat-input" placeholder="Escribe tu duda aquí...">
-                <button id="nyme-chat-send">Enviar</button>
+            <div id="nyme-chat-welcome" style="padding: 24px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; justify-content: center; height: calc(100% - 50px);">
+                <h3 style="margin: 0; color: white; text-align: center; font-size: 18px;">¡Hola! 👋</h3>
+                <p style="margin: 0; color: #8e8e93; font-size: 13px; text-align: center; line-height: 1.4;">Para poder ayudarte mejor, por favor dinos tu nombre:</p>
+                <input type="text" id="nyme-chat-name-input" placeholder="Tu nombre" style="padding: 10px; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 6px; color: white; outline: none; font-size: 14px;">
+                <button id="nyme-chat-start-btn" style="background: #30d158; border: none; border-radius: 6px; padding: 12px; color: white; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.2s;">Comenzar Chat</button>
+            </div>
+            <div id="nyme-chat-body" style="display: none; flex: 1; padding: 12px; overflow-y: auto; background: #000; flex-direction: column; gap: 8px;"></div>
+            <div id="nyme-chat-footer" style="display: none; padding: 10px; background: #1c1c1e; border-top: 1px solid #2c2c2e; gap: 6px;">
+                <input type="text" id="nyme-chat-input" placeholder="Escribe tu duda aquí..." style="flex: 1; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 6px; padding: 8px; color: white; outline: none; font-size: 14px;">
+                <button id="nyme-chat-send" style="background: #30d158; border: none; border-radius: 6px; padding: 8px 14px; color: white; cursor: pointer; font-weight: bold;">Enviar</button>
             </div>
         `;
         document.body.appendChild(chatBox);
+
+        // Lógica de Vistas del Chat
+        function setupViews() {
+            var welcome = document.getElementById('nyme-chat-welcome');
+            var body = document.getElementById('nyme-chat-body');
+            var footer = document.getElementById('nyme-chat-footer');
+            
+            if (clientName) {
+                welcome.style.display = 'none';
+                body.style.display = 'flex';
+                footer.style.display = 'flex';
+                loadMessages();
+            } else {
+                welcome.style.display = 'flex';
+                body.style.display = 'none';
+                footer.style.display = 'none';
+            }
+        }
+
+        // Configurar botón comenzar chat
+        document.getElementById('nyme-chat-start-btn').onclick = function() {
+            var nameInput = document.getElementById('nyme-chat-name-input');
+            var nameVal = nameInput.value.trim();
+            if (!nameVal) {
+                nameInput.style.borderColor = 'red';
+                return;
+            }
+            clientName = nameVal;
+            localStorage.setItem('nyme_client_name', clientName);
+            setupViews();
+        };
 
         // Acciones click
         trigger.onclick = function() {
             var display = chatBox.style.display;
             chatBox.style.display = display === 'flex' ? 'none' : 'flex';
             if (chatBox.style.display === 'flex') {
-                loadMessages();
+                setupViews();
             }
         };
 
@@ -751,7 +792,7 @@ async def webchat_widget(request: Request):
             fetch('/api/webchat/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wa_id: clientWaId, name: clientName, body: text, tenant_id: 1 })
+                body: JSON.stringify({ wa_id: clientWaId, name: clientName || 'Visitante Web', body: text, tenant_id: 1 })
             }).then(() => {
                 setTimeout(loadMessages, 500);
             });

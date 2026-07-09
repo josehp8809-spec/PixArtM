@@ -169,6 +169,7 @@ class SettingsState(AppState):
         self._load_core_data()
         if self.tenant_id == 1:
             self._reload_tenants()
+            self.load_pending_registrations()
         
         # Procesar código de OAuth de Facebook si viene en los parámetros de la URL
         code = self.router.page.params.get("code")
@@ -1171,6 +1172,82 @@ def facebook_onboarding_modal() -> rx.Component:
     )
 
 
+def pre_registration_row(req: dict) -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.vstack(
+                    rx.heading(req["company_name"], size="3", color="white"),
+                    rx.text(
+                        "Contacto: ", req["contact_name"], " (", req["contact_email"], ") | Tel: ", 
+                        rx.cond(req["contact_phone"], req["contact_phone"], "N/A"),
+                        color="#8e8e93", size="2"
+                    ),
+                    spacing="1",
+                    align_items="start"
+                ),
+                rx.spacer(),
+                rx.text(req["created_at"], color="#636366", size="1"),
+                align_items="center",
+                width="100%"
+            ),
+            rx.cond(
+                req["notes"] != "",
+                rx.box(
+                    rx.text("Notas: ", req["notes"], color="#8e8e93", size="2", italic=True),
+                    margin_top="8px",
+                    padding="8px 12px",
+                    background="rgba(255,255,255,0.03)",
+                    border_radius="6px",
+                    width="100%"
+                )
+            ),
+            # Formulario de Aprobación en línea
+            rx.vstack(
+                rx.divider(color="rgba(255, 255, 255, 0.08)", margin="10px 0"),
+                rx.text("Configura el usuario inicial de esta empresa:", size="2", color="#0fa3b1", weight="bold"),
+                rx.grid(
+                    rx.vstack(
+                        rx.text("Usuario inicial *", size="1", color="#8e8e93"),
+                        rx.input(placeholder="admin_empresa", on_change=AppState.set_approve_username, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                        spacing="1"
+                    ),
+                    rx.vstack(
+                        rx.text("Contraseña inicial *", size="1", color="#8e8e93"),
+                        rx.input(placeholder="••••••••", type="password", on_change=AppState.set_approve_password, background="#1c1c1e", border="1px solid #3a3a3c", color="white", width="100%"),
+                        spacing="1"
+                    ),
+                    columns="2", spacing="3", width="100%"
+                ),
+                rx.cond(
+                    AppState.approve_error != "",
+                    rx.callout(AppState.approve_error, color="red", variant="soft", width="100%", margin_top="10px")
+                ),
+                rx.cond(
+                    AppState.approve_success != "",
+                    rx.callout(AppState.approve_success, color="green", variant="soft", width="100%", margin_top="10px")
+                ),
+                rx.hstack(
+                    rx.button("Aprobar y Activar Empresa", on_click=lambda: AppState.approve_registration(req["id"]), color_scheme="green", size="2", weight="bold"),
+                    rx.button("Rechazar Solicitud", on_click=lambda: AppState.reject_registration(req["id"]), color_scheme="red", size="2", variant="soft"),
+                    spacing="3",
+                    margin_top="10px"
+                ),
+                width="100%",
+                align_items="start"
+            ),
+            align_items="start",
+            width="100%"
+        ),
+        padding="20px",
+        border="1px solid rgba(15, 163, 177, 0.2)",
+        border_radius="12px",
+        background="rgba(18, 18, 18, 0.5)",
+        width="100%",
+        margin_bottom="12px"
+    )
+
+
 def settings_page() -> rx.Component:
     return rx.vstack(
         navbar("/settings"),
@@ -1190,6 +1267,10 @@ def settings_page() -> rx.Component:
                     rx.cond(
                         SettingsState.tenant_id == 1,
                         rx.tabs.trigger("🏢 Empresas", value="tenants"),
+                    ),
+                    rx.cond(
+                        SettingsState.tenant_id == 1,
+                        rx.tabs.trigger("📝 Solicitudes", value="pre_registrations"),
                     ),
                     border_bottom="1px solid #2c2c2e",
                     padding="0 32px",
@@ -2119,6 +2200,27 @@ def settings_page() -> rx.Component:
                         spacing="4", align_items="start", width="100%",
                     ),
                     value="tenants", padding="24px 32px",
+                ),
+
+                # ── Pre-registros (SaaS) ──────────────────────────────────
+                rx.tabs.content(
+                    rx.vstack(
+                        rx.heading("Solicitudes de Registro Pendientes", size="5", color="white", margin_bottom="16px"),
+                        rx.cond(
+                            AppState.pending_registrations,
+                            rx.vstack(
+                                rx.foreach(
+                                    AppState.pending_registrations,
+                                    pre_registration_row
+                                ),
+                                spacing="4",
+                                width="100%"
+                            ),
+                            rx.text("No hay solicitudes de registro pendientes.", color="#636366", size="2")
+                        ),
+                        spacing="4", align_items="start", width="100%"
+                    ),
+                    value="pre_registrations", padding="24px 32px",
                 ),
 
                 default_value="users",
