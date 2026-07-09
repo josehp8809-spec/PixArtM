@@ -30,6 +30,9 @@ class AppState(rx.State):
     role: str = ""
     tenant_id: int = 1
     tenant_name: str = ""
+    current_plan_name: str = "Starter"
+    current_billing_period: str = "monthly"
+    current_ai_mode: str = "BYOK"
 
     # ── Formulario de login ───────────────────────────────────────────────────
     login_username: str = ""
@@ -43,8 +46,15 @@ class AppState(rx.State):
     reg_contact_email: str = ""
     reg_contact_phone: str = ""
     reg_notes: str = ""
+    reg_selected_plan: str = "Starter"
+    reg_billing_frequency: str = "monthly"
+    reg_ai_mode: str = "BYOK"
     reg_success: bool = False
     reg_error: str = ""
+
+    # ── Landing Page Pricing State ──────────────────────────────────────────
+    pricing_byok: bool = True
+    pricing_period: str = "monthly"
 
     # ── Aprobación de Registro ───────────────────────────────────────────────
     pending_registrations: list[dict] = []
@@ -244,6 +254,12 @@ class AppState(rx.State):
 
     def _load_core_data(self):
         """Carga líneas, quick replies, contactos, métricas, agentes IA, plantillas, analítica y automatizaciones."""
+        # Cargar plan actual de la empresa
+        t_info = db.get_tenant_by_id(self.tenant_id)
+        if t_info:
+            self.current_plan_name = t_info.get("plan_name", "Starter")
+            self.current_billing_period = t_info.get("billing_period", "monthly")
+            self.current_ai_mode = t_info.get("ai_mode", "BYOK")
         raw_lines = db.get_all_lines(self.tenant_id)
         self.all_lines = [
             {
@@ -319,6 +335,18 @@ class AppState(rx.State):
     @rx.var
     def order_total_amount_str(self) -> str:
         return f"${self.order_total_amount:.2f}"
+
+    @rx.var
+    def current_agent_limit(self) -> int:
+        if self.current_plan_name == "Starter":
+            return 2
+        elif self.current_plan_name == "Pro":
+            return 5
+        return 999 # Enterprise / Ilimitado
+
+    @rx.var
+    def current_agent_count(self) -> int:
+        return sum(1 for u in self.team_list if u.get("role") == "agent")
     def _refresh_contacts(self):
         raw = db.get_contacts_for_user(self.user_id, self.role, self.tenant_id)
         self.contacts = [
@@ -1328,6 +1356,16 @@ class AppState(rx.State):
     def set_reg_contact_email(self, val: str): self.reg_contact_email = val
     def set_reg_contact_phone(self, val: str): self.reg_contact_phone = val
     def set_reg_notes(self, val: str): self.reg_notes = val
+    def set_reg_selected_plan(self, val: str): self.reg_selected_plan = val
+    def set_reg_billing_frequency(self, val: str): self.reg_billing_frequency = val
+    def set_reg_ai_mode(self, val: str): self.reg_ai_mode = val
+    def set_pricing_byok(self, val: bool): self.pricing_byok = val
+    def set_pricing_period(self, val: str): self.pricing_period = val
+    @rx.event
+    def handle_buy_plan(self, plan_name: str):
+        ai_str = "byok" if self.pricing_byok else "incluida"
+        url = f"/register?plan={plan_name}&frequency={self.pricing_period}&ai={ai_str}"
+        return rx.redirect(url)
     def set_approve_username(self, val: str): self.approve_username = val
     def set_approve_password(self, val: str): self.approve_password = val
     def set_support_new_message(self, val: str): self.support_new_message = val
@@ -1359,6 +1397,33 @@ class AppState(rx.State):
 
     # ── Auto-Registro ─────────────────────────────────────────────────────────
     @rx.event
+    def on_mount_register(self):
+        self.reset_registration_form()
+        plan = self.router.page.params.get("plan", "Starter")
+        freq = self.router.page.params.get("frequency", "monthly")
+        ai = self.router.page.params.get("ai", "BYOK")
+        
+        # Mapear de query params a valores correctos
+        if plan.lower() == "pro":
+            self.reg_selected_plan = "Pro"
+        elif plan.lower() == "enterprise":
+            self.reg_selected_plan = "Enterprise"
+        else:
+            self.reg_selected_plan = "Starter"
+            
+        if freq.lower() in ("semestral", "semestralmente"):
+            self.reg_billing_frequency = "semestral"
+        elif freq.lower() in ("annual", "anual", "anualmente"):
+            self.reg_billing_frequency = "annual"
+        else:
+            self.reg_billing_frequency = "monthly"
+            
+        if ai.lower() == "incluida":
+            self.reg_ai_mode = "Incluida"
+        else:
+            self.reg_ai_mode = "BYOK"
+
+    @rx.event
     def reset_registration_form(self):
         self.reg_company_name = ""
         self.reg_contact_name = ""
@@ -1388,7 +1453,10 @@ class AppState(rx.State):
             self.reg_contact_name.strip(),
             self.reg_contact_email.strip(),
             self.reg_contact_phone.strip(),
-            self.reg_notes.strip()
+            self.reg_notes.strip(),
+            selected_plan=self.reg_selected_plan,
+            billing_frequency=self.reg_billing_frequency,
+            ai_mode=self.reg_ai_mode
         )
         if res:
             self.reg_success = True
@@ -1439,6 +1507,14 @@ class AppState(rx.State):
             return
             
         new_tenant_id = tenant_res
+
+        # Guardar detalles del plan en el Tenant aprobado
+        db.update_tenant_plan(
+            new_tenant_id,
+            req.get("selected_plan", "Starter"),
+            req.get("billing_frequency", "monthly"),
+            req.get("ai_mode", "BYOK")
+        )
 
         # 2. Crear el Usuario Admin
         success_u, user_res = db.create_user(

@@ -1184,7 +1184,16 @@ def pre_registration_row(req: dict) -> rx.Component:
         rx.vstack(
             rx.hstack(
                 rx.vstack(
-                    rx.heading(req["company_name"], size="3", color="white"),
+                    rx.hstack(
+                        rx.heading(req["company_name"], size="3", color="white"),
+                        rx.badge(
+                            rx.cond(req["selected_plan"] == "Enterprise", "Enterprise", req["selected_plan"] + " - " + req["billing_frequency"] + " (" + req["ai_mode"] + ")"),
+                            color_scheme="blue",
+                            variant="soft"
+                        ),
+                        spacing="2",
+                        align_items="center"
+                    ),
                     rx.text(
                         "Contacto: ", req["contact_name"], " (", req["contact_email"], ") | Tel: ", 
                         rx.cond(req["contact_phone"], req["contact_phone"], "N/A"),
@@ -1330,6 +1339,39 @@ def settings_page() -> rx.Component:
                         rx.cond(SettingsState.nu_msg != "",
                                   rx.text(SettingsState.nu_msg, size="2")),
                         rx.divider(color="#2c2c2e"),
+                        rx.box(
+                            rx.hstack(
+                                rx.vstack(
+                                    rx.hstack(
+                                        rx.text("📋 Plan Contratado: ", size="2", color="#8e8e93"),
+                                        rx.badge(SettingsState.current_plan_name, color_scheme="blue", variant="solid"),
+                                        spacing="2", align_items="center"
+                                    ),
+                                    rx.hstack(
+                                        rx.text("🤖 Modo de IA: ", size="2", color="#8e8e93"),
+                                        rx.badge(SettingsState.current_ai_mode, color_scheme="purple", variant="soft"),
+                                        spacing="2", align_items="center"
+                                    ),
+                                    spacing="1", align_items="start"
+                                ),
+                                rx.spacer(),
+                                rx.vstack(
+                                    rx.text("Agentes humanos creados", size="1", color="#8e8e93"),
+                                    rx.hstack(
+                                        rx.heading(SettingsState.current_agent_count.to(str), size="6", color="white"),
+                                        rx.text("/", color="#636366"),
+                                        rx.heading(
+                                            rx.cond(SettingsState.current_plan_name == "Enterprise", "Ilimitado", SettingsState.current_agent_limit.to(str)),
+                                            size="6", color="#0fa3b1"
+                                        ),
+                                        align_items="baseline", spacing="1"
+                                    ),
+                                    align_items="end"
+                                ),
+                                width="100%", align_items="center"
+                            ),
+                            background="#1c1c1e", border="1px solid #2c2c2e", border_radius="12px", padding="16px", width="100%", margin_bottom="12px"
+                        ),
                         rx.heading("Usuarios activos", size="4", color="white"),
                         rx.foreach(SettingsState.all_users.to(list[dict]), user_row),
                         spacing="4", align_items="start", width="100%",

@@ -621,7 +621,7 @@ app = rx.App(
 
 app.add_page(landing_page,       route="/",          title="Nyme — Inteligencia Omnicanal")
 app.add_page(login_page,         route="/login",     title="Nyme — Iniciar Sesión")
-app.add_page(register_page,      route="/register",  title="Nyme — Registrarse")
+app.add_page(register_page,      route="/register",  title="Nyme — Registrarse", on_load=AppState.on_mount_register)
 app.add_page(support_page,       route="/support",   title="Nyme — Soporte Técnico")
 app.add_page(privacy_page,       route="/privacy",   title="Nyme — Política de Privacidad")
 app.add_page(terms_page,         route="/terms",     title="Nyme — Términos del Servicio")

@@ -390,8 +390,16 @@ class Database:
                 )
             """)
 
-            # Agregar columna gemini_api_key a la tabla tenants si no existe
+            # Agregar columnas de plan a la tabla tenants si no existen
             cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS gemini_api_key TEXT;")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan_name TEXT DEFAULT 'Starter';")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS billing_period TEXT DEFAULT 'monthly';")
+            cur.execute("ALTER TABLE tenants ADD COLUMN IF NOT EXISTS ai_mode TEXT DEFAULT 'BYOK';")
+
+            # Agregar columnas de plan a la tabla pre_registrations si no existen
+            cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS selected_plan TEXT DEFAULT 'Starter';")
+            cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS billing_frequency TEXT DEFAULT 'monthly';")
+            cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS ai_mode TEXT DEFAULT 'BYOK';")
 
             conn.commit()
             cur.close()
@@ -583,12 +591,17 @@ class Database:
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute("SELECT id, name, is_active FROM tenants WHERE id = %s", (tenant_id,))
+            cur.execute("SELECT id, name, is_active, plan_name, billing_period, ai_mode FROM tenants WHERE id = %s", (tenant_id,))
             row = cur.fetchone()
             cur.close()
             conn.close()
             if row:
-                return {"id": row[0], "name": row[1], "is_active": row[2]}
+                return {
+                    "id": row[0], "name": row[1], "is_active": row[2],
+                    "plan_name": row[3] or "Starter",
+                    "billing_period": row[4] or "monthly",
+                    "ai_mode": row[5] or "BYOK"
+                }
             return None
         except Exception as e:
             print(f"[DB] Error al obtener tenant por ID: {e}")
@@ -601,7 +614,7 @@ class Database:
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute("SELECT id, name, is_active, email, phone, website, notes, contact_name_1, contact_email_1, contact_phone_1, contact_name_2, contact_email_2, contact_phone_2 FROM tenants ORDER BY id ASC")
+            cur.execute("SELECT id, name, is_active, email, phone, website, notes, contact_name_1, contact_email_1, contact_phone_1, contact_name_2, contact_email_2, contact_phone_2, plan_name, billing_period, ai_mode FROM tenants ORDER BY id ASC")
             rows = cur.fetchall()
             cur.close()
             conn.close()
@@ -609,6 +622,24 @@ class Database:
         except Exception as e:
             print(f"[DB] Error al obtener todos los tenants: {e}")
             return []
+
+    def update_tenant_plan(self, tenant_id, plan_name, billing_period, ai_mode):
+        if not self._check_available():
+            return False
+        try:
+            conn = self.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE tenants SET plan_name = %s, billing_period = %s, ai_mode = %s WHERE id = %s",
+                (plan_name, billing_period, ai_mode, tenant_id)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True
+        except Exception as e:
+            print(f"[DB] Error actualizando plan del tenant {tenant_id}: {e}")
+            return False
 
     def create_tenant(self, name, email=None, phone=None, website=None, notes=None, contact_name_1=None, contact_email_1=None, contact_phone_1=None, contact_name_2=None, contact_email_2=None, contact_phone_2=None):
         """Crea una nueva empresa (tenant). Retorna (True, tenant_id) o (False, error_msg)."""
@@ -1927,17 +1958,17 @@ class Database:
             return False
 
     # ── Auto-Registro de Empresas ───────────────────────────────────────────
-    def save_pre_registration(self, company_name, contact_name, contact_email, contact_phone, notes):
+    def save_pre_registration(self, company_name, contact_name, contact_email, contact_phone, notes, selected_plan='Starter', billing_frequency='monthly', ai_mode='BYOK'):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
-                INSERT INTO pre_registrations (company_name, contact_name, contact_email, contact_phone, notes)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO pre_registrations (company_name, contact_name, contact_email, contact_phone, notes, selected_plan, billing_frequency, ai_mode)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (contact_email) DO NOTHING
                 """,
-                (company_name, contact_name, contact_email, contact_phone, notes)
+                (company_name, contact_name, contact_email, contact_phone, notes, selected_plan, billing_frequency, ai_mode)
             )
             conn.commit(); cur.close(); conn.close()
             return True
@@ -1950,7 +1981,7 @@ class Database:
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "SELECT id, company_name, contact_name, contact_email, contact_phone, notes, status, created_at FROM pre_registrations WHERE status = %s ORDER BY created_at DESC",
+                "SELECT id, company_name, contact_name, contact_email, contact_phone, notes, status, created_at, selected_plan, billing_frequency, ai_mode FROM pre_registrations WHERE status = %s ORDER BY created_at DESC",
                 (status,)
             )
             rows = cur.fetchall()
@@ -1964,7 +1995,10 @@ class Database:
                     "contact_phone": r[4],
                     "notes": r[5],
                     "status": r[6],
-                    "created_at": r[7].strftime("%Y-%m-%d %H:%M:%S") if r[7] else ""
+                    "created_at": r[7].strftime("%Y-%m-%d %H:%M:%S") if r[7] else "",
+                    "selected_plan": r[8] or "Starter",
+                    "billing_frequency": r[9] or "monthly",
+                    "ai_mode": r[10] or "BYOK"
                 }
                 for r in rows
             ]

@@ -247,6 +247,367 @@ def visitor_chat_modal() -> rx.Component:
     )
 
 
+def pricing_section() -> rx.Component:
+    return rx.vstack(
+        # Heading
+        rx.center(
+            rx.vstack(
+                rx.heading("Planes y Precios", size="7", color="white", weight="bold", text_align="center"),
+                rx.text("Escoge la modalidad de Inteligencia Artificial y la frecuencia de facturación que mejor se adapte a tu negocio.", color="#8e8e93", size="3", text_align="center", max_width="650px"),
+                spacing="2",
+                align_items="center",
+                margin_bottom="32px"
+            )
+        ),
+        
+        # Selectors Container
+        rx.vstack(
+            # IA selector (Switch stylized)
+            rx.hstack(
+                rx.button(
+                    "Traigo mi propia API Key (Ahorro)",
+                    on_click=lambda: AppState.set_pricing_byok(True),
+                    background=rx.cond(AppState.pricing_byok, "linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)", "transparent"),
+                    border=rx.cond(AppState.pricing_byok, "none", "1px solid rgba(255, 255, 255, 0.15)"),
+                    color="white",
+                    size="2",
+                    weight="bold",
+                    cursor="pointer",
+                    border_radius="8px",
+                ),
+                rx.button(
+                    "Quiero IA Incluida (Listo para usar)",
+                    on_click=lambda: AppState.set_pricing_byok(False),
+                    background=rx.cond(AppState.pricing_byok, "transparent", "linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)"),
+                    border=rx.cond(AppState.pricing_byok, "1px solid rgba(255, 255, 255, 0.15)", "none"),
+                    color="white",
+                    size="2",
+                    weight="bold",
+                    cursor="pointer",
+                    border_radius="8px",
+                ),
+                spacing="3",
+                justify="center",
+                margin_bottom="12px"
+            ),
+            
+            # Billing Frequency Selector
+            rx.hstack(
+                rx.button(
+                    "Mensual",
+                    on_click=lambda: AppState.set_pricing_period("monthly"),
+                    background=rx.cond(AppState.pricing_period == "monthly", "rgba(255, 255, 255, 0.1)", "transparent"),
+                    color=rx.cond(AppState.pricing_period == "monthly", "#0fa3b1", "#8e8e93"),
+                    size="1",
+                    variant="ghost",
+                    cursor="pointer",
+                    border_radius="6px"
+                ),
+                rx.button(
+                    "Semestral (-10%)",
+                    on_click=lambda: AppState.set_pricing_period("semestral"),
+                    background=rx.cond(AppState.pricing_period == "semestral", "rgba(255, 255, 255, 0.1)", "transparent"),
+                    color=rx.cond(AppState.pricing_period == "semestral", "#0fa3b1", "#8e8e93"),
+                    size="1",
+                    variant="ghost",
+                    cursor="pointer",
+                    border_radius="6px"
+                ),
+                rx.button(
+                    "Anual (-20%)",
+                    on_click=lambda: AppState.set_pricing_period("annual"),
+                    background=rx.cond(AppState.pricing_period == "annual", "rgba(255, 255, 255, 0.1)", "transparent"),
+                    color=rx.cond(AppState.pricing_period == "annual", "#0fa3b1", "#8e8e93"),
+                    size="1",
+                    variant="ghost",
+                    cursor="pointer",
+                    border_radius="6px"
+                ),
+                spacing="1",
+                background="rgba(255, 255, 255, 0.03)",
+                padding="4px",
+                border_radius="8px",
+                justify="center",
+                margin_bottom="32px",
+                border="1px solid rgba(255, 255, 255, 0.08)"
+            ),
+            align_items="center",
+            width="100%"
+        ),
+        
+        # Cards Grid
+        rx.grid(
+            # CARD 1: STARTER
+            rx.vstack(
+                rx.badge("Starter", color_scheme="blue", variant="solid", margin_bottom="8px"),
+                rx.text("Ideal para pequeñas empresas locales.", color="#8e8e93", size="2"),
+                rx.hstack(
+                    rx.heading(
+                        rx.cond(
+                            AppState.pricing_byok,
+                            rx.cond(
+                                AppState.pricing_period == "monthly",
+                                "$299",
+                                rx.cond(AppState.pricing_period == "semestral", "$269", "$239")
+                            ),
+                            rx.cond(
+                                AppState.pricing_period == "monthly",
+                                "$499",
+                                rx.cond(AppState.pricing_period == "semestral", "$449", "$399")
+                            )
+                        ),
+                        size="8", color="white", weight="bold"
+                    ),
+                    rx.text("MXN", color="#636366", size="2", self_align="end", margin_bottom="6px"),
+                    align_items="end"
+                ),
+                rx.text(
+                    rx.cond(
+                        AppState.pricing_period == "monthly",
+                        "MXN / al mes",
+                        rx.cond(
+                            AppState.pricing_period == "semestral",
+                            rx.cond(AppState.pricing_byok, "$1,614 cobrado cada 6 meses", "$2,694 cobrado cada 6 meses"),
+                            rx.cond(AppState.pricing_byok, "$2,868 cobrado cada 12 meses", "$4,788 cobrado cada 12 meses")
+                        )
+                    ),
+                    color="#8e8e93", size="1"
+                ),
+                rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
+                # Features
+                rx.vstack(
+                    rx.text("✓ 1 canal de WhatsApp Oficial", color="#d1d1d6", size="2"),
+                    rx.text("✓ 1 canal de FB Messenger", color="#d1d1d6", size="2"),
+                    rx.text("✓ 1 canal de Instagram DM", color="#d1d1d6", size="2"),
+                    rx.text("✓ 1 Administrador, 1 Coordinador", color="#d1d1d6", size="2"),
+                    rx.text("✓ 2 agentes humanos (cortesía)", color="#d1d1d6", size="2"),
+                    rx.text(
+                        rx.cond(AppState.pricing_byok, "✓ Automatización con IA (traes tu key)", "✓ IA Incluida (5k respuestas/mes)"),
+                        color="#d1d1d6", size="2"
+                    ),
+                    align_items="start", spacing="2", width="100%"
+                ),
+                rx.spacer(),
+                rx.button(
+                    "Contratar Starter",
+                    on_click=lambda: AppState.handle_buy_plan("Starter"),
+                    width="100%",
+                    background="rgba(255, 255, 255, 0.08)",
+                    color="white",
+                    _hover={"background": "rgba(255, 255, 255, 0.15)", "transform": "scale(1.02)"},
+                    border_radius="10px",
+                    margin_top="24px",
+                    cursor="pointer"
+                ),
+                padding="32px",
+                border="1px solid rgba(255, 255, 255, 0.08)",
+                border_radius="20px",
+                background="rgba(18, 18, 18, 0.4)",
+                backdrop_filter="blur(10px)",
+                width="100%",
+                align_items="start",
+                height="480px"
+            ),
+            
+            # CARD 2: PRO
+            rx.vstack(
+                rx.hstack(
+                    rx.badge("Pro", color_scheme="blue", variant="solid"),
+                    rx.badge("Recomendado", color_scheme="green", variant="soft"),
+                    spacing="2",
+                    margin_bottom="8px"
+                ),
+                rx.text("Ideal para equipos en crecimiento.", color="#8e8e93", size="2"),
+                rx.hstack(
+                    rx.heading(
+                        rx.cond(
+                            AppState.pricing_byok,
+                            rx.cond(
+                                AppState.pricing_period == "monthly",
+                                "$699",
+                                rx.cond(AppState.pricing_period == "semestral", "$629", "$559")
+                            ),
+                            rx.cond(
+                                AppState.pricing_period == "monthly",
+                                "$999",
+                                rx.cond(AppState.pricing_period == "semestral", "$899", "$799")
+                            )
+                        ),
+                        size="8", color="white", weight="bold"
+                    ),
+                    rx.text("MXN", color="#636366", size="2", self_align="end", margin_bottom="6px"),
+                    align_items="end"
+                ),
+                rx.text(
+                    rx.cond(
+                        AppState.pricing_period == "monthly",
+                        "MXN / al mes",
+                        rx.cond(
+                            AppState.pricing_period == "semestral",
+                            rx.cond(AppState.pricing_byok, "$3,774 cobrado cada 6 meses", "$5,394 cobrado cada 6 meses"),
+                            rx.cond(AppState.pricing_byok, "$6,708 cobrado cada 12 meses", "$9,588 cobrado cada 12 meses")
+                        )
+                    ),
+                    color="#8e8e93", size="1"
+                ),
+                rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
+                # Features
+                rx.vstack(
+                    rx.text("✓ Canales ilimitados (WA, FB, IG)", color="#d1d1d6", size="2"),
+                    rx.text("✓ 2 Administradores, 3 Coordinadores", color="#d1d1d6", size="2"),
+                    rx.text("✓ 5 agentes humanos (cortesía)", color="#d1d1d6", size="2"),
+                    rx.text("✓ Reportes y analítica avanzada", color="#d1d1d6", size="2"),
+                    rx.text(
+                        rx.cond(AppState.pricing_byok, "✓ IA avanzada (traes tu key)", "✓ IA Incluida (15k respuestas/mes)"),
+                        color="#d1d1d6", size="2"
+                    ),
+                    rx.text("✓ Asistencia en onboarding de Meta", color="#d1d1d6", size="2"),
+                    align_items="start", spacing="2", width="100%"
+                ),
+                rx.spacer(),
+                rx.button(
+                    "Contratar Pro",
+                    on_click=lambda: AppState.handle_buy_plan("Pro"),
+                    width="100%",
+                    background="linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)",
+                    color="white",
+                    _hover={"box_shadow": "0 4px 15px rgba(15, 163, 177, 0.4)", "transform": "scale(1.02)"},
+                    border_radius="10px",
+                    margin_top="24px",
+                    cursor="pointer",
+                    weight="bold"
+                ),
+                padding="32px",
+                border="2px solid #0fa3b1",
+                border_radius="20px",
+                background="rgba(18, 18, 18, 0.6)",
+                backdrop_filter="blur(10px)",
+                width="100%",
+                align_items="start",
+                height="480px",
+                box_shadow="0 10px 30px rgba(15, 163, 177, 0.15)"
+            ),
+            
+            # CARD 3: ENTERPRISE
+            rx.vstack(
+                rx.badge("Enterprise", color_scheme="purple", variant="solid", margin_bottom="8px"),
+                rx.text("Soluciones masivas y a la medida.", color="#8e8e93", size="2"),
+                rx.hstack(
+                    rx.heading("A cotizar", size="8", color="white", weight="bold"),
+                    align_items="end"
+                ),
+                rx.text("Soporte prioritario y integraciones personalizadas", color="#8e8e93", size="1"),
+                rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
+                # Features
+                rx.vstack(
+                    rx.text("✓ Mensajería masiva e ilimitada", color="#d1d1d6", size="2"),
+                    rx.text("✓ SLAs de servicio garantizados", color="#d1d1d6", size="2"),
+                    rx.text("✓ Administradores y agentes ilimitados", color="#d1d1d6", size="2"),
+                    rx.text("✓ Integraciones CRM externas a medida", color="#d1d1d6", size="2"),
+                    rx.text("✓ Agente IA dedicado con RAG a medida", color="#d1d1d6", size="2"),
+                    align_items="start", spacing="2", width="100%"
+                ),
+                rx.spacer(),
+                rx.button(
+                    "Contactar Soporte",
+                    on_click=AppState.toggle_visitor_chat,
+                    width="100%",
+                    background="rgba(255, 255, 255, 0.08)",
+                    color="white",
+                    _hover={"background": "rgba(255, 255, 255, 0.15)", "transform": "scale(1.02)"},
+                    border_radius="10px",
+                    margin_top="24px",
+                    cursor="pointer"
+                ),
+                padding="32px",
+                border="1px solid rgba(255, 255, 255, 0.08)",
+                border_radius="20px",
+                background="rgba(18, 18, 18, 0.4)",
+                backdrop_filter="blur(10px)",
+                width="100%",
+                align_items="start",
+                height="480px"
+            ),
+            columns="3",
+            spacing="6",
+            width="100%",
+            max_width="1050px"
+        ),
+        
+        # ── Cómo Contratar (Proceso de Onboarding) ──────────────────────────
+        rx.center(
+            rx.vstack(
+                rx.heading("¿Cómo contratar Nyme?", size="6", color="white", weight="bold", margin_top="80px", margin_bottom="8px"),
+                rx.text("El proceso es rápido, transparente y en solo 3 sencillos pasos.", color="#8e8e93", size="2", text_align="center", margin_bottom="32px"),
+                
+                # Pasos Horizontales
+                rx.grid(
+                    # Paso 1
+                    rx.vstack(
+                        rx.hstack(
+                            rx.center(
+                                rx.text("1", color="#0fa3b1", weight="bold", size="5"),
+                                background="rgba(15, 163, 177, 0.1)",
+                                border_radius="50%",
+                                width="44px",
+                                height="44px"
+                            ),
+                            rx.heading("Solicita tu registro", size="3", color="white"),
+                            spacing="3", align_items="center"
+                        ),
+                        rx.text("Haz clic en 'Contratar' en tu plan deseado o ve directamente a 'Comenzar Ahora' y llena tus datos de contacto.", color="#8e8e93", size="2"),
+                        padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
+                    ),
+                    
+                    # Paso 2
+                    rx.vstack(
+                        rx.hstack(
+                            rx.center(
+                                rx.text("2", color="#0fa3b1", weight="bold", size="5"),
+                                background="rgba(15, 163, 177, 0.1)",
+                                border_radius="50%",
+                                width="44px",
+                                height="44px"
+                            ),
+                            rx.heading("Activación de tu cuenta", size="3", color="white"),
+                            spacing="3", align_items="center"
+                        ),
+                        rx.text("Nuestro equipo revisa tus datos y te envía tus credenciales administrativas e instrucciones a tu correo en minutos.", color="#8e8e93", size="2"),
+                        padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
+                    ),
+                    
+                    # Paso 3
+                    rx.vstack(
+                        rx.hstack(
+                            rx.center(
+                                rx.text("3", color="#0fa3b1", weight="bold", size="5"),
+                                background="rgba(15, 163, 177, 0.1)",
+                                border_radius="50%",
+                                width="44px",
+                                height="44px"
+                            ),
+                            rx.heading("Conecta y opera", size="3", color="white"),
+                            spacing="3", align_items="center"
+                        ),
+                        rx.text("Inicias sesión, conectas tus páginas de redes sociales de forma guiada y empiezas a automatizar y vender.", color="#8e8e93", size="2"),
+                        padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
+                    ),
+                    columns="3",
+                    spacing="6",
+                    width="100%",
+                    max_width="1050px"
+                ),
+                width="100%"
+            ),
+            width="100%"
+        ),
+        
+        padding="64px 5%",
+        width="100%",
+        align_items="center",
+        id="pricing"
+    )
+
 def landing_page() -> rx.Component:
     # Read dynamic localized string based on AppState.landing_lang via rx.cond
     def t(key: str) -> rx.Var:
@@ -380,6 +741,9 @@ def landing_page() -> rx.Component:
             width="100%",
             align_items="center"
         ),
+
+        # 3.5 PRICING SECTION
+        pricing_section(),
 
         # 4. FAQ SECTION
         rx.center(

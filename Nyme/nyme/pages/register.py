@@ -176,6 +176,48 @@ def register_page() -> rx.Component:
                         ),
 
                         rx.vstack(
+                            rx.text("Plan Seleccionado *", size="1", color="#8e8e93", weight="bold"),
+                            rx.select(
+                                ["Starter", "Pro", "Enterprise"],
+                                value=AppState.reg_selected_plan,
+                                on_change=AppState.set_reg_selected_plan,
+                                background="rgba(28, 28, 30, 0.8)",
+                                border="1px solid rgba(255, 255, 255, 0.15)",
+                                color="white",
+                                width="100%"
+                            ),
+                            spacing="1", width="100%"
+                        ),
+
+                        rx.vstack(
+                            rx.text("Frecuencia de Pago *", size="1", color="#8e8e93", weight="bold"),
+                            rx.select(
+                                ["monthly", "semestral", "annual"],
+                                value=AppState.reg_billing_frequency,
+                                on_change=AppState.set_reg_billing_frequency,
+                                background="rgba(28, 28, 30, 0.8)",
+                                border="1px solid rgba(255, 255, 255, 0.15)",
+                                color="white",
+                                width="100%"
+                            ),
+                            spacing="1", width="100%"
+                        ),
+
+                        rx.vstack(
+                            rx.text("Modalidad de IA *", size="1", color="#8e8e93", weight="bold"),
+                            rx.select(
+                                ["BYOK", "Incluida"],
+                                value=AppState.reg_ai_mode,
+                                on_change=AppState.set_reg_ai_mode,
+                                background="rgba(28, 28, 30, 0.8)",
+                                border="1px solid rgba(255, 255, 255, 0.15)",
+                                color="white",
+                                width="100%"
+                            ),
+                            spacing="1", width="100%"
+                        ),
+
+                        rx.vstack(
                             rx.text(t("notes"), size="1", color="#8e8e93", weight="bold"),
                             rx.text_area(
                                 placeholder="Cuéntanos más de tu negocio...",
