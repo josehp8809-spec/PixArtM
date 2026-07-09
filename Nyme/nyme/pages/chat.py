@@ -700,5 +700,5 @@ def chat_page() -> rx.Component:
         width="100%",
         height="100dvh",
         overflow="hidden",
-        on_mount=[AppState.require_auth, AppState.start_polling],
+        on_mount=[AppState.require_auth, AppState.detect_timezone, AppState.start_polling],
     )

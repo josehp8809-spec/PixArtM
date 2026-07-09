@@ -2022,7 +2022,7 @@ class Database:
                     "sender_username": r[2],
                     "sender_tenant_id": r[3],
                     "message": r[4],
-                    "created_at": r[5].strftime("%H:%M") if r[5] else ""
+                    "created_at": r[5]
                 }
                 for r in rows
             ]

@@ -55,6 +55,16 @@ def install_node():
     return node_dir
 
 def main():
+    # Eliminar caché anterior de .web para forzar compilación limpia
+    import shutil
+    web_dir = os.path.join(os.getcwd(), ".web")
+    if os.path.exists(web_dir):
+        print("[Build] Eliminando caché de .web para compilación limpia...")
+        try:
+            shutil.rmtree(web_dir)
+        except Exception as e:
+            print(f"[Build] Warning al eliminar .web: {e}")
+
     node_dir = install_node()
     node_bin_dir = os.path.join(node_dir, "bin")
     

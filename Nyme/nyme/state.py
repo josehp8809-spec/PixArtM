@@ -61,6 +61,7 @@ class AppState(rx.State):
     support_rooms_list: list[dict] = []
     active_support_room_id: int = 0
     active_support_tenant_name: str = ""
+    client_timezone: str = "America/Mexico_City"
 
     # ── Datos cargados ────────────────────────────────────────────────────────
     contacts: list[dict]      = []
@@ -385,7 +386,7 @@ class AppState(rx.State):
             self.messages.append({
                 "type": m[0],
                 "body": body,
-                "time": m[2].strftime("%H:%M") if m[2] else "",
+                "time": self.format_local_time(m[2]),
                 "agent": m[3] or "",
                 "line_id": m[4] or 0,
                 "media_id": media_id,
@@ -397,7 +398,7 @@ class AppState(rx.State):
     def _refresh_internal(self):
         raw = db.get_internal_messages()
         self.internal_messages = [
-            {"user": r[0], "msg": r[1], "time": r[2].strftime("%H:%M")}
+            {"user": r[0], "msg": r[1], "time": self.format_local_time(r[2])}
             for r in raw
         ]
 
@@ -1325,6 +1326,28 @@ class AppState(rx.State):
         if key == "Enter":
             return self.send_support_message()
 
+    def set_client_timezone(self, tz: str): self.client_timezone = tz
+
+    @rx.event
+    def detect_timezone(self):
+        return rx.call_script(
+            "Intl.DateTimeFormat().resolvedOptions().timeZone",
+            callback=AppState.set_client_timezone
+        )
+
+    def format_local_time(self, dt):
+        if not dt:
+            return ""
+        from zoneinfo import ZoneInfo
+        try:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+            local_dt = dt.astimezone(ZoneInfo(self.client_timezone))
+            return local_dt.strftime("%H:%M")
+        except Exception as e:
+            print(f"[Timezone Error] {e}")
+            return dt.strftime("%H:%M")
+
     # ── Auto-Registro ─────────────────────────────────────────────────────────
     @rx.event
     def reset_registration_form(self):
@@ -1447,12 +1470,34 @@ class AppState(rx.State):
             room_id = db.get_or_create_support_room(self.tenant_id)
             if room_id:
                 self.support_room_id = room_id
-                self.support_messages = db.get_support_messages(room_id)
+                raw_msgs = db.get_support_messages(room_id)
+                self.support_messages = [
+                    {
+                        "id": m["id"],
+                        "room_id": m["room_id"],
+                        "sender_username": m["sender_username"],
+                        "sender_tenant_id": m["sender_tenant_id"],
+                        "message": m["message"],
+                        "created_at": self.format_local_time(m["created_at"])
+                    }
+                    for m in raw_msgs
+                ]
         # Para Superadmin (SaaS Global): cargar todas las salas activas de soporte
         elif self.tenant_id == 1:
             self.support_rooms_list = db.get_all_support_rooms()
             if self.active_support_room_id > 0:
-                self.support_messages = db.get_support_messages(self.active_support_room_id)
+                raw_msgs = db.get_support_messages(self.active_support_room_id)
+                self.support_messages = [
+                    {
+                        "id": m["id"],
+                        "room_id": m["room_id"],
+                        "sender_username": m["sender_username"],
+                        "sender_tenant_id": m["sender_tenant_id"],
+                        "message": m["message"],
+                        "created_at": self.format_local_time(m["created_at"])
+                    }
+                    for m in raw_msgs
+                ]
 
     @rx.event
     def send_support_message(self):
@@ -1472,7 +1517,18 @@ class AppState(rx.State):
         )
         if success:
             self.support_new_message = ""
-            self.support_messages = db.get_support_messages(room_to_send)
+            raw_msgs = db.get_support_messages(room_to_send)
+            self.support_messages = [
+                {
+                    "id": m["id"],
+                    "room_id": m["room_id"],
+                    "sender_username": m["sender_username"],
+                    "sender_tenant_id": m["sender_tenant_id"],
+                    "message": m["message"],
+                    "created_at": self.format_local_time(m["created_at"])
+                }
+                for m in raw_msgs
+            ]
             if self.tenant_id == 1:
                 self.support_rooms_list = db.get_all_support_rooms()
 
@@ -1480,6 +1536,17 @@ class AppState(rx.State):
     def select_support_room(self, room_id: int, tenant_name: str):
         self.active_support_room_id = room_id
         self.active_support_tenant_name = tenant_name
-        self.support_messages = db.get_support_messages(room_id)
+        raw_msgs = db.get_support_messages(room_id)
+        self.support_messages = [
+            {
+                "id": m["id"],
+                "room_id": m["room_id"],
+                "sender_username": m["sender_username"],
+                "sender_tenant_id": m["sender_tenant_id"],
+                "message": m["message"],
+                "created_at": self.format_local_time(m["created_at"])
+            }
+            for m in raw_msgs
+        ]
 
 

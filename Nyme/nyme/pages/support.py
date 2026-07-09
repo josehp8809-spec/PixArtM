@@ -273,5 +273,5 @@ def support_page() -> rx.Component:
         min_height="100vh",
         spacing="0",
         width="100%",
-        on_mount=AppState.load_support_chat
+        on_mount=[AppState.detect_timezone, AppState.load_support_chat]
     )

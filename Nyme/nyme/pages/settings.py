@@ -165,6 +165,7 @@ class SettingsState(AppState):
 
     def on_mount_settings(self):
         self.require_auth()
+        self.detect_timezone()
         self._reload_users()
         self._load_core_data()
         if self.tenant_id == 1:
