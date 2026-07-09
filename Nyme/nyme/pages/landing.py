@@ -180,7 +180,7 @@ def landing_page() -> rx.Component:
                 rx.hstack(
                     rx.button(
                         t("hero_cta"),
-                        on_click=rx.redirect("/login"),
+                        on_click=rx.redirect("/register"),
                         size="3",
                         background="linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)",
                         color="white",
@@ -279,7 +279,7 @@ def landing_page() -> rx.Component:
             width="100%",
             align_items="center"
         ),
-        rx.script(src="/webchat"),
+        rx.script(src="/api/webchat/widget.js"),
         background_color="#000000",
         min_height="100vh",
         spacing="0",
