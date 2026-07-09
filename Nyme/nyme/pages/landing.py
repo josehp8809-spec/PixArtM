@@ -33,6 +33,7 @@ TEXTS = {
         "footer_privacy": "Política de Privacidad",
         "footer_terms": "Términos del Servicio",
         "footer_deletion": "Eliminación de Datos",
+        "footer_guide": "Guía de Uso",
         "footer_contact": "Contacto: soporte@nyme.com"
     },
     "en": {
@@ -64,6 +65,7 @@ TEXTS = {
         "footer_privacy": "Privacy Policy",
         "footer_terms": "Terms of Service",
         "footer_deletion": "Data Deletion Instructions",
+        "footer_guide": "User Guide",
         "footer_contact": "Contact: support@nyme.com"
     }
 }
@@ -259,6 +261,7 @@ def landing_page() -> rx.Component:
                     rx.link(t("footer_privacy"), href="/privacy", color="#8e8e93", size="2", _hover={"color": "#0fa3b1"}),
                     rx.link(t("footer_terms"), href="/terms", color="#8e8e93", size="2", _hover={"color": "#0fa3b1"}),
                     rx.link(t("footer_deletion"), href="/data-deletion", color="#8e8e93", size="2", _hover={"color": "#0fa3b1"}),
+                    rx.link(t("footer_guide"), href="/instructions", color="#8e8e93", size="2", _hover={"color": "#0fa3b1"}),
                     align_items="end",
                     spacing="2"
                 ),

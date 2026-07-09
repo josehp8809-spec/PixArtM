@@ -18,7 +18,7 @@ from nyme.pages.contacts import contacts_page
 from nyme.pages.orders import orders_page
 from nyme.pages.navbar import navbar as premium_navbar
 from nyme.pages.landing import landing_page
-from nyme.pages.documents import privacy_page, terms_page, data_deletion_page
+from nyme.pages.documents import privacy_page, terms_page, data_deletion_page, instructions_page
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Navbar compartida
@@ -619,6 +619,7 @@ app.add_page(login_page,         route="/login",     title="Nyme — Iniciar Ses
 app.add_page(privacy_page,       route="/privacy",   title="Nyme — Política de Privacidad")
 app.add_page(terms_page,         route="/terms",     title="Nyme — Términos del Servicio")
 app.add_page(data_deletion_page, route="/data-deletion", title="Nyme — Eliminación de Datos")
+app.add_page(instructions_page,  route="/instructions", title="Nyme — Guía de Uso")
 app.add_page(chat_page,          route="/chat",      title="Nyme — WhatsApp")
 app.add_page(contacts_page,      route="/contacts",  title="Nyme — Directorio")
 app.add_page(internal_chat_page, route="/internal",  title="Nyme — Equipo")

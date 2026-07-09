@@ -43,7 +43,24 @@ DOCS_TEXTS = {
         "deletion_step1_title": "Opción A: Eliminación automática de canales (Auto-servicio)",
         "deletion_step1_desc": "Si solo deseas eliminar un número de WhatsApp o canal de red social de nuestra plataforma, ve a la sección de Configuración en tu panel de Nyme, busca el canal en la lista y haz clic en el botón de eliminar (papelera 🗑️). Este proceso purga inmediatamente de nuestra base de datos los registros del canal, sus credenciales (Tokens) y todo su historial de mensajes asociados.",
         "deletion_step2_title": "Opción B: Eliminación completa de tu Cuenta de Nyme",
-        "deletion_step2_desc": "Si deseas eliminar tu cuenta de Nyme por completo, junto con los datos de tu empresa, agentes, contactos e historial total, envía un correo electrónico a soporte@nyme.com con el asunto 'Solicitud de Eliminación de Datos'. Tu solicitud se procesará en un plazo máximo de 48 horas hábiles, tras el cual se borrará toda tu información de forma definitiva e irrecuperable."
+        "deletion_step2_desc": "Si deseas eliminar tu cuenta de Nyme por completo, junto con los datos de tu empresa, agentes, contactos e historial total, envía un correo electrónico a soporte@nyme.com con el asunto 'Solicitud de Eliminación de Datos'. Tu solicitud se procesará en un plazo máximo de 48 horas hábiles, tras el cual se borrará toda tu información de forma definitiva e irrecuperable.",
+        "guide_title": "Guía de Uso e Instrucciones de Nyme",
+        "guide_last_updated": "Última actualización: 9 de Julio de 2026",
+        "guide_p1": "Esta guía práctica explica cómo utilizar las funciones principales de Nyme para centralizar la comunicación de tu negocio y automatizar la atención a tus clientes.",
+        "guide_h1": "1. Conexión de Canales y Webhooks",
+        "guide_p2": "Para recibir mensajes en tiempo real, debes dar de alta tus canales en el panel:",
+        "guide_li1": "Configuración: Ve a Configuración > Canales y registra tu canal ingresando el Phone Number ID o Page ID y tu Access Token.",
+        "guide_li2": "Meta Webhooks: Configura el webhook de tu aplicación de Meta apuntando a 'https://nyme-app.onrender.com/webhook' usando el token de verificación asignado, y suscríbete al evento 'messages'.",
+        "guide_h2": "2. Bandeja de Entrada y CRM",
+        "guide_p3": "Una vez conectados, gestiona tus clientes de forma eficiente:",
+        "guide_li3": "Asignación: Asigna conversaciones a asesores específicos haciendo clic en 'Asignarme' o usando el menú desplegable.",
+        "guide_li4": "Ciclo de Vida: Clasifica a tus contactos en el panel lateral (Nuevo, Pendiente, etc.) para segmentar tu base de datos.",
+        "guide_li5": "Levantamiento de Pedidos: Genera borradores de órdenes registrando productos del catálogo directamente desde la conversación.",
+        "guide_h3": "3. Respuestas Rápidas e Inteligencia Artificial",
+        "guide_p4": "Ahorra tiempo automatizando respuestas a preguntas frecuentes:",
+        "guide_li6": "Atajos de Teclado: Escribe '/' en el campo de texto del chat para abrir la lista de respuestas rápidas y enviarlas en un segundo.",
+        "guide_li7": "Agentes IA (RAG): Ve a Configuración > Agentes IA para activar un bot inteligente, y pégale documentos de conocimiento (menús, políticas, precios) para que atienda automáticamente.",
+        "footer_guide": "Guía de Uso"
     },
     "en": {
         "nav_home": "Home",
@@ -85,7 +102,24 @@ DOCS_TEXTS = {
         "deletion_step1_title": "Option A: Self-service channel removal",
         "deletion_step1_desc": "If you only want to delete a WhatsApp number or social media channel from our platform, navigate to the Settings section in your Nyme dashboard, locate the channel in the list, and click the delete button (trash bin 🗑️). This action immediately purges the channel configurations, security tokens, and all associated message history from our databases.",
         "deletion_step2_title": "Option B: Complete Nyme Account Deletion",
-        "deletion_step2_desc": "If you wish to delete your entire Nyme account, along with all business records, agents, contacts, and full chat history, send an email to support@nyme.com with the subject 'Data Deletion Request'. Your request will be processed within 48 business hours, permanently and irreversibly purging all your data."
+        "deletion_step2_desc": "If you wish to delete your entire Nyme account, along with all business records, agents, contacts, and full chat history, send an email to support@nyme.com with the subject 'Data Deletion Request'. Your request will be processed within 48 business hours, permanently and irreversibly purging all your data.",
+        "guide_title": "Nyme User Guide & Instructions",
+        "guide_last_updated": "Last updated: July 9, 2026",
+        "guide_p1": "This practical guide explains how to use the core features of Nyme to centralize your business communication and automate customer support.",
+        "guide_h1": "1. Connecting Channels & Webhooks",
+        "guide_p2": "To receive messages in real time, you must link your channels in the dashboard:",
+        "guide_li1": "Settings: Go to Settings > Channels and register your channel by entering the Phone Number ID or Page ID and your Access Token.",
+        "guide_li2": "Meta Webhooks: Configure your Meta application webhook pointing to 'https://nyme-app.onrender.com/webhook' using the verification token, and subscribe to the 'messages' field.",
+        "guide_h2": "2. Omnichannel Inbox & CRM",
+        "guide_p3": "Once connected, manage your customers efficiently:",
+        "guide_li3": "Assign: Assign chats to specific agents by clicking 'Assign to me' or using the dropdown.",
+        "guide_li4": "Lifecycle Stage: Tag your contacts in the sidebar (New Customer, Pending, etc.) to segment your CRM database.",
+        "guide_li5": "Order Management: Create order drafts by selecting products from your catalog directly inside the conversation.",
+        "guide_h3": "3. Quick Replies & AI Agents",
+        "guide_p4": "Save time by automating repetitive responses:",
+        "guide_li6": "Keyboard Shortcuts: Type '/' in the chat input box to show the quick replies list and send them in a second.",
+        "guide_li7": "AI Agents (RAG): Go to Settings > AI Agents to activate an intelligent assistant, and paste knowledge base documents (menus, policies, pricing) for automatic responses.",
+        "footer_guide": "User Guide"
     }
 }
 
@@ -151,6 +185,7 @@ def doc_footer() -> rx.Component:
                 rx.link("Privacy", href="/privacy", color="#8e8e93", size="1", _hover={"color": "#0fa3b1"}),
                 rx.link("Terms", href="/terms", color="#8e8e93", size="1", _hover={"color": "#0fa3b1"}),
                 rx.link("Data Deletion", href="/data-deletion", color="#8e8e93", size="1", _hover={"color": "#0fa3b1"}),
+                rx.link(t("footer_guide"), href="/instructions", color="#8e8e93", size="1", _hover={"color": "#0fa3b1"}),
                 spacing="4"
             ),
             width="100%",
@@ -293,6 +328,66 @@ def data_deletion_page() -> rx.Component:
                     background="rgba(10, 132, 255, 0.05)",
                     width="100%",
                     align_items="start"
+                ),
+                
+                align_items="start",
+                max_width="800px",
+                width="100%",
+                padding="64px 24px"
+            ),
+            width="100%"
+        ),
+        doc_footer(),
+        background_color="#000000",
+        min_height="100vh",
+        spacing="0",
+        width="100%"
+    )
+
+
+def instructions_page() -> rx.Component:
+    t = lambda key: DOCS_TEXTS[AppState.landing_lang][key]
+    
+    return rx.vstack(
+        doc_navbar(),
+        rx.center(
+            rx.vstack(
+                rx.heading(t("guide_title"), size="7", color="white", weight="bold", margin_bottom="4px"),
+                rx.text(t("guide_last_updated"), color="#0fa3b1", size="2", margin_bottom="24px"),
+                
+                rx.text(t("guide_p1"), color="#d1d1d6", size="3", line_height="1.6", margin_bottom="24px"),
+                
+                rx.heading(t("guide_h1"), size="4", color="white", margin_bottom="12px"),
+                rx.text(t("guide_p2"), color="#d1d1d6", size="3", line_height="1.6", margin_bottom="12px"),
+                rx.vstack(
+                    rx.text(f"• {t('guide_li1')}", color="#8e8e93", size="2"),
+                    rx.text(f"• {t('guide_li2')}", color="#8e8e93", size="2"),
+                    align_items="start",
+                    padding_left="16px",
+                    margin_bottom="24px",
+                    spacing="2"
+                ),
+                
+                rx.heading(t("guide_h2"), size="4", color="white", margin_bottom="12px"),
+                rx.text(t("guide_p3"), color="#d1d1d6", size="3", line_height="1.6", margin_bottom="12px"),
+                rx.vstack(
+                    rx.text(f"• {t('guide_li3')}", color="#8e8e93", size="2"),
+                    rx.text(f"• {t('guide_li4')}", color="#8e8e93", size="2"),
+                    rx.text(f"• {t('guide_li5')}", color="#8e8e93", size="2"),
+                    align_items="start",
+                    padding_left="16px",
+                    margin_bottom="24px",
+                    spacing="2"
+                ),
+                
+                rx.heading(t("guide_h3"), size="4", color="white", margin_bottom="12px"),
+                rx.text(t("guide_p4"), color="#d1d1d6", size="3", line_height="1.6", margin_bottom="12px"),
+                rx.vstack(
+                    rx.text(f"• {t('guide_li6')}", color="#8e8e93", size="2"),
+                    rx.text(f"• {t('guide_li7')}", color="#8e8e93", size="2"),
+                    align_items="start",
+                    padding_left="16px",
+                    spacing="2"
                 ),
                 
                 align_items="start",
