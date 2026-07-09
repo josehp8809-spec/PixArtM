@@ -34,7 +34,71 @@ TEXTS = {
         "footer_terms": "Términos del Servicio",
         "footer_deletion": "Eliminación de Datos",
         "footer_guide": "Guía de Uso",
-        "footer_contact": "Contacto: soporte@nyme.com"
+        "footer_contact": "Contacto: soporte@nyme.com",
+        
+        "price_title": "Planes y Precios",
+        "price_subtitle": "Escoge la modalidad de Inteligencia Artificial y la frecuencia de facturación que mejor se adapte a tu negocio.",
+        "byok_label": "Traigo mi propia API Key (Ahorro)",
+        "hosted_label": "Quiero IA Incluida (Listo para usar)",
+        "freq_monthly": "Mensual",
+        "freq_semestral": "Semestral (-10%)",
+        "freq_annual": "Anual (-20%)",
+        
+        "plan_starter_desc": "Ideal para pequeñas empresas locales.",
+        "plan_pro_desc": "Ideal para equipos en crecimiento.",
+        "plan_ent_desc": "Soluciones masivas y a la medida.",
+        
+        "billing_monthly": "MXN / al mes",
+        "billing_semestral_byok": "$1,614 cobrado cada 6 meses",
+        "billing_semestral_hosted": "$2,694 cobrado cada 6 meses",
+        "billing_annual_byok": "$2,868 cobrado cada 12 meses",
+        "billing_annual_hosted": "$4,788 cobrado cada 12 meses",
+        
+        "billing_semestral_byok_pro": "$3,774 cobrado cada 6 meses",
+        "billing_semestral_hosted_pro": "$5,394 cobrado cada 6 meses",
+        "billing_annual_byok_pro": "$6,708 cobrado cada 12 meses",
+        "billing_annual_hosted_pro": "$9,588 cobrado cada 12 meses",
+        
+        "ent_price": "A cotizar",
+        "ent_price_sub": "Soporte prioritario y integraciones personalizadas",
+        
+        "feat_wa_1": "✓ 1 canal de WhatsApp Oficial",
+        "feat_fb_1": "✓ 1 canal de FB Messenger",
+        "feat_ig_1": "✓ 1 canal de Instagram DM",
+        "feat_users_starter": "✓ 1 Administrador, 1 Coordinador",
+        "feat_agents_starter": "✓ 2 agentes humanos (cortesía)",
+        "feat_ai_byok_starter": "✓ Automatización con IA (traes tu key)",
+        "feat_ai_hosted_starter": "✓ IA Incluida (5k respuestas/mes)",
+        
+        "feat_channels_pro": "✓ Canales ilimitados (WA, FB, IG)",
+        "feat_users_pro": "✓ 2 Administradores, 3 Coordinadores",
+        "feat_agents_pro": "✓ 5 agentes humanos (cortesía)",
+        "feat_reports_pro": "✓ Reportes y analítica avanzada",
+        "feat_ai_byok_pro": "✓ IA avanzada (traes tu key)",
+        "feat_ai_hosted_pro": "✓ IA Incluida (15k respuestas/mes)",
+        "feat_meta_pro": "✓ Asistencia en onboarding de Meta",
+        
+        "feat_bulk_ent": "✓ Mensajería masiva e ilimitada",
+        "feat_sla_ent": "✓ SLAs de servicio garantizados",
+        "feat_users_ent": "✓ Administradores y agentes ilimitados",
+        "feat_crm_ent": "✓ Integraciones CRM externas a medida",
+        "feat_ai_ent": "✓ Agente IA dedicado con RAG a medida",
+        
+        "btn_buy_starter": "Contratar Starter",
+        "btn_buy_pro": "Contratar Pro",
+        "btn_contact_support": "Contactar Soporte",
+        
+        "onboarding_title": "¿Cómo contratar Nyme?",
+        "onboarding_subtitle": "El proceso es rápido, transparente y en solo 3 sencillos pasos.",
+        
+        "step_1_title": "Solicita tu registro",
+        "step_1_desc": "Haz clic en 'Contratar' en tu plan deseado o ve directamente a 'Comenzar Ahora' y llena tus datos de contacto.",
+        
+        "step_2_title": "Activación de tu cuenta",
+        "step_2_desc": "Nuestro equipo revisa tus datos y te envía tus credenciales administrativas e instrucciones a tu correo en minutos.",
+        
+        "step_3_title": "Conecta y opera",
+        "step_3_desc": "Inicias sesión, conectas tus páginas de redes sociales de forma guiada y empiezas a automatizar y vender."
     },
     "en": {
         "nav_features": "Features",
@@ -66,9 +130,81 @@ TEXTS = {
         "footer_terms": "Terms of Service",
         "footer_deletion": "Data Deletion Instructions",
         "footer_guide": "User Guide",
-        "footer_contact": "Contact: support@nyme.com"
+        "footer_contact": "Contact: support@nyme.com",
+        
+        "price_title": "Pricing & Plans",
+        "price_subtitle": "Choose the AI model and billing frequency that best suits your business.",
+        "byok_label": "Bring my own API Key (BYOK)",
+        "hosted_label": "Hosted AI Included (Ready to use)",
+        "freq_monthly": "Monthly",
+        "freq_semestral": "Semiannual (-10%)",
+        "freq_annual": "Annual (-20%)",
+        
+        "plan_starter_desc": "Ideal for local small businesses.",
+        "plan_pro_desc": "Ideal for growing teams.",
+        "plan_ent_desc": "Custom enterprise solutions.",
+        
+        "billing_monthly": "MXN / month",
+        "billing_semestral_byok": "$1,614 billed every 6 months",
+        "billing_semestral_hosted": "$2,694 billed every 6 months",
+        "billing_annual_byok": "$2,868 billed every 12 months",
+        "billing_annual_hosted": "$4,788 billed every 12 months",
+        
+        "billing_semestral_byok_pro": "$3,774 billed every 6 months",
+        "billing_semestral_hosted_pro": "$5,394 billed every 6 months",
+        "billing_annual_byok_pro": "$6,708 billed every 12 months",
+        "billing_annual_hosted_pro": "$9,588 billed every 12 months",
+        
+        "ent_price": "Custom Quote",
+        "ent_price_sub": "Priority support and custom integrations",
+        
+        "feat_wa_1": "✓ 1 Official WhatsApp channel",
+        "feat_fb_1": "✓ 1 FB Messenger channel",
+        "feat_ig_1": "✓ 1 Instagram DM channel",
+        "feat_users_starter": "✓ 1 Admin, 1 Coordinator",
+        "feat_agents_starter": "✓ 2 human agents (courtesy)",
+        "feat_ai_byok_starter": "✓ AI Automation (bring your key)",
+        "feat_ai_hosted_starter": "✓ Hosted AI (5k replies/mo)",
+        
+        "feat_channels_pro": "✓ Unlimited channels (WA, FB, IG)",
+        "feat_users_pro": "✓ 2 Admins, 3 Coordinators",
+        "feat_agents_pro": "✓ 5 human agents (courtesy)",
+        "feat_reports_pro": "✓ Reports & advanced analytics",
+        "feat_ai_byok_pro": "✓ Advanced AI (bring your key)",
+        "feat_ai_hosted_pro": "✓ Hosted AI (15k replies/mo)",
+        "feat_meta_pro": "✓ Meta onboarding assistance",
+        
+        "feat_bulk_ent": "✓ Unlimited bulk messaging",
+        "feat_sla_ent": "✓ Guaranteed service SLAs",
+        "feat_users_ent": "✓ Unlimited admins & agents",
+        "feat_crm_ent": "✓ Custom external CRM integrations",
+        "feat_ai_ent": "✓ Dedicated AI Agent with custom RAG",
+        
+        "btn_buy_starter": "Subscribe Starter",
+        "btn_buy_pro": "Subscribe Pro",
+        "btn_contact_support": "Contact Support",
+        
+        "onboarding_title": "How to Subscribe?",
+        "onboarding_subtitle": "The process is fast, transparent and in just 3 simple steps.",
+        
+        "step_1_title": "Request Registration",
+        "step_1_desc": "Click 'Subscribe' on your desired plan or go to 'Get Started' and fill out your contact details.",
+        
+        "step_2_title": "Account Activation",
+        "step_2_desc": "Our team reviews your data and sends your admin credentials and guide to your email in minutes.",
+        
+        "step_3_title": "Connect & Operate",
+        "step_3_desc": "Log in, connect your social media pages via our wizard and start automating and selling."
     }
 }
+
+
+def t(key: str) -> rx.Var:
+    return rx.cond(
+        AppState.landing_lang == "es",
+        TEXTS["es"].get(key, key),
+        TEXTS["en"].get(key, key)
+    )
 
 
 def feature_card(title: rx.Var, description: rx.Var) -> rx.Component:
@@ -252,8 +388,8 @@ def pricing_section() -> rx.Component:
         # Heading
         rx.center(
             rx.vstack(
-                rx.heading("Planes y Precios", size="7", color="white", weight="bold", text_align="center"),
-                rx.text("Escoge la modalidad de Inteligencia Artificial y la frecuencia de facturación que mejor se adapte a tu negocio.", color="#8e8e93", size="3", text_align="center", max_width="650px"),
+                rx.heading(t("price_title"), size="7", color="white", weight="bold", text_align="center"),
+                rx.text(t("price_subtitle"), color="#8e8e93", size="3", text_align="center", max_width="650px"),
                 spacing="2",
                 align_items="center",
                 margin_bottom="32px"
@@ -265,7 +401,7 @@ def pricing_section() -> rx.Component:
             # IA selector (Switch stylized)
             rx.hstack(
                 rx.button(
-                    "Traigo mi propia API Key (Ahorro)",
+                    t("byok_label"),
                     on_click=lambda: AppState.set_pricing_byok(True),
                     background=rx.cond(AppState.pricing_byok, "linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)", "transparent"),
                     border=rx.cond(AppState.pricing_byok, "none", "1px solid rgba(255, 255, 255, 0.15)"),
@@ -276,7 +412,7 @@ def pricing_section() -> rx.Component:
                     border_radius="8px",
                 ),
                 rx.button(
-                    "Quiero IA Incluida (Listo para usar)",
+                    t("hosted_label"),
                     on_click=lambda: AppState.set_pricing_byok(False),
                     background=rx.cond(AppState.pricing_byok, "transparent", "linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)"),
                     border=rx.cond(AppState.pricing_byok, "1px solid rgba(255, 255, 255, 0.15)", "none"),
@@ -294,7 +430,7 @@ def pricing_section() -> rx.Component:
             # Billing Frequency Selector
             rx.hstack(
                 rx.button(
-                    "Mensual",
+                    t("freq_monthly"),
                     on_click=lambda: AppState.set_pricing_period("monthly"),
                     background=rx.cond(AppState.pricing_period == "monthly", "rgba(255, 255, 255, 0.1)", "transparent"),
                     color=rx.cond(AppState.pricing_period == "monthly", "#0fa3b1", "#8e8e93"),
@@ -304,7 +440,7 @@ def pricing_section() -> rx.Component:
                     border_radius="6px"
                 ),
                 rx.button(
-                    "Semestral (-10%)",
+                    t("freq_semestral"),
                     on_click=lambda: AppState.set_pricing_period("semestral"),
                     background=rx.cond(AppState.pricing_period == "semestral", "rgba(255, 255, 255, 0.1)", "transparent"),
                     color=rx.cond(AppState.pricing_period == "semestral", "#0fa3b1", "#8e8e93"),
@@ -314,7 +450,7 @@ def pricing_section() -> rx.Component:
                     border_radius="6px"
                 ),
                 rx.button(
-                    "Anual (-20%)",
+                    t("freq_annual"),
                     on_click=lambda: AppState.set_pricing_period("annual"),
                     background=rx.cond(AppState.pricing_period == "annual", "rgba(255, 255, 255, 0.1)", "transparent"),
                     color=rx.cond(AppState.pricing_period == "annual", "#0fa3b1", "#8e8e93"),
@@ -340,7 +476,7 @@ def pricing_section() -> rx.Component:
             # CARD 1: STARTER
             rx.vstack(
                 rx.badge("Starter", color_scheme="blue", variant="solid", margin_bottom="8px"),
-                rx.text("Ideal para pequeñas empresas locales.", color="#8e8e93", size="2"),
+                rx.text(t("plan_starter_desc"), color="#8e8e93", size="2"),
                 rx.hstack(
                     rx.heading(
                         rx.cond(
@@ -364,11 +500,11 @@ def pricing_section() -> rx.Component:
                 rx.text(
                     rx.cond(
                         AppState.pricing_period == "monthly",
-                        "MXN / al mes",
+                        t("billing_monthly"),
                         rx.cond(
                             AppState.pricing_period == "semestral",
-                            rx.cond(AppState.pricing_byok, "$1,614 cobrado cada 6 meses", "$2,694 cobrado cada 6 meses"),
-                            rx.cond(AppState.pricing_byok, "$2,868 cobrado cada 12 meses", "$4,788 cobrado cada 12 meses")
+                            rx.cond(AppState.pricing_byok, t("billing_semestral_byok"), t("billing_semestral_hosted")),
+                            rx.cond(AppState.pricing_byok, t("billing_annual_byok"), t("billing_annual_hosted"))
                         )
                     ),
                     color="#8e8e93", size="1"
@@ -376,20 +512,21 @@ def pricing_section() -> rx.Component:
                 rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
                 # Features
                 rx.vstack(
-                    rx.text("✓ 1 canal de WhatsApp Oficial", color="#d1d1d6", size="2"),
-                    rx.text("✓ 1 canal de FB Messenger", color="#d1d1d6", size="2"),
-                    rx.text("✓ 1 canal de Instagram DM", color="#d1d1d6", size="2"),
-                    rx.text("✓ 1 Administrador, 1 Coordinador", color="#d1d1d6", size="2"),
-                    rx.text("✓ 2 agentes humanos (cortesía)", color="#d1d1d6", size="2"),
+                    rx.text(t("feat_wa_1"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_fb_1"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_ig_1"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_users_starter"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_agents_starter"), color="#d1d1d6", size="2"),
                     rx.text(
-                        rx.cond(AppState.pricing_byok, "✓ Automatización con IA (traes tu key)", "✓ IA Incluida (5k respuestas/mes)"),
+                        rx.cond(AppState.pricing_byok, t("feat_ai_byok_starter"), t("feat_ai_hosted_starter")),
                         color="#d1d1d6", size="2"
                     ),
-                    align_items="start", spacing="2", width="100%"
+                    align_items="start", spacing="2", width="100%",
+                    min_height="220px", justify="start"
                 ),
                 rx.spacer(),
                 rx.button(
-                    "Contratar Starter",
+                    t("btn_buy_starter"),
                     on_click=lambda: AppState.handle_buy_plan("Starter"),
                     width="100%",
                     background="rgba(255, 255, 255, 0.08)",
@@ -406,18 +543,18 @@ def pricing_section() -> rx.Component:
                 backdrop_filter="blur(10px)",
                 width="100%",
                 align_items="start",
-                height="480px"
+                height="540px"
             ),
             
             # CARD 2: PRO
             rx.vstack(
                 rx.hstack(
                     rx.badge("Pro", color_scheme="blue", variant="solid"),
-                    rx.badge("Recomendado", color_scheme="green", variant="soft"),
+                    rx.badge(rx.cond(AppState.landing_lang == "es", "Recomendado", "Recommended"), color_scheme="green", variant="soft"),
                     spacing="2",
                     margin_bottom="8px"
                 ),
-                rx.text("Ideal para equipos en crecimiento.", color="#8e8e93", size="2"),
+                rx.text(t("plan_pro_desc"), color="#8e8e93", size="2"),
                 rx.hstack(
                     rx.heading(
                         rx.cond(
@@ -441,11 +578,11 @@ def pricing_section() -> rx.Component:
                 rx.text(
                     rx.cond(
                         AppState.pricing_period == "monthly",
-                        "MXN / al mes",
+                        t("billing_monthly"),
                         rx.cond(
                             AppState.pricing_period == "semestral",
-                            rx.cond(AppState.pricing_byok, "$3,774 cobrado cada 6 meses", "$5,394 cobrado cada 6 meses"),
-                            rx.cond(AppState.pricing_byok, "$6,708 cobrado cada 12 meses", "$9,588 cobrado cada 12 meses")
+                            rx.cond(AppState.pricing_byok, t("billing_semestral_byok_pro"), t("billing_semestral_hosted_pro")),
+                            rx.cond(AppState.pricing_byok, t("billing_annual_byok_pro"), t("billing_annual_hosted_pro"))
                         )
                     ),
                     color="#8e8e93", size="1"
@@ -453,20 +590,21 @@ def pricing_section() -> rx.Component:
                 rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
                 # Features
                 rx.vstack(
-                    rx.text("✓ Canales ilimitados (WA, FB, IG)", color="#d1d1d6", size="2"),
-                    rx.text("✓ 2 Administradores, 3 Coordinadores", color="#d1d1d6", size="2"),
-                    rx.text("✓ 5 agentes humanos (cortesía)", color="#d1d1d6", size="2"),
-                    rx.text("✓ Reportes y analítica avanzada", color="#d1d1d6", size="2"),
+                    rx.text(t("feat_channels_pro"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_users_pro"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_agents_pro"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_reports_pro"), color="#d1d1d6", size="2"),
                     rx.text(
-                        rx.cond(AppState.pricing_byok, "✓ IA avanzada (traes tu key)", "✓ IA Incluida (15k respuestas/mes)"),
+                        rx.cond(AppState.pricing_byok, t("feat_ai_byok_pro"), t("feat_ai_hosted_pro")),
                         color="#d1d1d6", size="2"
                     ),
-                    rx.text("✓ Asistencia en onboarding de Meta", color="#d1d1d6", size="2"),
-                    align_items="start", spacing="2", width="100%"
+                    rx.text(t("feat_meta_pro"), color="#d1d1d6", size="2"),
+                    align_items="start", spacing="2", width="100%",
+                    min_height="220px", justify="start"
                 ),
                 rx.spacer(),
                 rx.button(
-                    "Contratar Pro",
+                    t("btn_buy_pro"),
                     on_click=lambda: AppState.handle_buy_plan("Pro"),
                     width="100%",
                     background="linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)",
@@ -484,32 +622,33 @@ def pricing_section() -> rx.Component:
                 backdrop_filter="blur(10px)",
                 width="100%",
                 align_items="start",
-                height="480px",
+                height="540px",
                 box_shadow="0 10px 30px rgba(15, 163, 177, 0.15)"
             ),
             
             # CARD 3: ENTERPRISE
             rx.vstack(
                 rx.badge("Enterprise", color_scheme="purple", variant="solid", margin_bottom="8px"),
-                rx.text("Soluciones masivas y a la medida.", color="#8e8e93", size="2"),
+                rx.text(t("plan_ent_desc"), color="#8e8e93", size="2"),
                 rx.hstack(
-                    rx.heading("A cotizar", size="8", color="white", weight="bold"),
+                    rx.heading(t("ent_price"), size="8", color="white", weight="bold"),
                     align_items="end"
                 ),
-                rx.text("Soporte prioritario y integraciones personalizadas", color="#8e8e93", size="1"),
+                rx.text(t("ent_price_sub"), color="#8e8e93", size="1"),
                 rx.divider(color="rgba(255,255,255,0.08)", margin_y="16px"),
                 # Features
                 rx.vstack(
-                    rx.text("✓ Mensajería masiva e ilimitada", color="#d1d1d6", size="2"),
-                    rx.text("✓ SLAs de servicio garantizados", color="#d1d1d6", size="2"),
-                    rx.text("✓ Administradores y agentes ilimitados", color="#d1d1d6", size="2"),
-                    rx.text("✓ Integraciones CRM externas a medida", color="#d1d1d6", size="2"),
-                    rx.text("✓ Agente IA dedicado con RAG a medida", color="#d1d1d6", size="2"),
-                    align_items="start", spacing="2", width="100%"
+                    rx.text(t("feat_bulk_ent"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_sla_ent"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_users_ent"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_crm_ent"), color="#d1d1d6", size="2"),
+                    rx.text(t("feat_ai_ent"), color="#d1d1d6", size="2"),
+                    align_items="start", spacing="2", width="100%",
+                    min_height="220px", justify="start"
                 ),
                 rx.spacer(),
                 rx.button(
-                    "Contactar Soporte",
+                    t("btn_contact_support"),
                     on_click=AppState.toggle_visitor_chat,
                     width="100%",
                     background="rgba(255, 255, 255, 0.08)",
@@ -526,7 +665,7 @@ def pricing_section() -> rx.Component:
                 backdrop_filter="blur(10px)",
                 width="100%",
                 align_items="start",
-                height="480px"
+                height="540px"
             ),
             columns="3",
             spacing="6",
@@ -537,8 +676,8 @@ def pricing_section() -> rx.Component:
         # ── Cómo Contratar (Proceso de Onboarding) ──────────────────────────
         rx.center(
             rx.vstack(
-                rx.heading("¿Cómo contratar Nyme?", size="6", color="white", weight="bold", margin_top="80px", margin_bottom="8px"),
-                rx.text("El proceso es rápido, transparente y en solo 3 sencillos pasos.", color="#8e8e93", size="2", text_align="center", margin_bottom="32px"),
+                rx.heading(t("onboarding_title"), size="6", color="white", weight="bold", margin_top="80px", margin_bottom="8px"),
+                rx.text(t("onboarding_subtitle"), color="#8e8e93", size="2", text_align="center", margin_bottom="32px"),
                 
                 # Pasos Horizontales
                 rx.grid(
@@ -552,10 +691,10 @@ def pricing_section() -> rx.Component:
                                 width="44px",
                                 height="44px"
                             ),
-                            rx.heading("Solicita tu registro", size="3", color="white"),
+                            rx.heading(t("step_1_title"), size="3", color="white"),
                             spacing="3", align_items="center"
                         ),
-                        rx.text("Haz clic en 'Contratar' en tu plan deseado o ve directamente a 'Comenzar Ahora' y llena tus datos de contacto.", color="#8e8e93", size="2"),
+                        rx.text(t("step_1_desc"), color="#8e8e93", size="2"),
                         padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
                     ),
                     
@@ -569,10 +708,10 @@ def pricing_section() -> rx.Component:
                                 width="44px",
                                 height="44px"
                             ),
-                            rx.heading("Activación de tu cuenta", size="3", color="white"),
+                            rx.heading(t("step_2_title"), size="3", color="white"),
                             spacing="3", align_items="center"
                         ),
-                        rx.text("Nuestro equipo revisa tus datos y te envía tus credenciales administrativas e instrucciones a tu correo en minutos.", color="#8e8e93", size="2"),
+                        rx.text(t("step_2_desc"), color="#8e8e93", size="2"),
                         padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
                     ),
                     
@@ -586,10 +725,10 @@ def pricing_section() -> rx.Component:
                                 width="44px",
                                 height="44px"
                             ),
-                            rx.heading("Conecta y opera", size="3", color="white"),
+                            rx.heading(t("step_3_title"), size="3", color="white"),
                             spacing="3", align_items="center"
                         ),
-                        rx.text("Inicias sesión, conectas tus páginas de redes sociales de forma guiada y empiezas a automatizar y vender.", color="#8e8e93", size="2"),
+                        rx.text(t("step_3_desc"), color="#8e8e93", size="2"),
                         padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
                     ),
                     columns="3",
@@ -609,14 +748,6 @@ def pricing_section() -> rx.Component:
     )
 
 def landing_page() -> rx.Component:
-    # Read dynamic localized string based on AppState.landing_lang via rx.cond
-    def t(key: str) -> rx.Var:
-        return rx.cond(
-            AppState.landing_lang == "es",
-            TEXTS["es"][key],
-            TEXTS["en"][key]
-        )
-
     return rx.vstack(
         # 1. NAVBAR
         rx.hstack(
