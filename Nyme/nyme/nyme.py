@@ -614,6 +614,9 @@ app = rx.App(
         "font_family": "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
         "background_color": "#000000",
     },
+    stylesheets=[
+        "/nyme.css",
+    ],
 )
 
 app.add_page(landing_page,       route="/",          title="Nyme — Inteligencia Omnicanal")

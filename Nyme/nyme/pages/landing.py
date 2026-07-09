@@ -102,6 +102,151 @@ def faq_item(question: rx.Var, answer: rx.Var) -> rx.Component:
     )
 
 
+def visitor_chat_modal() -> rx.Component:
+    # Helper translations
+    def vt(es: str, en: str) -> rx.Var:
+        return rx.cond(AppState.landing_lang == "es", es, en)
+
+    # Bubble item for visitor chat
+    def visitor_bubble(msg: rx.Var) -> rx.Component:
+        is_in = msg["type"] == "INBOUND"
+        return rx.hstack(
+            rx.box(
+                rx.vstack(
+                    rx.text(msg["body"], size="2", color="white", white_space="pre-wrap"),
+                    rx.hstack(
+                        rx.text(
+                            rx.cond(is_in, rx.cond(AppState.landing_lang == "es", "Tú", "You"), msg["agent"]),
+                            color="#8e8e93",
+                            size="1"
+                        ),
+                        rx.text(" · ", color="#8e8e93", size="1"),
+                        rx.text(msg["time"], color="#8e8e93", size="1"),
+                        spacing="1",
+                        align_items="center"
+                    ),
+                    spacing="1",
+                    align_items=rx.cond(is_in, "start", "end"),
+                ),
+                background=rx.cond(is_in, "#1c1c1e", "#0a3055"),
+                border_radius="12px",
+                padding="10px 14px",
+                max_width="85%",
+            ),
+            width="100%",
+            justify=rx.cond(is_in, "start", "end"),
+            padding_x="8px",
+            margin_y="2px",
+        )
+
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                # Header
+                rx.hstack(
+                    rx.image(src="/logo.png", width="28px", height="auto", border_radius="6px"),
+                    rx.vstack(
+                        rx.heading(vt("Soporte Nyme", "Nyme Support"), size="3", color="white"),
+                        rx.text(vt("Canal de ayuda en línea", "Online help channel"), size="1", color="#8e8e93"),
+                        spacing="0",
+                    ),
+                    rx.spacer(),
+                    rx.dialog.close(
+                        rx.button("✕", variant="ghost", on_click=AppState.toggle_visitor_chat, color="white")
+                    ),
+                    width="100%",
+                    align_items="center",
+                    border_bottom="1px solid rgba(255,255,255,0.08)",
+                    padding_bottom="10px",
+                ),
+
+                # Body (Condicional: Registro vs Chat)
+                rx.cond(
+                    ~AppState.visitor_chat_started,
+                    # Pantalla de Bienvenida (Pedir Nombre)
+                    rx.vstack(
+                        rx.text(
+                            vt(
+                                "¡Hola! Escribe tu nombre para iniciar una conversación con nuestro equipo de soporte.",
+                                "Hello! Enter your name to start a chat with our support team."
+                            ),
+                            size="2", color="#8e8e93", text_align="center"
+                        ),
+                        rx.input(
+                            placeholder=vt("Tu Nombre Completo", "Your Full Name"),
+                            value=AppState.visitor_name,
+                            on_change=AppState.set_visitor_name,
+                            background="rgba(255,255,255,0.05)",
+                            border="1px solid rgba(255,255,255,0.1)",
+                            color="white",
+                            width="100%",
+                            margin_top="8px",
+                        ),
+                        rx.button(
+                            vt("Comenzar Chat", "Start Chat"),
+                            on_click=AppState.start_visitor_chat,
+                            background="linear-gradient(135deg, #0fa3b1 0%, #0077b6 100%)",
+                            color="white",
+                            width="100%",
+                            margin_top="12px",
+                        ),
+                        spacing="3",
+                        padding_y="16px",
+                        width="100%",
+                        align_items="stretch",
+                    ),
+                    # Pantalla de Chat
+                    rx.vstack(
+                        rx.scroll_area(
+                            rx.vstack(
+                                rx.foreach(AppState.visitor_messages, visitor_bubble),
+                                spacing="1",
+                                align_items="stretch",
+                            ),
+                            max_height="250px",
+                            min_height="180px",
+                            width="100%",
+                        ),
+                        rx.hstack(
+                            rx.text_area(
+                                placeholder=vt("Escribe un mensaje...", "Type a message..."),
+                                value=AppState.visitor_new_message,
+                                on_change=AppState.set_visitor_new_message,
+                                background="rgba(255,255,255,0.05)",
+                                border="1px solid rgba(255,255,255,0.1)",
+                                color="white",
+                                resize="none",
+                                rows="1",
+                                flex="1",
+                            ),
+                            rx.button(
+                                "→",
+                                on_click=AppState.send_visitor_message,
+                                background="#0fa3b1",
+                                color="white",
+                            ),
+                            width="100%",
+                            align_items="end",
+                            padding_top="8px",
+                        ),
+                        width="100%",
+                        spacing="0",
+                    ),
+                ),
+                width="100%",
+                spacing="3",
+            ),
+            background="rgba(10, 10, 10, 0.95)",
+            backdrop_filter="blur(16px)",
+            border="1px solid rgba(255,255,255,0.1)",
+            border_radius="16px",
+            max_width="400px",
+            padding="16px",
+        ),
+        open=AppState.visitor_chat_open,
+    )
+
+
 def landing_page() -> rx.Component:
     # Read dynamic localized string based on AppState.landing_lang via rx.cond
     def t(key: str) -> rx.Var:
@@ -127,6 +272,14 @@ def landing_page() -> rx.Component:
                     rx.cond(AppState.landing_lang == "es", "🇬🇧 EN", "🇪🇸 ES"),
                     on_click=AppState.toggle_landing_lang,
                     size="1",
+                    variant="ghost",
+                    color="#0fa3b1",
+                    _hover={"background": "rgba(15, 163, 177, 0.1)"}
+                ),
+                rx.button(
+                    rx.cond(AppState.landing_lang == "es", "💬 Ayuda", "💬 Help"),
+                    on_click=AppState.toggle_visitor_chat,
+                    size="2",
                     variant="ghost",
                     color="#0fa3b1",
                     _hover={"background": "rgba(15, 163, 177, 0.1)"}
@@ -279,7 +432,7 @@ def landing_page() -> rx.Component:
             width="100%",
             align_items="center"
         ),
-        rx.script(src="/api/webchat/widget.js"),
+        visitor_chat_modal(),
         background_color="#000000",
         min_height="100vh",
         spacing="0",

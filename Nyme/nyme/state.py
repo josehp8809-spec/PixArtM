@@ -63,6 +63,14 @@ class AppState(rx.State):
     active_support_tenant_name: str = ""
     client_timezone: str = "America/Mexico_City"
 
+    # ── Chat de Soporte de Visitante (Landing Page) ───────────────────────────
+    visitor_chat_open: bool = False
+    visitor_name: str = ""
+    visitor_new_message: str = ""
+    visitor_chat_started: bool = False
+    visitor_messages: list[dict] = []
+    visitor_wa_id: str = ""
+
     # ── Datos cargados ────────────────────────────────────────────────────────
     contacts: list[dict]      = []
     messages: list[dict]      = []
@@ -1548,5 +1556,72 @@ class AppState(rx.State):
             }
             for m in raw_msgs
         ]
+
+    def set_visitor_name(self, val: str): self.visitor_name = val
+    def set_visitor_new_message(self, val: str): self.visitor_new_message = val
+
+    @rx.event
+    def toggle_visitor_chat(self):
+        self.visitor_chat_open = not self.visitor_chat_open
+        if self.visitor_chat_open:
+            self.detect_timezone()
+            if self.visitor_chat_started:
+                return AppState.poll_visitor_messages()
+
+    @rx.event
+    def start_visitor_chat(self):
+        name_val = self.visitor_name.strip()
+        if not name_val:
+            return
+        import uuid
+        self.visitor_wa_id = "web_" + str(uuid.uuid4())[:8]
+        db.upsert_contact(self.visitor_wa_id, name_val, "", "Origen: Landing Chat", 1)
+        self.visitor_chat_started = True
+        self.visitor_messages = []
+        return AppState.poll_visitor_messages()
+
+    def load_visitor_messages(self):
+        if not self.visitor_wa_id:
+            return
+        raw = db.get_messages(self.visitor_wa_id, 1)
+        self.visitor_messages = []
+        for m in raw:
+            body = m[1] or ""
+            self.visitor_messages.append({
+                "type": m[0],
+                "body": body,
+                "time": self.format_local_time(m[2]),
+                "agent": m[3] or "",
+            })
+
+    @rx.event
+    def send_visitor_message(self):
+        msg_text = self.visitor_new_message.strip()
+        if not msg_text or not self.visitor_wa_id:
+            return
+
+        db.save_message(self.visitor_wa_id, "INBOUND", msg_text, line_id=0, tenant_id=1)
+        db.mark_conversation_unread(self.visitor_wa_id, 0)
+        self.visitor_new_message = ""
+        self.load_visitor_messages()
+
+        # Disparar respondedor de IA automático para chat web
+        import asyncio
+        from nyme.nyme import run_ai_agent_responder, execute_workflows_for_message
+        asyncio.create_task(
+            run_ai_agent_responder(self.visitor_wa_id, 0, {}, msg_text, 1)
+        )
+        asyncio.create_task(
+            execute_workflows_for_message(self.visitor_wa_id, 0, {}, msg_text, 1)
+        )
+
+    @rx.event(background=True)
+    async def poll_visitor_messages(self):
+        while True:
+            await asyncio.sleep(4)
+            async with self:
+                if not self.visitor_chat_open or not self.visitor_chat_started:
+                    break
+                self.load_visitor_messages()
 
 
