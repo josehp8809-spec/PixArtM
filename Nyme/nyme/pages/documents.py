@@ -124,6 +124,14 @@ DOCS_TEXTS = {
 }
 
 
+def t(key: str) -> rx.Var:
+    return rx.cond(
+        AppState.landing_lang == "es",
+        DOCS_TEXTS["es"].get(key, key),
+        DOCS_TEXTS["en"].get(key, key)
+    )
+
+
 def doc_navbar() -> rx.Component:
     return rx.hstack(
         rx.hstack(
@@ -175,7 +183,6 @@ def doc_navbar() -> rx.Component:
 
 
 def doc_footer() -> rx.Component:
-    t = lambda key: DOCS_TEXTS[AppState.landing_lang].get(key, key)
     return rx.vstack(
         rx.divider(color="rgba(255, 255, 255, 0.08)", margin_bottom="24px"),
         rx.hstack(
@@ -200,8 +207,6 @@ def doc_footer() -> rx.Component:
 
 
 def privacy_page() -> rx.Component:
-    t = lambda key: DOCS_TEXTS[AppState.landing_lang][key]
-    
     return rx.vstack(
         doc_navbar(),
         rx.center(
@@ -255,8 +260,6 @@ def privacy_page() -> rx.Component:
 
 
 def terms_page() -> rx.Component:
-    t = lambda key: DOCS_TEXTS[AppState.landing_lang][key]
-    
     return rx.vstack(
         doc_navbar(),
         rx.center(
@@ -294,8 +297,6 @@ def terms_page() -> rx.Component:
 
 
 def data_deletion_page() -> rx.Component:
-    t = lambda key: DOCS_TEXTS[AppState.landing_lang][key]
-    
     return rx.vstack(
         doc_navbar(),
         rx.center(
@@ -346,8 +347,6 @@ def data_deletion_page() -> rx.Component:
 
 
 def instructions_page() -> rx.Component:
-    t = lambda key: DOCS_TEXTS[AppState.landing_lang][key]
-    
     return rx.vstack(
         doc_navbar(),
         rx.center(

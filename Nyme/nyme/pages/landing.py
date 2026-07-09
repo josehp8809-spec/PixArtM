@@ -71,7 +71,7 @@ TEXTS = {
 }
 
 
-def feature_card(title: str, description: str) -> rx.Component:
+def feature_card(title: rx.Var, description: rx.Var) -> rx.Component:
     return rx.vstack(
         rx.heading(title, size="4", color="white", margin_bottom="8px"),
         rx.text(description, color="#8e8e93", size="2"),
@@ -91,7 +91,7 @@ def feature_card(title: str, description: str) -> rx.Component:
     )
 
 
-def faq_item(question: str, answer: str) -> rx.Component:
+def faq_item(question: rx.Var, answer: rx.Var) -> rx.Component:
     return rx.vstack(
         rx.text(question, color="white", weight="bold", size="3", margin_bottom="6px"),
         rx.text(answer, color="#8e8e93", size="2"),
@@ -103,8 +103,13 @@ def faq_item(question: str, answer: str) -> rx.Component:
 
 
 def landing_page() -> rx.Component:
-    # Read dynamic localized string based on AppState.landing_lang
-    t = lambda key: TEXTS[AppState.landing_lang][key]
+    # Read dynamic localized string based on AppState.landing_lang via rx.cond
+    def t(key: str) -> rx.Var:
+        return rx.cond(
+            AppState.landing_lang == "es",
+            TEXTS["es"][key],
+            TEXTS["en"][key]
+        )
 
     return rx.vstack(
         # 1. NAVBAR
