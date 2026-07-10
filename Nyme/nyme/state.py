@@ -651,14 +651,13 @@ class AppState(rx.State):
         db.set_conversation_status(self.selected_contact, self.selected_line_id, status)
         self._refresh_contacts()
 
-    def archive_conversation(self):
-        """Marca la conversación como 'resolved' (archivada) y limpia la selección."""
+    def archive_current_conversation(self):
         if self.selected_contact and self.selected_line_id:
-            db.set_conversation_status(self.selected_contact, self.selected_line_id, "resolved")
-            self.selected_contact = ""
-            self.selected_line_id = 0
-            self.conv_status = "resolved"
-            self._refresh_contacts()
+            self.set_conv_status("resolved")
+
+    def reopen_current_conversation(self):
+        if self.selected_contact and self.selected_line_id:
+            self.set_conv_status("active")
 
     # ─────────────────────────────────────────────────────────────────────────
     # GEMINI AI (chat)

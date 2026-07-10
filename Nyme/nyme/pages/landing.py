@@ -667,7 +667,7 @@ def pricing_section() -> rx.Component:
                 align_items="start",
                 height="540px"
             ),
-            columns="3",
+            columns={"initial": "1", "sm": "1", "md": "3"},
             spacing="6",
             width="100%",
             max_width="1050px"
@@ -731,7 +731,7 @@ def pricing_section() -> rx.Component:
                         rx.text(t("step_3_desc"), color="#8e8e93", size="2"),
                         padding="24px", border="1px solid rgba(255, 255, 255, 0.05)", border_radius="14px", background="rgba(255, 255, 255, 0.01)", align_items="start", spacing="2", width="100%"
                     ),
-                    columns="3",
+                    columns={"initial": "1", "sm": "1", "md": "3"},
                     spacing="6",
                     width="100%",
                     max_width="1050px"

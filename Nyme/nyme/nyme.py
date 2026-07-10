@@ -103,7 +103,7 @@ def reports_page() -> rx.Component:
                 ),
                 rx.box(
                     rx.vstack(
-                        rx.text("✅ Chats Cerrados", size="1", color="#8e8e93", weight="medium"),
+                        rx.text("🗂️ Chats Archivados", size="1", color="#8e8e93", weight="medium"),
                         rx.text(AppState.conversation_states_chart["resolved"].to_string(), size="6", color="#30d158", weight="bold"),
                         spacing="1", align_items="start"
                     ),

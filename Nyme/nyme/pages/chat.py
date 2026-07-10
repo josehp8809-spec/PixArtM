@@ -134,7 +134,7 @@ def contact_item(contact: rx.Var) -> rx.Component:
                             status,
                             ("pending", "⏳ Pendiente"),
                             ("active", "🟡 En curso"),
-                            ("resolved", "✅ Cerrado"),
+                            ("resolved", "🗂️ Archivado"),
                             ("snoozed", "💤 Pospuesto"),
                             "⏳ Pendiente"
                         ),
@@ -304,7 +304,7 @@ def contacts_panel() -> rx.Component:
                 rx.hstack(
                     filter_btn("Abiertos", "open", AppState.filter_status, AppState.set_filter_status("open")),
                     filter_btn("Pospuestos", "snoozed", AppState.filter_status, AppState.set_filter_status("snoozed")),
-                    filter_btn("Cerrados", "closed", AppState.filter_status, AppState.set_filter_status("closed")),
+                    filter_btn("Archivados", "closed", AppState.filter_status, AppState.set_filter_status("closed")),
                     width="100%", spacing="1", padding_x="8px", padding_bottom="8px"
                 ),
                 width="100%", spacing="1"
@@ -389,14 +389,24 @@ def _active_chat() -> rx.Component:
                 on_change=AppState.set_conv_status,
                 background="#1c1c1e", color="white", border="1px solid #3a3a3c", size="1"
             ),
-            # Botón rápido para Archivar
-            rx.button(
-                "📥 Archivar",
-                on_click=AppState.archive_conversation,
-                color_scheme="green",
-                variant="solid",
-                size="1",
-                cursor="pointer",
+            rx.cond(
+                AppState.conv_status == "resolved",
+                rx.button(
+                    "📥 Reabrir Chat",
+                    on_click=AppState.reopen_current_conversation,
+                    size="1",
+                    color_scheme="blue",
+                    variant="solid",
+                    cursor="pointer"
+                ),
+                rx.button(
+                    "🗂️ Archivar Chat",
+                    on_click=AppState.archive_current_conversation,
+                    size="1",
+                    color_scheme="green",
+                    variant="solid",
+                    cursor="pointer"
+                )
             ),
             padding="12px 16px", border_bottom="1px solid #2c2c2e", background="#111", width="100%", align_items="center", spacing="3"
         ),

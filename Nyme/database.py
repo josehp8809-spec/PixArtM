@@ -1979,15 +1979,24 @@ class Database:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
                 """
-                INSERT INTO pre_registrations (company_name, contact_name, contact_email, contact_phone, notes, selected_plan, billing_frequency, ai_mode)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (contact_email) DO NOTHING
+                INSERT INTO pre_registrations (company_name, contact_name, contact_email, contact_phone, notes, selected_plan, billing_frequency, ai_mode, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'pending')
+                ON CONFLICT (contact_email) DO UPDATE
+                SET company_name = EXCLUDED.company_name,
+                    contact_name = EXCLUDED.contact_name,
+                    contact_phone = EXCLUDED.contact_phone,
+                    notes = EXCLUDED.notes,
+                    selected_plan = EXCLUDED.selected_plan,
+                    billing_frequency = EXCLUDED.billing_frequency,
+                    ai_mode = EXCLUDED.ai_mode,
+                    status = 'pending',
+                    created_at = CURRENT_TIMESTAMP
                 """,
-                (company_name, contact_name, contact_email.lower().strip(), contact_phone, notes, selected_plan, billing_frequency, ai_mode)
+                (company_name.strip(), contact_name.strip(), contact_email.strip().lower(), contact_phone.strip(), notes.strip(), selected_plan, billing_frequency, ai_mode)
             )
             inserted = cur.rowcount > 0
             conn.commit(); cur.close(); conn.close()
-            return inserted
+            return True
         except Exception as e:
             print(f"[DB] Error guardando pre-registro: {e}")
             return False
