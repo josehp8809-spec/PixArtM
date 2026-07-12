@@ -58,6 +58,7 @@ class AppState(rx.State):
 
     # ── Aprobación de Registro ───────────────────────────────────────────────
     pending_registrations: list[dict] = []
+    approved_registrations: list[dict] = []
     approve_username: str = ""
     approve_password: str = ""
     approve_error: str = ""
@@ -270,6 +271,8 @@ class AppState(rx.State):
                 "channel_type": l[8] if len(l) > 8 else "whatsapp",
                 "page_id": l[9] if len(l) > 9 else "",
                 "app_id": l[10] if len(l) > 10 else "",
+                "tenant_name": l[11] if len(l) > 11 else "",
+                "tenant_id": l[12] if len(l) > 12 else self.tenant_id
             }
             for l in raw_lines
         ]
@@ -1480,6 +1483,7 @@ class AppState(rx.State):
     @rx.event
     def load_pending_registrations(self):
         self.pending_registrations = db.get_pre_registrations("pending")
+        self.approved_registrations = db.get_pre_registrations("approved")
         self.approve_error = ""
         self.approve_success = ""
 
@@ -1487,6 +1491,8 @@ class AppState(rx.State):
     def approve_registration(self, req_id: int):
         self.approve_error = ""
         self.approve_success = ""
+        self.approve_username = ""
+        self.approve_password = ""
         
         # Buscar los detalles del preregistro
         req = next((r for r in self.pending_registrations if r["id"] == req_id), None)
@@ -1559,8 +1565,8 @@ class AppState(rx.State):
             self.approve_error = f"Empresa creada (ID {new_tenant_id}), pero falló creación de usuario: {user_res}"
             return
 
-        # 3. Marcar el preregistro como aprobado
-        db.update_pre_registration_status(req_id, "approved")
+        # 3. Marcar el preregistro como aprobado y guardar credenciales
+        db.update_pre_registration_status(req_id, "approved", generated_username, generated_password)
         
         # 4. Enviar Correo de Activación
         from nyme.email_client import send_welcome_email
@@ -1576,7 +1582,9 @@ class AppState(rx.State):
         )
 
         mail_status = "Correo enviado con accesos." if email_sent else "No se pudo enviar el correo (SMTP no configurado). Guarda los accesos de abajo."
-        self.approve_success = f"✅ Empresa '{req['company_name']}' activada con éxito. Usuario: {generated_username} | Contraseña: {generated_password} ({mail_status})"
+        self.approve_username = generated_username
+        self.approve_password = generated_password
+        self.approve_success = f"✅ Empresa '{req['company_name']}' activada con éxito. ({mail_status})"
         self.load_pending_registrations()
 
     @rx.event

@@ -400,6 +400,8 @@ class Database:
             cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS selected_plan TEXT DEFAULT 'Starter';")
             cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS billing_frequency TEXT DEFAULT 'monthly';")
             cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS ai_mode TEXT DEFAULT 'BYOK';")
+            cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS generated_username TEXT DEFAULT '';")
+            cur.execute("ALTER TABLE pre_registrations ADD COLUMN IF NOT EXISTS generated_password TEXT DEFAULT '';")
 
             conn.commit()
             cur.close()
@@ -1117,7 +1119,25 @@ class Database:
         if not self._check_available(): return []
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, channel_type, page_id, app_id FROM lines WHERE tenant_id = %s ORDER BY id", (tenant_id,))
+            if tenant_id == 1:
+                cur.execute(
+                    """
+                    SELECT l.id, l.name, l.phone_number_id, l.access_token, l.welcome_message, l.welcome_active, l.color, l.is_active, l.channel_type, l.page_id, l.app_id, t.name as tenant_name, l.tenant_id 
+                    FROM lines l 
+                    LEFT JOIN tenants t ON l.tenant_id = t.id 
+                    ORDER BY l.id
+                    """
+                )
+            else:
+                cur.execute(
+                    """
+                    SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, channel_type, page_id, app_id 
+                    FROM lines 
+                    WHERE tenant_id = %s 
+                    ORDER BY id
+                    """, 
+                    (tenant_id,)
+                )
             rows = cur.fetchall(); cur.close(); conn.close(); return rows
         except Exception: return []
 
@@ -1125,7 +1145,10 @@ class Database:
         if not self._check_available(): return None
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE id = %s AND tenant_id = %s", (line_id, tenant_id))
+            if tenant_id == 1:
+                cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE id = %s", (line_id,))
+            else:
+                cur.execute("SELECT id, name, phone_number_id, access_token, welcome_message, welcome_active, color, is_active, tenant_id, channel_type, page_id, app_id FROM lines WHERE id = %s AND tenant_id = %s", (line_id, tenant_id))
             row = cur.fetchone(); cur.close(); conn.close()
             if not row: return None
             keys = ["id","name","phone_number_id","access_token","welcome_message","welcome_active","color","is_active","tenant_id","channel_type","page_id","app_id"]
@@ -2006,7 +2029,7 @@ class Database:
         try:
             conn = self.get_connection(); cur = conn.cursor()
             cur.execute(
-                "SELECT id, company_name, contact_name, contact_email, contact_phone, notes, status, created_at, selected_plan, billing_frequency, ai_mode FROM pre_registrations WHERE status = %s ORDER BY created_at DESC",
+                "SELECT id, company_name, contact_name, contact_email, contact_phone, notes, status, created_at, selected_plan, billing_frequency, ai_mode, generated_username, generated_password FROM pre_registrations WHERE status = %s ORDER BY created_at DESC",
                 (status,)
             )
             rows = cur.fetchall()
@@ -2023,7 +2046,9 @@ class Database:
                     "created_at": r[7].strftime("%Y-%m-%d %H:%M:%S") if r[7] else "",
                     "selected_plan": r[8] or "Starter",
                     "billing_frequency": r[9] or "monthly",
-                    "ai_mode": r[10] or "BYOK"
+                    "ai_mode": r[10] or "BYOK",
+                    "generated_username": r[11] or "",
+                    "generated_password": r[12] or ""
                 }
                 for r in rows
             ]
@@ -2031,14 +2056,20 @@ class Database:
             print(f"[DB] Error obteniendo pre-registros: {e}")
             return []
 
-    def update_pre_registration_status(self, req_id, status):
+    def update_pre_registration_status(self, req_id, status, username=None, password=None):
         if not self._check_available(): return False
         try:
             conn = self.get_connection(); cur = conn.cursor()
-            cur.execute(
-                "UPDATE pre_registrations SET status = %s WHERE id = %s",
-                (status, req_id)
-            )
+            if username and password:
+                cur.execute(
+                    "UPDATE pre_registrations SET status = %s, generated_username = %s, generated_password = %s WHERE id = %s",
+                    (status, username, password, req_id)
+                )
+            else:
+                cur.execute(
+                    "UPDATE pre_registrations SET status = %s WHERE id = %s",
+                    (status, req_id)
+                )
             conn.commit(); cur.close(); conn.close()
             return True
         except Exception as e:

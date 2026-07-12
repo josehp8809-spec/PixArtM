@@ -174,19 +174,7 @@ class SettingsState(AppState):
         redirect_uri = os.getenv("META_REDIRECT_URI", "")
         return f"https://www.facebook.com/v19.0/dialog/oauth?client_id={client_id}&redirect_uri={redirect_uri}&scope=pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages&response_type=code"
 
-    def on_mount_settings(self):
-        self.require_auth()
-        self.detect_timezone()
-        self._reload_users()
-        self._load_core_data()
-        if self.tenant_id == 1:
-            self._reload_tenants()
-            self.load_pending_registrations()
-        
-        # Procesar código de OAuth de Facebook si viene en los parámetros de la URL
-        code = self.router.page.params.get("code")
-        if code:
-            return self.process_facebook_oauth_code(code)
+
 
     def process_facebook_oauth_code(self, code: str):
         self.fb_loading = True
@@ -781,12 +769,19 @@ class SettingsState(AppState):
     # Gancho on_mount_settings extendido
     def on_mount_settings(self):
         self.require_auth()
+        self.detect_timezone()
         self._reload_users()
         self._load_core_data()
         self._refresh_flows()
         if self.tenant_id == 1:
             self._reload_tenants()
+            self.load_pending_registrations()
         self.selected_line_tenant_name = self.tenant_name
+        
+        # Procesar código de OAuth de Facebook si viene en los parámetros de la URL
+        code = self.router.page.params.get("code")
+        if code:
+            return self.process_facebook_oauth_code(code)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -845,6 +840,10 @@ def line_row(line: rx.Var) -> rx.Component:
             rx.hstack(
                 rx.text(name, weight="bold", size="2", color="white"),
                 rx.badge(channel_label, color_scheme=channel_badge_color, size="1"),
+                rx.cond(
+                    line["tenant_name"].to(str) != "",
+                    rx.badge("🏢 " + line["tenant_name"].to(str), color_scheme="gray", size="1", variant="outline")
+                ),
                 spacing="2", align_items="center"
             ),
             rx.text(identifier_text, size="1", color="#636366"),
@@ -1239,7 +1238,35 @@ def pre_registration_row(req: dict) -> rx.Component:
                 ),
                 rx.cond(
                     AppState.approve_success != "",
-                    rx.callout(AppState.approve_success, color="green", variant="soft", width="100%", margin_top="10px")
+                    rx.vstack(
+                        rx.callout(AppState.approve_success, color="green", variant="soft", width="100%", margin_top="10px"),
+                        rx.cond(
+                            AppState.approve_username != "",
+                            rx.vstack(
+                                rx.hstack(
+                                    rx.text("👤 Usuario administrador:", size="2", color="#8e8e93", weight="bold"),
+                                    rx.badge(AppState.approve_username, color_scheme="blue", size="2"),
+                                    rx.button("📋 Copiar", on_click=rx.set_clipboard(AppState.approve_username), size="1", variant="ghost", cursor="pointer"),
+                                    spacing="2", align_items="center"
+                                ),
+                                rx.hstack(
+                                    rx.text("🔑 Contraseña temporal:", size="2", color="#8e8e93", weight="bold"),
+                                    rx.badge(AppState.approve_password, color_scheme="amber", size="2"),
+                                    rx.button("📋 Copiar", on_click=rx.set_clipboard(AppState.approve_password), size="1", variant="ghost", cursor="pointer"),
+                                    spacing="2", align_items="center"
+                                ),
+                                spacing="2",
+                                background="rgba(255,255,255,0.03)",
+                                padding="12px",
+                                border_radius="8px",
+                                width="100%",
+                                margin_top="8px",
+                                align_items="start"
+                            )
+                        ),
+                        width="100%",
+                        align_items="start"
+                    )
                 ),
                 rx.hstack(
                     rx.button("Aprobar y Activar Empresa", on_click=lambda: AppState.approve_registration(req["id"]), color_scheme="green", size="2", weight="bold"),
@@ -1259,6 +1286,44 @@ def pre_registration_row(req: dict) -> rx.Component:
         background="rgba(18, 18, 18, 0.5)",
         width="100%",
         margin_bottom="12px"
+    )
+
+
+def approved_registration_row(req: rx.Var) -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.hstack(
+                rx.vstack(
+                    rx.heading(req["company_name"], size="3", color="white"),
+                    rx.text("Contacto: ", req["contact_name"], " (", req["contact_email"], ")", color="#8e8e93", size="2"),
+                    spacing="1",
+                    align_items="start"
+                ),
+                rx.spacer(),
+                rx.badge(req["created_at"], color_scheme="gray", size="1"),
+                align_items="center",
+                width="100%"
+            ),
+            rx.hstack(
+                rx.text("👤 Usuario: ", color="#8e8e93", size="2"),
+                rx.badge(req["generated_username"], color_scheme="blue", size="2"),
+                rx.button("📋 Copiar", on_click=rx.set_clipboard(req["generated_username"]), size="1", variant="ghost", cursor="pointer"),
+                rx.text("🔑 Contraseña: ", color="#8e8e93", size="2", margin_left="16px"),
+                rx.badge(req["generated_password"], color_scheme="amber", size="2"),
+                rx.button("📋 Copiar", on_click=rx.set_clipboard(req["generated_password"]), size="1", variant="ghost", cursor="pointer"),
+                spacing="2",
+                align_items="center",
+                margin_top="10px"
+            ),
+            align_items="start",
+            width="100%"
+        ),
+        padding="16px",
+        border="1px solid rgba(255, 255, 255, 0.08)",
+        border_radius="10px",
+        background="rgba(255, 255, 255, 0.02)",
+        width="100%",
+        margin_bottom="8px"
     )
 
 
@@ -2299,6 +2364,20 @@ def settings_page() -> rx.Component:
                                 width="100%"
                             ),
                             rx.text("No hay solicitudes de registro pendientes.", color="#636366", size="2")
+                        ),
+                        rx.divider(color="rgba(255, 255, 255, 0.08)", margin_y="20px"),
+                        rx.heading("Solicitudes Aprobadas / Cuentas Creadas", size="5", color="white", margin_bottom="16px"),
+                        rx.cond(
+                            AppState.approved_registrations,
+                            rx.vstack(
+                                rx.foreach(
+                                    AppState.approved_registrations,
+                                    approved_registration_row
+                                ),
+                                spacing="4",
+                                width="100%"
+                            ),
+                            rx.text("No hay solicitudes de registro aprobadas aún.", color="#636366", size="2")
                         ),
                         spacing="4", align_items="start", width="100%"
                     ),
