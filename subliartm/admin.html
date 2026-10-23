@@ -188,6 +188,10 @@
                     <i data-lucide="folder-tree" class="w-3.5 h-3.5"></i>
                     Categorías (<span id="categoryCountBadge">4</span>)
                 </button>
+                <button onclick="switchTab('content')" id="tabBtn-content" class="px-4 py-2 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-brand-dark flex items-center gap-1.5">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    Textos de la Web
+                </button>
             </div>
         </div>
 
@@ -441,6 +445,110 @@
             </div>
         </div>
 
+        <!-- TAB 4: WEB CONTENT EDITOR (CMS) -->
+        <div id="tab-content" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-heading font-bold text-brand-dark">Editor de Textos y Avisos de la Web</h2>
+                    <p class="text-xs text-slate-500">Modifica los títulos, avisos de temporada, promociones y teléfono que ven tus clientes.</p>
+                </div>
+                <button onclick="saveSiteContent()" class="px-5 py-2.5 bg-brand-teal hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-sm">
+                    <i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios en la Web
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Card 1: Banner Superior de Anuncio -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                <i data-lucide="megaphone" class="w-4 h-4"></i>
+                            </span>
+                            <h3 class="font-heading font-bold text-sm text-brand-dark">Aviso Superior (Barra de Anuncios)</h3>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cmsShowBanner" checked class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Texto del Anuncio</label>
+                        <textarea id="cmsBannerText" rows="2" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Texto del Enlace / Botón</label>
+                        <input type="text" id="cmsBannerLink" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal">
+                    </div>
+                </div>
+
+                <!-- Card 2: Contacto WhatsApp -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        </span>
+                        <h3 class="font-heading font-bold text-sm text-brand-dark">Teléfono de WhatsApp para Cotizaciones</h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Número de WhatsApp (con código de país sin espacios)</label>
+                        <input type="text" id="cmsWhatsAppPhone" placeholder="5215512345678" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 font-mono focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal">
+                        <p class="text-[10px] text-slate-400 mt-1">Ejemplo en México: 521 + 10 dígitos (ej. 5215540302010). Todos los botones de cotizar y el botón flotante enviarán mensajes a este número.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Encabezado de Temporada -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <span class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </span>
+                        <h3 class="font-heading font-bold text-sm text-brand-dark">Sección de Temporada Activa</h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Título de la Temporada</label>
+                        <input type="text" id="cmsSeasonTitle" placeholder="Especial: Día de Muertos & Navidad" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Subtítulo explicativo</label>
+                        <textarea id="cmsSeasonSubtitle" rows="2" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal"></textarea>
+                    </div>
+                </div>
+
+                <!-- Card 4: Portada Principal (Hero) -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                        <span class="w-7 h-7 rounded-lg bg-teal-50 text-brand-teal flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </span>
+                        <h3 class="font-heading font-bold text-sm text-brand-dark">Portada Principal (Hero)</h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Insignia Superior</label>
+                        <input type="text" id="cmsHeroBadge" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Título Principal de la Portada</label>
+                        <input type="text" id="cmsHeroTitle" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Párrafo Descriptivo</label>
+                        <textarea id="cmsHeroDesc" rows="2" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex justify-end">
+                <button onclick="saveSiteContent()" class="px-6 py-3 bg-brand-teal hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-md">
+                    <i data-lucide="check" class="w-4 h-4"></i> Guardar y Aplicar Cambios en la Web
+                </button>
+            </div>
+        </div>
+
     </main>
 
     <!-- Settings Modal -->
@@ -505,11 +613,56 @@
         let categories = JSON.parse(localStorage.getItem('subli_categories') || 'null') || DEFAULT_CATEGORIES;
         let products = JSON.parse(localStorage.getItem('subli_products') || '[]');
 
+        const DEFAULT_SITE_CONTENT = {
+            showBanner: true,
+            bannerText: '¡Aparta tus pedidos para Día de Muertos & Temporada Navideña! Esferas, tazas y letreros con precio especial.',
+            bannerLink: 'Ver catálogo de temporada →',
+            whatsappPhone: '5210000000000',
+            seasonTitle: 'Especial: Día de Muertos & Navidad',
+            seasonSubtitle: 'Anticípate a tus fechas especiales con detalles personalizados para tu familia, posadas o regalos corporativos de tu empresa.',
+            heroBadge: 'Taller Creativo de Personalización & Diseño',
+            heroTitle: 'Tus ideas hechas realidad con color, arte y precisión',
+            heroDesc: 'Corte láser en MDF, sublimación en alta definición, lonas publicitarias y diseño gráfico profesional. Cuidamos cada detalle para que tu evento, marca o detalle personal luzca impecable.'
+        };
+
+        let siteContent = JSON.parse(localStorage.getItem('subli_site_content') || 'null') || DEFAULT_SITE_CONTENT;
+
+        function loadSiteContentInputs() {
+            if (!document.getElementById('cmsBannerText')) return;
+            document.getElementById('cmsShowBanner').checked = siteContent.showBanner !== false;
+            document.getElementById('cmsBannerText').value = siteContent.bannerText || '';
+            document.getElementById('cmsBannerLink').value = siteContent.bannerLink || '';
+            document.getElementById('cmsWhatsAppPhone').value = siteContent.whatsappPhone || '';
+            document.getElementById('cmsSeasonTitle').value = siteContent.seasonTitle || '';
+            document.getElementById('cmsSeasonSubtitle').value = siteContent.seasonSubtitle || '';
+            document.getElementById('cmsHeroBadge').value = siteContent.heroBadge || '';
+            document.getElementById('cmsHeroTitle').value = siteContent.heroTitle || '';
+            document.getElementById('cmsHeroDesc').value = siteContent.heroDesc || '';
+        }
+
+        function saveSiteContent() {
+            siteContent = {
+                showBanner: document.getElementById('cmsShowBanner').checked,
+                bannerText: document.getElementById('cmsBannerText').value.trim(),
+                bannerLink: document.getElementById('cmsBannerLink').value.trim(),
+                whatsappPhone: document.getElementById('cmsWhatsAppPhone').value.trim() || '5210000000000',
+                seasonTitle: document.getElementById('cmsSeasonTitle').value.trim(),
+                seasonSubtitle: document.getElementById('cmsSeasonSubtitle').value.trim(),
+                heroBadge: document.getElementById('cmsHeroBadge').value.trim(),
+                heroTitle: document.getElementById('cmsHeroTitle').value.trim(),
+                heroDesc: document.getElementById('cmsHeroDesc').value.trim()
+            };
+
+            localStorage.setItem('subli_site_content', JSON.stringify(siteContent));
+            alert('¡Textos y configuración de la web guardados correctamente! Puedes verlos reflejados en la web pública.');
+        }
+
         // Initialize icons and render
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             checkAuthOnLoad();
             loadSettings();
+            loadSiteContentInputs();
             renderCategories();
             renderProducts();
             populateCategorySelect();
@@ -621,7 +774,7 @@
 
         // Tab Switching
         function switchTab(tabId) {
-            ['upload', 'catalog', 'categories'].forEach(t => {
+            ['upload', 'catalog', 'categories', 'content'].forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const btnEl = document.getElementById(`tabBtn-${t}`);
                 if (t === tabId) {
@@ -632,6 +785,9 @@
                     btnEl.className = "px-4 py-2 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-brand-dark flex items-center gap-1.5";
                 }
             });
+            if (tabId === 'content') {
+                loadSiteContentInputs();
+            }
             lucide.createIcons();
         }
 

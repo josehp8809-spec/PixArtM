@@ -99,11 +99,11 @@
 <body class="bg-light-canvas text-slate-800 font-sans selection:bg-brand-cyan/30 selection:text-brand-dark antialiased min-h-screen">
 
   <!-- TOP BANNER DE TEMPORADA -->
-  <div class="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-600 text-white text-xs sm:text-sm font-semibold py-2.5 px-4 text-center relative z-50 shadow-sm">
+  <div id="top-banner-bar" class="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-600 text-white text-xs sm:text-sm font-semibold py-2.5 px-4 text-center relative z-50 shadow-sm">
     <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
       <span class="bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full uppercase text-[11px] font-black tracking-wider">🎉 Edición Especial</span>
-      <span>¡Aparta tus pedidos para <strong>Día de Muertos & Temporada Navideña</strong>! Esferas, tazas y letreros con precio especial.</span>
-      <a href="#temporada" class="underline underline-offset-2 hover:text-amber-100 transition-colors ml-1 font-bold">Ver catálogo de temporada &rarr;</a>
+      <span id="top-banner-text">¡Aparta tus pedidos para <strong>Día de Muertos & Temporada Navideña</strong>! Esferas, tazas y letreros con precio especial.</span>
+      <a href="#temporada" id="top-banner-link" class="underline underline-offset-2 hover:text-amber-100 transition-colors ml-1 font-bold">Ver catálogo de temporada &rarr;</a>
     </div>
   </div>
 
@@ -177,14 +177,14 @@
           
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-brand-teal text-xs sm:text-sm font-bold tracking-wide uppercase mb-6 shadow-sm">
             <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
-            Taller Creativo de Personalización & Diseño
+            <span id="hero-badge-text">Taller Creativo de Personalización & Diseño</span>
           </div>
 
-          <h1 class="text-4xl sm:text-6xl lg:text-7xl font-heading font-black tracking-tight text-slate-900 leading-[1.1] mb-6">
+          <h1 id="hero-title" class="text-4xl sm:text-6xl lg:text-7xl font-heading font-black tracking-tight text-slate-900 leading-[1.1] mb-6">
             Tus ideas hechas realidad con <span class="brand-text-gradient">color, arte y precisión</span>
           </h1>
 
-          <p class="text-slate-600 text-base sm:text-xl font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+          <p id="hero-desc" class="text-slate-600 text-base sm:text-xl font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
             Corte láser en MDF, sublimación en alta definición, lonas publicitarias y diseño gráfico profesional. Cuidamos cada detalle para que tu evento, marca o detalle personal luzca impecable.
           </p>
 
@@ -304,16 +304,16 @@
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-800 text-xs font-extrabold uppercase tracking-widest mb-3 shadow-sm">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-600"></i> Catálogo de Temporada
         </div>
-        <h2 class="text-3xl sm:text-5xl font-heading font-black text-slate-900 tracking-tight">
+        <h2 id="season-title" class="text-3xl sm:text-5xl font-heading font-black text-slate-900 tracking-tight">
           Especial: <span class="season-text-gradient">Día de Muertos & Navidad</span>
         </h2>
-        <p class="text-slate-600 text-sm sm:text-base mt-4">
+        <p id="season-desc" class="text-slate-600 text-sm sm:text-base mt-4">
           Anticípate a tus fechas especiales con detalles personalizados para tu familia, posadas o regalos corporativos de tu empresa.
         </p>
       </div>
 
       <!-- Season Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div id="seasonal-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Season Card 1: Esferas -->
         <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
@@ -968,27 +968,144 @@
       startAutoPlay();
     }
 
+    // Configuración WhatsApp
+    let WHATSAPP_PHONE = '5210000000000';
+
+    function initDynamicCMS() {
+      // 1. Textos y configuración general
+      const siteContent = JSON.parse(localStorage.getItem('subli_site_content') || 'null');
+      if (siteContent) {
+        if (siteContent.showBanner === false) {
+          const banner = document.getElementById('top-banner-bar');
+          if (banner) banner.style.display = 'none';
+        }
+        if (siteContent.bannerText && document.getElementById('top-banner-text')) {
+          document.getElementById('top-banner-text').textContent = siteContent.bannerText;
+        }
+        if (siteContent.bannerLink && document.getElementById('top-banner-link')) {
+          document.getElementById('top-banner-link').textContent = siteContent.bannerLink;
+        }
+        if (siteContent.heroBadge && document.getElementById('hero-badge-text')) {
+          document.getElementById('hero-badge-text').textContent = siteContent.heroBadge;
+        }
+        if (siteContent.heroTitle && document.getElementById('hero-title')) {
+          document.getElementById('hero-title').innerHTML = siteContent.heroTitle.replace(/(color, arte y precisión|[^<]+)$/, '<span class="brand-text-gradient">$1</span>');
+        }
+        if (siteContent.heroDesc && document.getElementById('hero-desc')) {
+          document.getElementById('hero-desc').textContent = siteContent.heroDesc;
+        }
+        if (siteContent.seasonTitle && document.getElementById('season-title')) {
+          document.getElementById('season-title').innerHTML = `Especial: <span class="season-text-gradient">${siteContent.seasonTitle.replace(/^Especial:\s*/i, '')}</span>`;
+        }
+        if (siteContent.seasonSubtitle && document.getElementById('season-desc')) {
+          document.getElementById('season-desc').textContent = siteContent.seasonSubtitle;
+        }
+        if (siteContent.whatsappPhone) {
+          WHATSAPP_PHONE = siteContent.whatsappPhone;
+          const navWa = document.getElementById('nav-wa-btn');
+          const floatWa = document.getElementById('floating-wa-btn');
+          if (navWa) navWa.href = `https://wa.me/${WHATSAPP_PHONE}?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto`;
+          if (floatWa) floatWa.href = `https://wa.me/${WHATSAPP_PHONE}?text=Hola%20Subli%20Art%20M,%20vengo%20de%20su%20p%C3%A1gina%20web`;
+        }
+      }
+
+      // 2. Categorías dinámicas en el Cotizador
+      const categories = JSON.parse(localStorage.getItem('subli_categories') || 'null');
+      if (categories && categories.length > 0) {
+        const select = document.getElementById('quote-service');
+        if (select) {
+          select.innerHTML = '<option value="" disabled selected>Selecciona una opción</option>';
+          categories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat.name;
+            opt.textContent = `${cat.name} (${cat.desc.slice(0, 35)}...)`;
+            select.appendChild(opt);
+          });
+        }
+      }
+
+      // 3. Productos dinámicos en el Carrusel
+      const products = JSON.parse(localStorage.getItem('subli_products') || '[]');
+      const carouselProducts = products.filter(p => p.inCarousel !== false);
+      if (carouselProducts.length > 0) {
+        const track = document.getElementById('carousel-track');
+        if (track) {
+          track.innerHTML = carouselProducts.map(prod => `
+            <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+              <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between">
+                <div>
+                  <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+                    <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[11px] font-bold text-brand-dark px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                      ${prod.category}
+                    </span>
+                    ${prod.price ? `
+                      <span class="absolute bottom-4 right-4 bg-black/75 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl">
+                        ${prod.price}
+                      </span>
+                    ` : ''}
+                  </div>
+                  <div class="p-6">
+                    <h4 class="text-base font-heading font-black text-slate-900 mb-2 line-clamp-1">${prod.title}</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-3">
+                      ${prod.description}
+                    </p>
+                  </div>
+                </div>
+                <div class="px-6 pb-6 pt-0">
+                  <button onclick="prefillQuote('${prod.title.replace(/'/g, "\\'")}')" class="text-xs font-heading font-bold text-brand-teal flex items-center gap-1 group-hover:underline">
+                    Quiero uno parecido <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 4. Productos de Temporada dinámicos
+      const seasonalProducts = products.filter(p => p.isSeasonal);
+      if (seasonalProducts.length > 0) {
+        const seasonGrid = document.getElementById('seasonal-cards-container');
+        if (seasonGrid) {
+          seasonGrid.innerHTML = seasonalProducts.map(prod => `
+            <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
+              <div>
+                <div class="h-44 rounded-2xl bg-slate-100 border border-slate-200/60 relative overflow-hidden mb-5">
+                  <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover">
+                  <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    Temporada
+                  </span>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">${prod.category}</span>
+                <h3 class="font-heading font-bold text-base text-slate-900 mb-2">${prod.title}</h3>
+                <p class="text-slate-600 text-xs leading-relaxed mb-4 line-clamp-2">
+                  ${prod.description}
+                </p>
+                ${prod.price ? `
+                  <div class="bg-amber-50 rounded-xl p-2.5 mb-4 text-xs text-amber-800 font-bold flex items-center justify-between">
+                    <span>Precio estimado:</span>
+                    <span>${prod.price}</span>
+                  </div>
+                ` : ''}
+              </div>
+              <button onclick="prefillQuote('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar este trabajo
+              </button>
+            </div>
+          `).join('');
+        }
+      }
+
+      lucide.createIcons();
+    }
+
     window.addEventListener('resize', updateCarousel);
     window.addEventListener('DOMContentLoaded', () => {
+      initDynamicCMS();
       updateCarousel();
       startAutoPlay();
     });
-
-    // Rellenar cotizador automáticamente
-    function prefillQuote(serviceName) {
-      const select = document.getElementById('quote-service');
-      for (let i = 0; i < select.options.length; i++) {
-        if (select.options[i].text.toLowerCase().includes(serviceName.toLowerCase())) {
-          select.selectedIndex = i;
-          break;
-        }
-      }
-      document.getElementById('cotizador').scrollIntoView({ behavior: 'smooth' });
-      document.getElementById('quote-quantity').focus();
-    }
-
-    // Configuración WhatsApp
-    let WHATSAPP_PHONE = '5210000000000';
 
     function sendWhatsAppQuote(e) {
       e.preventDefault();
