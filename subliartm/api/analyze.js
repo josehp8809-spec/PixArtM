@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 /**
  * Subli Art M - Vercel Serverless Function: Gemini Flash Product Analyzer
  * Analyzes uploaded product photo + user notes to classify, tag, generate commercial copy,
@@ -11,7 +13,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   );
 
   if (req.method === 'OPTIONS') {
@@ -21,6 +23,35 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Security: Verify auth token or direct header
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const AUTH_SECRET = process.env.AUTH_SECRET || 'subli-art-m-secret-key-salt-2026';
+
+  let isAuthenticated = false;
+  if (token) {
+    try {
+      const decoded = Buffer.from(token, 'base64').toString('utf8');
+      const parts = decoded.split(':');
+      if (parts.length === 3) {
+        const [userEmail, expiresAt, signature] = parts;
+        if (Date.now() <= parseInt(expiresAt, 10)) {
+          const expectedSig = crypto.createHmac('sha256', AUTH_SECRET).update(`${userEmail}:${expiresAt}`).digest('hex');
+          if (signature === expectedSig) {
+            isAuthenticated = true;
+          }
+        }
+      }
+    } catch {
+      isAuthenticated = false;
+    }
+  }
+
+  // If not authenticated and no explicit client key was passed, block access
+  if (!isAuthenticated && !req.headers['x-gemini-key']) {
+    return res.status(401).json({ error: 'No autorizado. Debes iniciar sesión en el panel para usar la IA.' });
   }
 
   const apiKey = process.env.GEMINI_API_KEY || req.headers['x-gemini-key'];

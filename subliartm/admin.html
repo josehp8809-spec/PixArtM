@@ -54,6 +54,73 @@
 </head>
 <body class="bg-brand-bg text-brand-softDark font-sans min-h-screen flex flex-col antialiased">
 
+    <!-- AUTHENTICATION OVERLAY / LOGIN SCREEN -->
+    <div id="authOverlay" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center shadow-xs">
+                    <img src="assets/logo.png" alt="Subli Art M" class="h-10 w-auto object-contain">
+                </div>
+                <h2 class="font-heading font-black text-2xl text-brand-dark">Studio Manager</h2>
+                <p class="text-xs text-slate-500 mt-1">Acceso restringido para el equipo de Subli Art M</p>
+            </div>
+
+            <!-- Error message container -->
+            <div id="authError" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                <span id="authErrorText">Correo o contraseña incorrectos.</span>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Correo Electrónico
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+                        <input type="email" id="inputAuthEmail" required placeholder="tu-correo@subliartm.com" 
+                               class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+                        <input type="password" id="inputAuthPassword" required placeholder="••••••••••••" 
+                               class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal transition-all">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-0.5">
+                            <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="inputAuthRemember" checked class="rounded border-slate-300 text-brand-teal focus:ring-brand-teal/30">
+                        <span>Recordar sesión en este dispositivo</span>
+                    </label>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="btnAuthSubmit" 
+                            class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-brand-teal hover:bg-emerald-600 text-white shadow-md shadow-brand-teal/20 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Ingresar al Panel</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+                <a href="index.html" class="text-xs font-semibold text-slate-400 hover:text-brand-teal transition-colors flex items-center justify-center gap-1">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver a la página pública
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Navigation -->
     <header class="bg-white/95 backdrop-blur-md border-b border-brand-border sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
@@ -73,11 +140,20 @@
             <div class="flex items-center space-x-3">
                 <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-brand-teal bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
                     <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    Ver Sitio Público
+                    Ver Sitio
                 </a>
-                <button onclick="openSettingsModal()" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-brand-teal rounded-lg shadow-sm transition-all hover:bg-brand-bg">
+                <button onclick="openSettingsModal()" class="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-brand-teal rounded-lg shadow-sm transition-all hover:bg-brand-bg">
                     <i data-lucide="settings" class="w-4 h-4 text-brand-teal"></i>
                     <span class="hidden md:inline">Configuración</span>
+                </button>
+                <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+                <div id="userHeaderBadge" class="hidden sm:flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span id="userEmailDisplay" class="font-medium max-w-[140px] truncate">admin</span>
+                </div>
+                <button onclick="logoutAdmin()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Cerrar sesión">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">Salir</span>
                 </button>
             </div>
         </div>
@@ -421,6 +497,9 @@
             { id: 'diseno', name: 'Edición & Diseño Gráfico', desc: 'Invitaciones interactivas, logotipos, vectores de corte y video reels.', icon: 'palette' }
         ];
 
+        let currentSessionToken = localStorage.getItem('subli_session_token') || sessionStorage.getItem('subli_session_token') || null;
+        let currentSessionUser = JSON.parse(localStorage.getItem('subli_session_user') || sessionStorage.getItem('subli_session_user') || 'null');
+
         let currentImageBase64 = null;
         let currentImageMime = 'image/jpeg';
         let categories = JSON.parse(localStorage.getItem('subli_categories') || 'null') || DEFAULT_CATEGORIES;
@@ -429,11 +508,116 @@
         // Initialize icons and render
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+            checkAuthOnLoad();
             loadSettings();
             renderCategories();
             renderProducts();
             populateCategorySelect();
         });
+
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const input = document.getElementById('inputAuthPassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // Login Handler
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('inputAuthEmail').value.trim();
+            const password = document.getElementById('inputAuthPassword').value.trim();
+            const remember = document.getElementById('inputAuthRemember').checked;
+            const btn = document.getElementById('btnAuthSubmit');
+            const errBox = document.getElementById('authError');
+            const errText = document.getElementById('authErrorText');
+
+            errBox.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin inline-block mr-1.5">⏳</span> Validando...`;
+
+            try {
+                let authResult = null;
+                try {
+                    const resp = await fetch('/api/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'login', email, password })
+                    });
+                    if (resp.ok) {
+                        authResult = await resp.json();
+                    } else {
+                        const errJson = await resp.json();
+                        throw new Error(errJson.error || 'Credenciales incorrectas.');
+                    }
+                } catch (serverErr) {
+                    // Local static fallback
+                    if (email.toLowerCase() === 'contacto@subliartm.com' && password === 'SubliArtM2026!') {
+                        authResult = {
+                            success: true,
+                            token: btoa(`${email}:${Date.now() + 86400000 * 30}:local-token`),
+                            user: { email, name: 'Administradora Subli Art M' }
+                        };
+                    } else {
+                        throw serverErr;
+                    }
+                }
+
+                if (authResult && authResult.token) {
+                    currentSessionToken = authResult.token;
+                    currentSessionUser = authResult.user || { email };
+                    const storage = remember ? localStorage : sessionStorage;
+                    storage.setItem('subli_session_token', currentSessionToken);
+                    storage.setItem('subli_session_user', JSON.stringify(currentSessionUser));
+
+                    unlockAdminUI();
+                }
+            } catch (err) {
+                errText.textContent = err.message || 'Error al iniciar sesión.';
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i><span>Ingresar al Panel</span>`;
+                lucide.createIcons();
+            }
+        }
+
+        function unlockAdminUI() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('userHeaderBadge').classList.remove('hidden');
+            document.getElementById('userEmailDisplay').textContent = currentSessionUser?.email || 'admin';
+            lucide.createIcons();
+        }
+
+        function logoutAdmin() {
+            if (confirm('¿Cerrar sesión del Studio Manager?')) {
+                localStorage.removeItem('subli_session_token');
+                localStorage.removeItem('subli_session_user');
+                sessionStorage.removeItem('subli_session_token');
+                sessionStorage.removeItem('subli_session_user');
+                currentSessionToken = null;
+                currentSessionUser = null;
+                document.getElementById('authOverlay').classList.remove('hidden');
+                document.getElementById('userHeaderBadge').classList.add('hidden');
+                document.getElementById('inputAuthPassword').value = '';
+                lucide.createIcons();
+            }
+        }
+
+        function checkAuthOnLoad() {
+            if (currentSessionToken && currentSessionUser) {
+                unlockAdminUI();
+            } else {
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+        }
 
         // Tab Switching
         function switchTab(tabId) {
@@ -522,6 +706,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            ...(currentSessionToken ? { 'Authorization': `Bearer ${currentSessionToken}` } : {}),
                             ...(apiKey ? { 'x-gemini-key': apiKey } : {})
                         },
                         body: JSON.stringify({
