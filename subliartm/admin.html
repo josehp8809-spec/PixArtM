@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
         tailwind.config = {
@@ -605,10 +607,16 @@
             { id: 'diseno', name: 'Edición & Diseño Gráfico', desc: 'Invitaciones interactivas, logotipos, vectores de corte y video reels.', icon: 'palette' }
         ];
 
+        // Supabase Client Config
+        const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://yzykzfzxvngjycmfansk.supabase.co';
+        const SUPABASE_KEY = localStorage.getItem('supabase_key') || 'sb_publishable_kP5I2bwqJ_NzbWyF8grDbA_gEtX-VRS';
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
         let currentSessionToken = localStorage.getItem('subli_session_token') || sessionStorage.getItem('subli_session_token') || null;
         let currentSessionUser = JSON.parse(localStorage.getItem('subli_session_user') || sessionStorage.getItem('subli_session_user') || 'null');
 
         let currentImageBase64 = null;
+        let currentImageFile = null;
         let currentImageMime = 'image/jpeg';
         let categories = JSON.parse(localStorage.getItem('subli_categories') || 'null') || DEFAULT_CATEGORIES;
         let products = JSON.parse(localStorage.getItem('subli_products') || '[]');
@@ -666,6 +674,8 @@
             renderCategories();
             renderProducts();
             populateCategorySelect();
+            loadProductsFromSupabase();
+            loadCategoriesFromSupabase();
         });
 
         // Toggle password visibility
@@ -796,6 +806,7 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            currentImageFile = file;
             currentImageMime = file.type || 'image/jpeg';
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -812,6 +823,7 @@
 
         function removeImage() {
             currentImageBase64 = null;
+            currentImageFile = null;
             document.getElementById('fileInput').value = '';
             document.getElementById('dropzonePrompt').classList.remove('hidden');
             document.getElementById('previewContainer').classList.add('hidden');
@@ -983,8 +995,57 @@
             document.getElementById('userNotes').value = '';
         }
 
-        // Publish Product
-        function publishProduct() {
+        // Load cloud products from Supabase
+        async function loadProductsFromSupabase() {
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                        products = data.map(p => ({
+                            id: p.id,
+                            title: p.title,
+                            category: p.category,
+                            price: p.price_range,
+                            description: p.description,
+                            tags: p.tags || [],
+                            isSeasonal: p.is_seasonal,
+                            inCarousel: p.in_carousel,
+                            image: p.image_url,
+                            createdAt: p.created_at
+                        }));
+                        localStorage.setItem('subli_products', JSON.stringify(products));
+                        renderProducts();
+                    }
+                } catch (e) {
+                    console.warn('Error fetching Supabase products:', e);
+                }
+            }
+        }
+
+        // Load cloud categories from Supabase
+        async function loadCategoriesFromSupabase() {
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase.from('categories').select('*').order('created_at', { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        categories = data.map(c => ({
+                            id: c.id,
+                            name: c.name,
+                            desc: c.description,
+                            icon: c.icon || 'sparkles'
+                        }));
+                        localStorage.setItem('subli_categories', JSON.stringify(categories));
+                        renderCategories();
+                        populateCategorySelect();
+                    }
+                } catch (e) {
+                    console.warn('Error fetching Supabase categories:', e);
+                }
+            }
+        }
+
+        // Publish Product with Supabase Storage & Database
+        async function publishProduct() {
             const title = document.getElementById('aiTitle').value.trim();
             const category = document.getElementById('aiCategory').value;
             const price = document.getElementById('aiPrice').value.trim();
@@ -998,8 +1059,68 @@
                 return;
             }
 
+            const publishBtn = document.querySelector('button[onclick="publishProduct()"]');
+            if (publishBtn) {
+                publishBtn.disabled = true;
+                publishBtn.innerHTML = `<span class="animate-spin inline-block mr-1.5">⏳</span> Guardando en Supabase...`;
+            }
+
+            let finalImageUrl = currentImageBase64;
+
+            // 1. Upload photo to Supabase Storage Bucket 'product-images'
+            if (supabase && currentImageFile) {
+                try {
+                    const ext = currentImageFile.name.split('.').pop() || 'jpg';
+                    const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+                    const { data: uploadData, error: uploadErr } = await supabase.storage
+                        .from('product-images')
+                        .upload(fileName, currentImageFile, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (!uploadErr) {
+                        const { data: urlData } = supabase.storage
+                            .from('product-images')
+                            .getPublicUrl(fileName);
+                        if (urlData?.publicUrl) {
+                            finalImageUrl = urlData.publicUrl;
+                        }
+                    } else {
+                        console.warn('Storage upload error (fallback to local image):', uploadErr);
+                    }
+                } catch (e) {
+                    console.warn('Error uploading photo:', e);
+                }
+            }
+
+            // 2. Insert into Supabase 'products' Table
+            let savedId = 'prod-' + Date.now();
+            if (supabase) {
+                try {
+                    const { data: dbItem, error: dbErr } = await supabase.from('products').insert([{
+                        title,
+                        category,
+                        price_range: price,
+                        description,
+                        tags,
+                        is_seasonal: isSeasonal,
+                        season_name: isSeasonal ? 'Especial Temporada' : null,
+                        in_carousel: inCarousel,
+                        image_url: finalImageUrl,
+                        user_notes: document.getElementById('userNotes')?.value?.trim() || null
+                    }]).select();
+
+                    if (dbItem && dbItem[0]?.id) {
+                        savedId = dbItem[0].id;
+                    }
+                } catch (e) {
+                    console.warn('Error saving row to Supabase products table:', e);
+                }
+            }
+
             const newProduct = {
-                id: 'prod-' + Date.now(),
+                id: savedId,
                 title,
                 category,
                 price,
@@ -1007,14 +1128,19 @@
                 tags,
                 isSeasonal,
                 inCarousel,
-                image: currentImageBase64,
+                image: finalImageUrl,
                 createdAt: new Date().toISOString()
             };
 
             products.unshift(newProduct);
             localStorage.setItem('subli_products', JSON.stringify(products));
 
-            alert('¡Producto publicado exitosamente en el catálogo!');
+            if (publishBtn) {
+                publishBtn.disabled = false;
+                publishBtn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> Publicar en el Catálogo Web`;
+            }
+
+            alert('¡Trabajo y foto guardados en la nube con éxito! Ya son visibles en la web pública.');
             removeImage();
             renderProducts();
             switchTab('catalog');
@@ -1070,8 +1196,15 @@
             lucide.createIcons();
         }
 
-        function deleteProduct(id) {
+        async function deleteProduct(id) {
             if (confirm('¿Seguro que deseas eliminar este trabajo del catálogo?')) {
+                if (supabase) {
+                    try {
+                        await supabase.from('products').delete().eq('id', id);
+                    } catch (e) {
+                        console.warn('Error deleting product from Supabase:', e);
+                    }
+                }
                 products = products.filter(p => p.id !== id);
                 localStorage.setItem('subli_products', JSON.stringify(products));
                 renderProducts();
