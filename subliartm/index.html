@@ -101,29 +101,29 @@
 <body class="bg-light-canvas text-slate-800 font-sans selection:bg-brand-cyan/30 selection:text-brand-dark antialiased min-h-screen">
 
   <!-- TOP BANNER DE TEMPORADA -->
-  <div id="top-banner-bar" class="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-600 text-white text-xs sm:text-sm font-semibold py-2.5 px-4 text-center relative z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-      <span class="bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full uppercase text-[11px] font-black tracking-wider">🎉 Edición Especial</span>
-      <span id="top-banner-text">¡Aparta tus pedidos para <strong>Día de Muertos & Temporada Navideña</strong>! Esferas, tazas y letreros con precio especial.</span>
-      <a href="#temporada" id="top-banner-link" class="underline underline-offset-2 hover:text-amber-100 transition-colors ml-1 font-bold">Ver catálogo de temporada &rarr;</a>
+  <div id="top-banner-bar" class="bg-gradient-to-r from-amber-500 via-rose-500 to-emerald-600 text-white text-[11px] sm:text-sm font-semibold py-1.5 sm:py-2.5 px-3 sm:px-4 text-center relative z-50 shadow-sm leading-snug">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
+      <span class="bg-white/20 backdrop-blur-sm px-2 sm:px-2.5 py-0.5 rounded-full uppercase text-[10px] sm:text-[11px] font-black tracking-wider shrink-0">🎉 Edición Especial</span>
+      <span id="top-banner-text">¡Aparta tus pedidos para <strong>Día de Muertos & Temporada Navideña</strong>!</span>
+      <a href="#temporada" id="top-banner-link" class="underline underline-offset-2 hover:text-amber-100 transition-colors font-bold whitespace-nowrap ml-1">Ver catálogo &rarr;</a>
     </div>
   </div>
 
   <!-- NAVBAR LIMPIO Y LUMINOSO -->
-  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
         
         <!-- Logo -->
-        <a href="#inicio" class="flex items-center gap-3.5 group">
-          <div class="bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 transition-transform group-hover:scale-105 duration-300">
-            <img src="assets/logo.png" alt="Subli Art M Logo" class="h-10 w-auto object-contain">
+        <a href="#inicio" class="flex items-center gap-2 sm:gap-3.5 group min-w-0">
+          <div class="bg-white p-1 sm:p-1.5 rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 transition-transform group-hover:scale-105 duration-300 shrink-0">
+            <img src="assets/logo.png" alt="Subli Art M Logo" class="h-8 sm:h-10 w-auto object-contain">
           </div>
-          <div>
-            <span class="font-heading font-extrabold text-2xl tracking-tight text-slate-900 block leading-none">
+          <div class="min-w-0">
+            <span class="font-heading font-extrabold text-lg sm:text-2xl tracking-tight text-slate-900 block leading-tight truncate">
               SUBLI <span class="brand-text-gradient">+ART M</span>
             </span>
-            <span class="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-500 block mt-1">Diseño • Sublimación • Creación</span>
+            <span class="hidden sm:block text-[10px] uppercase font-bold tracking-[0.2em] text-slate-500 mt-0.5 truncate">Diseño • Sublimación • Creación</span>
           </div>
         </a>
 
@@ -144,31 +144,49 @@
         </nav>
 
         <!-- CTA Buttons -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <!-- Botón grande para Desktop/Tablet -->
           <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
              id="nav-wa-btn" 
              target="_blank" 
-             class="brand-gradient hover:opacity-95 text-white font-heading font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all transform hover:-translate-y-0.5">
+             class="hidden md:inline-flex brand-gradient hover:opacity-95 text-white font-heading font-bold text-sm px-5 py-2.5 rounded-xl items-center gap-2 shadow-sm transition-all transform hover:-translate-y-0.5">
             <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
             <span>Cotizar Proyecto</span>
           </a>
 
+          <!-- Botón de WhatsApp compacto para celulares -->
+          <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
+             id="mobile-nav-wa-btn" 
+             target="_blank" 
+             aria-label="Contactar por WhatsApp"
+             class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:scale-95 transition-all">
+            <i data-lucide="message-circle" class="w-5 h-5 fill-current"></i>
+          </a>
+
           <!-- Mobile Menu Button -->
-          <button id="mobile-menu-btn" class="lg:hidden text-slate-700 hover:text-slate-900 p-2 rounded-lg bg-slate-100">
-            <i data-lucide="menu" class="w-6 h-6"></i>
+          <button id="mobile-menu-btn" aria-label="Abrir menú" class="lg:hidden text-slate-700 hover:text-slate-900 w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center transition-all">
+            <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
         </div>
       </div>
     </div>
 
     <!-- Mobile Dropdown -->
-    <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-6 py-6 space-y-3 shadow-lg">
-      <a href="#temporada" class="block text-amber-600 font-bold py-1.5 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Catálogo de Temporada</a>
-      <a href="#carrusel" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Trabajos Destacados</a>
-      <a href="#galeria" class="block text-slate-700 hover:text-brand-teal font-bold py-1.5 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4 text-brand-teal"></i> Galería Completa (80+ Muestras)</a>
-      <a href="#servicios" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Nuestros Servicios</a>
-      <a href="#cotizador" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Cotizador Express a WhatsApp</a>
-      <a href="#contacto" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Contacto</a>
+    <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-5 py-5 space-y-2.5 shadow-xl">
+      <a href="#temporada" class="text-amber-600 font-bold py-2 flex items-center gap-2 border-b border-slate-100"><i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Catálogo de Temporada</a>
+      <a href="#carrusel" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Trabajos Destacados</a>
+      <a href="#galeria" class="text-slate-800 hover:text-brand-teal font-bold py-2 flex items-center gap-2 border-b border-slate-100"><i data-lucide="grid" class="w-4 h-4 text-brand-teal"></i> Galería Completa (80+ Muestras)</a>
+      <a href="#servicios" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Nuestros Servicios</a>
+      <a href="#cotizador" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Cotizador Express a WhatsApp</a>
+      <a href="#contacto" class="block text-slate-700 hover:text-brand-teal font-medium py-2">Contacto Directo</a>
+      <div class="pt-2">
+        <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
+           id="menu-wa-btn"
+           target="_blank" 
+           class="w-full brand-gradient text-white font-heading font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm">
+          <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar Proyecto por WhatsApp
+        </a>
+      </div>
     </div>
   </header>
 
@@ -1023,9 +1041,17 @@
     // Menú móvil
     const menuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
+    if (menuBtn && mobileMenu) {
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      // Cerrar menú al hacer click en cualquier enlace interno
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+      });
+    }
 
     // Lógica del Carrusel
     const track = document.getElementById('carousel-track');
@@ -1127,8 +1153,13 @@
         if (siteContent.whatsappPhone) {
           WHATSAPP_PHONE = siteContent.whatsappPhone;
           const navWa = document.getElementById('nav-wa-btn');
+          const mobileNavWa = document.getElementById('mobile-nav-wa-btn');
+          const menuWa = document.getElementById('menu-wa-btn');
           const floatWa = document.getElementById('floating-wa-btn');
-          if (navWa) navWa.href = `https://wa.me/${WHATSAPP_PHONE}?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto`;
+          const quoteMsg = `https://wa.me/${WHATSAPP_PHONE}?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto`;
+          if (navWa) navWa.href = quoteMsg;
+          if (mobileNavWa) mobileNavWa.href = quoteMsg;
+          if (menuWa) menuWa.href = quoteMsg;
           if (floatWa) floatWa.href = `https://wa.me/${WHATSAPP_PHONE}?text=Hola%20Subli%20Art%20M,%20vengo%20de%20su%20p%C3%A1gina%20web`;
         }
       }
