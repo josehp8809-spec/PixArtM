@@ -948,6 +948,70 @@
     <i data-lucide="message-circle" class="w-7 h-7 fill-current"></i>
   </a>
 
+  <!-- MODAL VISOR LIGHTBOX CON ZOOM Y NAVEGACIÓN -->
+  <div id="imageLightbox" class="fixed inset-0 z-50 bg-black/92 backdrop-blur-md hidden flex flex-col justify-between p-2 sm:p-5 transition-all duration-300 select-none">
+    
+    <!-- Top Bar: Info & Controls -->
+    <div class="flex items-center justify-between text-white z-20 px-2 sm:px-4 py-2">
+      <div class="flex items-center gap-3">
+        <span id="lbCategory" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-brand-teal px-3 py-1 rounded-full text-white shadow-xs">
+          Categoría
+        </span>
+        <span id="lbCounter" class="text-xs text-slate-300 font-mono">1 / 80</span>
+      </div>
+
+      <!-- Zoom Controls & Close -->
+      <div class="flex items-center gap-2">
+        <button onclick="zoomOut()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors" title="Alejar (-)">
+          <i data-lucide="zoom-out" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </button>
+        <span id="lbZoomLevel" class="text-xs font-mono text-slate-300 min-w-[42px] text-center hidden sm:inline-block">100%</span>
+        <button onclick="zoomIn()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors" title="Acercar (+)">
+          <i data-lucide="zoom-in" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </button>
+        <button onclick="resetZoom()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors" title="Tamaño original">
+          <i data-lucide="maximize" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </button>
+        <div class="h-5 w-px bg-white/20 mx-1"></div>
+        <button onclick="closeLightbox()" class="p-2 rounded-xl bg-red-600/80 hover:bg-red-600 text-white transition-colors" title="Cerrar (Esc)">
+          <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Stage: The Image with Zoom & Pan Container -->
+    <div id="lbStage" class="relative flex-1 flex items-center justify-center overflow-hidden my-2 cursor-grab active:cursor-grabbing">
+      
+      <!-- Previous Arrow -->
+      <button onclick="prevLightboxImage()" class="absolute left-2 sm:left-4 z-30 p-2 sm:p-3 rounded-2xl bg-black/60 hover:bg-black/90 text-white backdrop-blur-sm border border-white/15 transition-transform hover:scale-110 shadow-xl">
+        <i data-lucide="chevron-left" class="w-6 h-6 sm:w-8 sm:h-8"></i>
+      </button>
+
+      <!-- The Zoomable Image -->
+      <img id="lbImage" src="" alt="Detalle del trabajo" class="max-h-[72vh] max-w-[88vw] object-contain rounded-2xl transition-transform duration-100 ease-out shadow-2xl pointer-events-auto">
+
+      <!-- Next Arrow -->
+      <button onclick="nextLightboxImage()" class="absolute right-2 sm:right-4 z-30 p-2 sm:p-3 rounded-2xl bg-black/60 hover:bg-black/90 text-white backdrop-blur-sm border border-white/15 transition-transform hover:scale-110 shadow-xl">
+        <i data-lucide="chevron-right" class="w-6 h-6 sm:w-8 sm:h-8"></i>
+      </button>
+    </div>
+
+    <!-- Bottom Bar: Title, Description & WhatsApp CTA -->
+    <div class="z-20 bg-slate-900/90 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/10 max-w-4xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+      <div class="space-y-1">
+        <h3 id="lbTitle" class="text-base sm:text-lg font-heading font-bold text-white">Título del Producto</h3>
+        <p id="lbDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">Descripción del producto</p>
+        <span id="lbPrice" class="text-xs font-bold text-brand-cyan inline-block mt-1">Precio</span>
+      </div>
+
+      <button id="lbWhatsAppBtn" onclick="quoteCurrentLightbox()" class="shrink-0 brand-gradient text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition-all">
+        <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
+        <span>Cotizar este trabajo por WhatsApp</span>
+      </button>
+    </div>
+
+  </div>
+
   <!-- SCRIPTS -->
   <script>
     // Inicializar iconos
@@ -1131,11 +1195,15 @@
           seasonGrid.innerHTML = seasonalProducts.map(prod => `
             <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
               <div>
-                <div class="h-44 rounded-2xl bg-slate-100 border border-slate-200/60 relative overflow-hidden mb-5">
-                  <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover">
+                <div class="h-44 rounded-2xl bg-slate-100 border border-slate-200/60 relative overflow-hidden mb-5 cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en grande y hacer zoom">
+                  <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                   <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
                     Temporada
                   </span>
+                  <div class="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 text-xs font-bold">
+                    <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                    <span>Ver en grande</span>
+                  </div>
                 </div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">${prod.category}</span>
                 <h3 class="font-heading font-bold text-base text-slate-900 mb-2">${prod.title}</h3>
@@ -1208,7 +1276,7 @@
           <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
             <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between">
               <div>
-                <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+                <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100 cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en grande y hacer zoom">
                   <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                   <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[11px] font-bold text-brand-dark px-3 py-1 rounded-full border border-slate-200 shadow-sm">
                     ${prod.category}
@@ -1218,6 +1286,10 @@
                       ${prod.price}
                     </span>
                   ` : ''}
+                  <div class="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 text-xs font-bold">
+                    <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                    <span>Ver en grande</span>
+                  </div>
                 </div>
                 <div class="p-6">
                   <h4 class="text-base font-heading font-black text-slate-900 mb-2 line-clamp-1">${prod.title}</h4>
@@ -1288,7 +1360,7 @@
       grid.innerHTML = items.map(prod => `
         <div class="card-clean rounded-2xl sm:rounded-3xl overflow-hidden group bg-white flex flex-col justify-between border border-slate-200/80 shadow-2xs hover:shadow-md transition-all">
           <div>
-            <div class="relative h-44 sm:h-52 bg-slate-100 overflow-hidden">
+            <div class="relative h-44 sm:h-52 bg-slate-100 overflow-hidden cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en pantalla completa y hacer zoom">
               <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
               <span class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md text-[10px] font-bold text-slate-800 px-2.5 py-0.5 rounded-full shadow-xs">
                 ${prod.category}
@@ -1298,6 +1370,10 @@
                   Temporada
                 </span>
               ` : ''}
+              <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold">
+                <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                <span>Ver y hacer zoom</span>
+              </div>
             </div>
             <div class="p-3.5 sm:p-4">
               <h4 class="font-heading font-bold text-xs sm:text-sm text-slate-900 line-clamp-1 mb-1">${prod.title}</h4>
@@ -1342,6 +1418,191 @@
       const message = `¡Hola *Subli Art M*! 🎨✨\n\nVi este trabajo en su galería web y me gustaría cotizarlo:\n👉 *${title}*\n\n¿Me podrían dar precios y opciones de personalización, por favor?`;
       const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
+    }
+
+    // ==========================================
+    // VISOR LIGHTBOX CON ZOOM Y PAN
+    // ==========================================
+    let currentLightboxIndex = 0;
+    let currentLightboxList = [];
+    let currentZoom = 1;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let translateX = 0, translateY = 0;
+
+    function openLightbox(productId) {
+      currentLightboxList = allGalleryProducts && allGalleryProducts.length > 0 ? allGalleryProducts : [];
+      let idx = currentLightboxList.findIndex(p => p.id === productId);
+      if (idx === -1) idx = 0;
+      currentLightboxIndex = idx;
+      showLightboxItem();
+      const lb = document.getElementById('imageLightbox');
+      lb.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      initLightboxInteractions();
+      lucide.createIcons();
+    }
+
+    function showLightboxItem() {
+      if (!currentLightboxList || currentLightboxList.length === 0) return;
+      const item = currentLightboxList[currentLightboxIndex];
+      if (!item) return;
+
+      document.getElementById('lbImage').src = item.image;
+      document.getElementById('lbTitle').textContent = item.title;
+      document.getElementById('lbCategory').textContent = item.category;
+      document.getElementById('lbDesc').textContent = item.description || '';
+      document.getElementById('lbPrice').textContent = item.price || '';
+      document.getElementById('lbCounter').textContent = `${currentLightboxIndex + 1} / ${currentLightboxList.length}`;
+
+      resetZoom();
+    }
+
+    function closeLightbox() {
+      document.getElementById('imageLightbox').classList.add('hidden');
+      document.body.style.overflow = '';
+      resetZoom();
+    }
+
+    function prevLightboxImage() {
+      if (currentLightboxList.length === 0) return;
+      currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxList.length) % currentLightboxList.length;
+      showLightboxItem();
+    }
+
+    function nextLightboxImage() {
+      if (currentLightboxList.length === 0) return;
+      currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxList.length;
+      showLightboxItem();
+    }
+
+    function quoteCurrentLightbox() {
+      const item = currentLightboxList[currentLightboxIndex];
+      if (!item) return;
+      quoteSpecificProduct(item.title);
+    }
+
+    // Zoom Functions
+    function applyTransform() {
+      const img = document.getElementById('lbImage');
+      if (img) {
+        img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentZoom})`;
+      }
+      const lvl = document.getElementById('lbZoomLevel');
+      if (lvl) lvl.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function zoomIn() {
+      if (currentZoom < 3.5) {
+        currentZoom = Math.min(3.5, currentZoom + 0.35);
+        applyTransform();
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoom > 0.6) {
+        currentZoom = Math.max(0.6, currentZoom - 0.35);
+        if (currentZoom <= 1) {
+          translateX = 0;
+          translateY = 0;
+        }
+        applyTransform();
+      }
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      applyTransform();
+    }
+
+    function toggleDoubleZoom() {
+      if (currentZoom > 1.1) {
+        resetZoom();
+      } else {
+        currentZoom = 2.2;
+        applyTransform();
+      }
+    }
+
+    let interactionsInitialized = false;
+    function initLightboxInteractions() {
+      if (interactionsInitialized) return;
+      interactionsInitialized = true;
+
+      const stage = document.getElementById('lbStage');
+      const img = document.getElementById('lbImage');
+
+      // Wheel Zoom
+      stage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          zoomIn();
+        } else {
+          zoomOut();
+        }
+      }, { passive: false });
+
+      // Double Click
+      img.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        toggleDoubleZoom();
+      });
+
+      // Mouse Drag / Pan
+      stage.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        applyTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      // Touch Drag for Mobile
+      let touchStartX = 0, touchStartY = 0;
+      stage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          touchStartX = e.touches[0].clientX - translateX;
+          touchStartY = e.touches[0].clientY - translateY;
+        }
+      }, { passive: true });
+
+      stage.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length === 1 && currentZoom > 1) {
+          translateX = e.touches[0].clientX - touchStartX;
+          translateY = e.touches[0].clientY - touchStartY;
+          applyTransform();
+        }
+      }, { passive: true });
+
+      stage.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      // Keyboard navigation
+      window.addEventListener('keydown', (e) => {
+        const lb = document.getElementById('imageLightbox');
+        if (lb && !lb.classList.contains('hidden')) {
+          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'ArrowLeft') prevLightboxImage();
+          if (e.key === 'ArrowRight') nextLightboxImage();
+          if (e.key === '+' || e.key === '=') zoomIn();
+          if (e.key === '-' || e.key === '_') zoomOut();
+          if (e.key === '0') resetZoom();
+        }
+      });
     }
 
     window.addEventListener('resize', updateCarousel);
