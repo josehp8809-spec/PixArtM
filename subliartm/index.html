@@ -320,131 +320,172 @@
     </div>
   </section>
 
-  <!-- SECCIÓN ESPECIAL: PRODUCTOS DE TEMPORADA (FONDO CÁLIDO) -->
-  <section id="temporada" class="py-20 bg-gradient-to-b from-amber-50/50 via-rose-50/30 to-white border-y border-amber-200/60">
+  <!-- SECCIÓN ESPECIAL: PRODUCTOS DE TEMPORADA (CARRUSEL HORIZONTAL DESLIZABLE) -->
+  <section id="temporada" class="py-16 sm:py-20 bg-gradient-to-b from-amber-50/50 via-rose-50/30 to-white border-y border-amber-200/60 relative overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Season Header -->
-      <div class="text-center max-w-3xl mx-auto mb-14">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-800 text-xs font-extrabold uppercase tracking-widest mb-3 shadow-sm">
-          <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-600"></i> Catálogo de Temporada
+      <!-- Season Header & Navigation -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i> Catálogo de Temporada
+          </div>
+          <h2 id="season-title" class="text-2xl sm:text-4xl lg:text-5xl font-heading font-black text-slate-900 tracking-tight">
+            Especial: <span class="season-text-gradient">Día de Muertos & Navidad</span>
+          </h2>
+          <p id="season-desc" class="text-slate-600 text-xs sm:text-base mt-2 max-w-xl">
+            Desliza hacia los lados para explorar todos los diseños. Toca cualquier foto para hacer zoom y ver acabados reales.
+          </p>
         </div>
-        <h2 id="season-title" class="text-3xl sm:text-5xl font-heading font-black text-slate-900 tracking-tight">
-          Especial: <span class="season-text-gradient">Día de Muertos & Navidad</span>
-        </h2>
-        <p id="season-desc" class="text-slate-600 text-sm sm:text-base mt-4">
-          Anticípate a tus fechas especiales con detalles personalizados para tu familia, posadas o regalos corporativos de tu empresa.
-        </p>
+
+        <!-- Carousel Navigation Controls -->
+        <div class="flex items-center gap-2.5 mt-5 md:mt-0">
+          <button onclick="prevSeasonalSlide()" aria-label="Anterior temporada" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white hover:bg-amber-500 hover:text-white text-slate-700 border border-amber-200/90 flex items-center justify-center transition-all shadow-sm active:scale-95">
+            <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+          </button>
+          <button onclick="nextSeasonalSlide()" aria-label="Siguiente temporada" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white hover:bg-amber-500 hover:text-white text-slate-700 border border-amber-200/90 flex items-center justify-center transition-all shadow-sm active:scale-95">
+            <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- Season Cards Grid -->
-      <div id="seasonal-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <!-- Season Card 1: Esferas -->
-        <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
-          <div>
-            <div class="h-44 rounded-2xl bg-gradient-to-tr from-amber-100 to-amber-50 border border-amber-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4 mb-5">
-              <span class="absolute top-3 right-3 bg-amber-500 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                Top Ventas
-              </span>
-              <div class="w-16 h-16 rounded-2xl bg-amber-200/70 flex items-center justify-center text-amber-800 mb-2">
-                <i data-lucide="sparkles" class="w-8 h-8"></i>
+      <!-- Carousel Window -->
+      <div class="overflow-hidden rounded-3xl relative">
+        <div id="seasonal-cards-container" class="carousel-track gap-6">
+          
+          <!-- Slide 1: Esferas -->
+          <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+            <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-amber-200/80 hover:border-amber-400 bg-white shadow-sm transition-all duration-300">
+              <div>
+                <div class="h-60 sm:h-64 bg-gradient-to-tr from-amber-100 to-amber-50 border-b border-amber-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4">
+                  <span class="absolute top-3 right-3 bg-amber-500 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    Top Ventas
+                  </span>
+                  <div class="w-16 h-16 rounded-2xl bg-amber-200/70 flex items-center justify-center text-amber-800 mb-2">
+                    <i data-lucide="sparkles" class="w-8 h-8"></i>
+                  </div>
+                  <p class="text-xs uppercase font-extrabold text-amber-800">MDF Calado & Pintado</p>
+                </div>
+                <div class="p-5 sm:p-6">
+                  <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Esferas Navideñas con Nombre</h3>
+                  <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                    Esferas en MDF natural o pintado caladas con los nombres de tu familia, mascotas o logo corporativo.
+                  </p>
+                  <div class="bg-amber-50/80 rounded-xl p-3 text-xs text-amber-800 flex items-center justify-between font-semibold">
+                    <span>🎁 Paquetes x docena</span>
+                    <span class="font-bold">Precio especial</span>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs uppercase font-extrabold text-amber-800">MDF Calado & Pintado</p>
-            </div>
-            <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Esferas Navideñas con Nombre</h3>
-            <p class="text-slate-600 text-xs leading-relaxed mb-4">
-              Esferas en MDF natural o pintado (oro, plata, blanco) caladas con los nombres de tu familia, mascotas o logo de empresa.
-            </p>
-            <div class="bg-amber-50/80 rounded-xl p-3 mb-4 text-xs text-amber-800 flex items-center justify-between font-semibold">
-              <span>🎁 Paquetes x docena</span>
-              <span class="font-bold">Precio especial</span>
+              <div class="p-5 sm:p-6 pt-0">
+                <button onclick="prefillQuote('Esferas Navideñas MDF')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                  <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar Esferas
+                </button>
+              </div>
             </div>
           </div>
-          <button onclick="prefillQuote('Esferas Navideñas MDF')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar Esferas
-          </button>
-        </div>
 
-        <!-- Season Card 2: Catrinas -->
-        <div class="card-clean rounded-3xl p-6 border-rose-200 hover:border-rose-400 bg-white flex flex-col justify-between">
-          <div>
-            <div class="h-44 rounded-2xl bg-gradient-to-tr from-rose-100 to-purple-50 border border-rose-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4 mb-5">
-              <span class="absolute top-3 right-3 bg-rose-500 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                Día de Muertos
-              </span>
-              <div class="w-16 h-16 rounded-2xl bg-rose-200/70 flex items-center justify-center text-rose-800 mb-2">
-                <i data-lucide="palette" class="w-8 h-8"></i>
+          <!-- Slide 2: Catrinas -->
+          <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+            <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-rose-200/80 hover:border-rose-400 bg-white shadow-sm transition-all duration-300">
+              <div>
+                <div class="h-60 sm:h-64 bg-gradient-to-tr from-rose-100 to-purple-50 border-b border-rose-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4">
+                  <span class="absolute top-3 right-3 bg-rose-500 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    Día de Muertos
+                  </span>
+                  <div class="w-16 h-16 rounded-2xl bg-rose-200/70 flex items-center justify-center text-rose-800 mb-2">
+                    <i data-lucide="palette" class="w-8 h-8"></i>
+                  </div>
+                  <p class="text-xs uppercase font-extrabold text-rose-800">Sublimación de Alta Definición</p>
+                </div>
+                <div class="p-5 sm:p-6">
+                  <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Tazas y Termos de Catrina</h3>
+                  <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                    Diseños artísticos de catrinas y ofrendas. Ilustraciones exclusivas con nombres o fotos conmemorativas.
+                  </p>
+                  <div class="bg-rose-50/80 rounded-xl p-3 text-xs text-rose-800 flex items-center justify-between font-semibold">
+                    <span>☕ Cerámica & Mágicas</span>
+                    <span class="font-bold">Desde 1 pieza</span>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs uppercase font-extrabold text-rose-800">Sublimación de Alta Definición</p>
-            </div>
-            <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Tazas y Termos de Catrina</h3>
-            <p class="text-slate-600 text-xs leading-relaxed mb-4">
-              Diseños artísticos de catrinas y ofrendas. Diseños exclusivos de nuestra diseñadora con nombres personalizados o fotos conmemorativas.
-            </p>
-            <div class="bg-rose-50/80 rounded-xl p-3 mb-4 text-xs text-rose-800 flex items-center justify-between font-semibold">
-              <span>☕ Cerámica & Mágicas</span>
-              <span class="font-bold">Desde 1 pieza</span>
+              <div class="p-5 sm:p-6 pt-0">
+                <button onclick="prefillQuote('Tazas y Termos Día de Muertos')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                  <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar Tazas
+                </button>
+              </div>
             </div>
           </div>
-          <button onclick="prefillQuote('Tazas y Termos Día de Muertos')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar Tazas
-          </button>
-        </div>
 
-        <!-- Season Card 3: Cajas de Regalo -->
-        <div class="card-clean rounded-3xl p-6 border-purple-200 hover:border-purple-400 bg-white flex flex-col justify-between">
-          <div>
-            <div class="h-44 rounded-2xl bg-gradient-to-tr from-purple-100 to-indigo-50 border border-purple-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4 mb-5">
-              <span class="absolute top-3 right-3 bg-purple-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                Fin de Año
-              </span>
-              <div class="w-16 h-16 rounded-2xl bg-purple-200/70 flex items-center justify-center text-purple-800 mb-2">
-                <i data-lucide="gift" class="w-8 h-8"></i>
+          <!-- Slide 3: Cajas de Regalo -->
+          <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+            <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-purple-200/80 hover:border-purple-400 bg-white shadow-sm transition-all duration-300">
+              <div>
+                <div class="h-60 sm:h-64 bg-gradient-to-tr from-purple-100 to-indigo-50 border-b border-purple-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4">
+                  <span class="absolute top-3 right-3 bg-purple-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    Fin de Año
+                  </span>
+                  <div class="w-16 h-16 rounded-2xl bg-purple-200/70 flex items-center justify-center text-purple-800 mb-2">
+                    <i data-lucide="gift" class="w-8 h-8"></i>
+                  </div>
+                  <p class="text-xs uppercase font-extrabold text-purple-800">Cajas de Regalo MDF</p>
+                </div>
+                <div class="p-5 sm:p-6">
+                  <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Cajas Grabadas para Vinos</h3>
+                  <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                    Cajas finas en MDF con tapa corrediza o bisagra, grabadas con dedicatorias familiares o el logo de tu negocio.
+                  </p>
+                  <div class="bg-purple-50/80 rounded-xl p-3 text-xs text-purple-800 flex items-center justify-between font-semibold">
+                    <span>🍷 Acabado Premium</span>
+                    <span class="font-bold">Menudeo / Mayoreo</span>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs uppercase font-extrabold text-purple-800">Cajas de Regalo MDF</p>
-            </div>
-            <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Cajas Grabadas para Vinos</h3>
-            <p class="text-slate-600 text-xs leading-relaxed mb-4">
-              Cajas finas en MDF con tapa corrediza o bisagra, grabadas con dedicatorias familiares o el logo de tu negocio.
-            </p>
-            <div class="bg-purple-50/80 rounded-xl p-3 mb-4 text-xs text-purple-800 flex items-center justify-between font-semibold">
-              <span>🍷 Acabado Premium</span>
-              <span class="font-bold">Menudeo / Mayoreo</span>
+              <div class="p-5 sm:p-6 pt-0">
+                <button onclick="prefillQuote('Cajas de Regalo MDF Fin de Año')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                  <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar Cajas
+                </button>
+              </div>
             </div>
           </div>
-          <button onclick="prefillQuote('Cajas de Regalo MDF Fin de Año')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar Cajas
-          </button>
-        </div>
 
-        <!-- Season Card 4: Playeras Familiares -->
-        <div class="card-clean rounded-3xl p-6 border-emerald-200 hover:border-emerald-400 bg-white flex flex-col justify-between">
-          <div>
-            <div class="h-44 rounded-2xl bg-gradient-to-tr from-emerald-100 to-teal-50 border border-emerald-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4 mb-5">
-              <span class="absolute top-3 right-3 bg-emerald-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                Navidad
-              </span>
-              <div class="w-16 h-16 rounded-2xl bg-emerald-200/70 flex items-center justify-center text-emerald-800 mb-2">
-                <i data-lucide="shirt" class="w-8 h-8"></i>
+          <!-- Slide 4: Playeras Familiares -->
+          <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+            <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-emerald-200/80 hover:border-emerald-400 bg-white shadow-sm transition-all duration-300">
+              <div>
+                <div class="h-60 sm:h-64 bg-gradient-to-tr from-emerald-100 to-teal-50 border-b border-emerald-200/60 relative overflow-hidden flex flex-col items-center justify-center text-center p-4">
+                  <span class="absolute top-3 right-3 bg-emerald-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    Navidad
+                  </span>
+                  <div class="w-16 h-16 rounded-2xl bg-emerald-200/70 flex items-center justify-center text-emerald-800 mb-2">
+                    <i data-lucide="shirt" class="w-8 h-8"></i>
+                  </div>
+                  <p class="text-xs uppercase font-extrabold text-emerald-800">Playeras y Sudaderas</p>
+                </div>
+                <div class="p-5 sm:p-6">
+                  <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Playeras Navideñas Familiares</h3>
+                  <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                    Sets completos para toda la familia con diseños divertidos o elegantes para Nochebuena y fotos de temporada.
+                  </p>
+                  <div class="bg-emerald-50/80 rounded-xl p-3 text-xs text-emerald-800 flex items-center justify-between font-semibold">
+                    <span>👨‍👩‍👧‍👦 Todas las tallas</span>
+                    <span class="font-bold">Paquetes familiares</span>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs uppercase font-extrabold text-emerald-800">Playeras y Sudaderas</p>
-            </div>
-            <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Playeras Navideñas Familiares</h3>
-            <p class="text-slate-600 text-xs leading-relaxed mb-4">
-              Sets completos para toda la familia con diseños divertidos o elegantes para Nochebuena y fotos de temporada.
-            </p>
-            <div class="bg-emerald-50/80 rounded-xl p-3 mb-4 text-xs text-emerald-800 flex items-center justify-between font-semibold">
-              <span>👨‍👩‍👧‍👦 Todas las tallas</span>
-              <span class="font-bold">Paquetes familiares</span>
+              <div class="p-5 sm:p-6 pt-0">
+                <button onclick="prefillQuote('Playeras Familiares Navideñas')" class="w-full py-2.5 rounded-xl brand-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                  <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar Playeras
+                </button>
+              </div>
             </div>
           </div>
-          <button onclick="prefillQuote('Playeras Familiares Navideñas')" class="w-full py-2.5 rounded-xl brand-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar Playeras
-          </button>
-        </div>
 
+        </div>
       </div>
+
+      <!-- Carousel Dots Indicator -->
+      <div id="seasonal-carousel-dots" class="flex items-center justify-center gap-2 mt-8"></div>
 
     </div>
   </section>
@@ -1053,9 +1094,47 @@
       });
     }
 
-    // Lógica del Carrusel
+    // Helper para tarjeta del Carrusel de Temporada
+    function renderSeasonalCard(prod) {
+      return `
+        <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
+          <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-amber-200/80 hover:border-amber-400 bg-white shadow-sm transition-all duration-300">
+            <div>
+              <div class="h-60 sm:h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-amber-100 cursor-pointer" onclick="openLightbox('${prod.id}', 'seasonal')" title="Toca para ver en grande y hacer zoom">
+                <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                <span class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                  Edición Temporada
+                </span>
+                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold pointer-events-none">
+                  <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                  <span>Toca para Zoom</span>
+                </div>
+                ${prod.price ? `
+                  <span class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md text-amber-900 font-black text-xs px-3 py-1 rounded-xl shadow-xs border border-amber-200">
+                    ${prod.price}
+                  </span>
+                ` : ''}
+              </div>
+              <div class="p-5 sm:p-6">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">${prod.category}</span>
+                <h3 class="font-heading font-bold text-base text-slate-900 mb-2 line-clamp-1">${prod.title}</h3>
+                <p class="text-slate-600 text-xs leading-relaxed mb-4 line-clamp-2">
+                  ${prod.description}
+                </p>
+              </div>
+            </div>
+            <div class="p-5 sm:p-6 pt-0">
+              <button onclick="prefillQuote('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i> Cotizar este trabajo
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Lógica del Carrusel Principal (Trabajos Destacados)
     const track = document.getElementById('carousel-track');
-    const slides = track.children;
     let currentIndex = 0;
     let autoPlayTimer = null;
 
@@ -1066,12 +1145,13 @@
     }
 
     function updateCarousel() {
+      if (!track || !track.children || track.children.length === 0) return;
       const visible = getVisibleSlides();
-      const maxIndex = Math.max(0, slides.length - visible);
+      const maxIndex = Math.max(0, track.children.length - visible);
       if (currentIndex > maxIndex) currentIndex = 0;
       if (currentIndex < 0) currentIndex = maxIndex;
 
-      const slideWidth = slides[0].getBoundingClientRect().width;
+      const slideWidth = track.children[0].getBoundingClientRect().width;
       const gap = 24; // gap-6
       const offset = currentIndex * (slideWidth + gap);
       track.style.transform = `translateX(-${offset}px)`;
@@ -1093,6 +1173,7 @@
 
     function renderDots(total) {
       const dotsContainer = document.getElementById('carousel-dots');
+      if (!dotsContainer) return;
       dotsContainer.innerHTML = '';
       for (let i = 0; i < total; i++) {
         const dot = document.createElement('button');
@@ -1110,13 +1191,111 @@
       autoPlayTimer = setInterval(() => {
         currentIndex++;
         updateCarousel();
-      }, 4000);
+      }, 4500);
     }
 
     function resetAutoPlay() {
       clearInterval(autoPlayTimer);
       startAutoPlay();
     }
+
+    // Lógica del Carrusel de Temporada (Día de Muertos & Navidad)
+    let currentSeasonalIndex = 0;
+    let seasonalAutoPlayTimer = null;
+
+    function getVisibleSeasonalSlides() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    }
+
+    function updateSeasonalCarousel() {
+      const sTrack = document.getElementById('seasonal-cards-container');
+      if (!sTrack || !sTrack.children || sTrack.children.length === 0) return;
+      const visible = getVisibleSeasonalSlides();
+      const maxIndex = Math.max(0, sTrack.children.length - visible);
+      if (currentSeasonalIndex > maxIndex) currentSeasonalIndex = 0;
+      if (currentSeasonalIndex < 0) currentSeasonalIndex = maxIndex;
+
+      const slideWidth = sTrack.children[0].getBoundingClientRect().width;
+      const gap = 24; // gap-6
+      const offset = currentSeasonalIndex * (slideWidth + gap);
+      sTrack.style.transform = `translateX(-${offset}px)`;
+
+      renderSeasonalDots(maxIndex + 1);
+    }
+
+    function nextSeasonalSlide() {
+      currentSeasonalIndex++;
+      updateSeasonalCarousel();
+      resetSeasonalAutoPlay();
+    }
+
+    function prevSeasonalSlide() {
+      currentSeasonalIndex--;
+      updateSeasonalCarousel();
+      resetSeasonalAutoPlay();
+    }
+
+    function renderSeasonalDots(total) {
+      const dotsContainer = document.getElementById('seasonal-carousel-dots');
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+      if (total <= 1) return;
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('button');
+        dot.className = `h-2.5 rounded-full transition-all ${i === currentSeasonalIndex ? 'w-8 bg-amber-500' : 'w-2.5 bg-amber-200 hover:bg-amber-300'}`;
+        dot.onclick = () => {
+          currentSeasonalIndex = i;
+          updateSeasonalCarousel();
+          resetSeasonalAutoPlay();
+        };
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function startSeasonalAutoPlay() {
+      seasonalAutoPlayTimer = setInterval(() => {
+        currentSeasonalIndex++;
+        updateSeasonalCarousel();
+      }, 5000);
+    }
+
+    function resetSeasonalAutoPlay() {
+      clearInterval(seasonalAutoPlayTimer);
+      startSeasonalAutoPlay();
+    }
+
+    // Soporte táctil swipe para deslizar con el dedo en celular y tablet
+    function enableTouchSwipe(elementId, onNext, onPrev) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      let startX = 0;
+      let startY = 0;
+      el.addEventListener('touchstart', (e) => {
+        startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY;
+      }, { passive: true });
+      el.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].screenX;
+        const endY = e.changedTouches[0].screenY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+        // Solo deslizar si el movimiento es predominantemente horizontal
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+          if (diffX > 0) onNext();
+          else onPrev();
+        }
+      }, { passive: true });
+    }
+
+    enableTouchSwipe('carousel-track', nextSlide, prevSlide);
+    enableTouchSwipe('seasonal-cards-container', nextSeasonalSlide, prevSeasonalSlide);
+
+    window.addEventListener('resize', () => {
+      updateCarousel();
+      updateSeasonalCarousel();
+    });
 
     // Configuración WhatsApp
     let WHATSAPP_PHONE = '5212215873074';
@@ -1218,41 +1397,12 @@
         }
       }
 
-      // 4. Productos de Temporada dinámicos
+      // 4. Productos de Temporada dinámicos (Carrusel)
       const seasonalProducts = products.filter(p => p.isSeasonal);
       if (seasonalProducts.length > 0) {
         const seasonGrid = document.getElementById('seasonal-cards-container');
         if (seasonGrid) {
-          seasonGrid.innerHTML = seasonalProducts.map(prod => `
-            <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
-              <div>
-                <div class="h-44 rounded-2xl bg-slate-100 border border-slate-200/60 relative overflow-hidden mb-5 cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en grande y hacer zoom">
-                  <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                  <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                    Temporada
-                  </span>
-                  <div class="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 text-xs font-bold">
-                    <i data-lucide="zoom-in" class="w-4 h-4"></i>
-                    <span>Ver en grande</span>
-                  </div>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">${prod.category}</span>
-                <h3 class="font-heading font-bold text-base text-slate-900 mb-2">${prod.title}</h3>
-                <p class="text-slate-600 text-xs leading-relaxed mb-4 line-clamp-2">
-                  ${prod.description}
-                </p>
-                ${prod.price ? `
-                  <div class="bg-amber-50 rounded-xl p-2.5 mb-4 text-xs text-amber-800 font-bold flex items-center justify-between">
-                    <span>Precio estimado:</span>
-                    <span>${prod.price}</span>
-                  </div>
-                ` : ''}
-              </div>
-              <button onclick="prefillQuote('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar este trabajo
-              </button>
-            </div>
-          `).join('');
+          seasonGrid.innerHTML = seasonalProducts.map(renderSeasonalCard).join('');
         }
       }
 
@@ -1293,6 +1443,13 @@
         } catch (e) {
           console.warn('Error loading Supabase data:', e);
         }
+      }
+
+      if (products && products.length > 0) {
+        allGalleryProducts = products;
+        renderGalleryGrid(products);
+        updateCarousel();
+        updateSeasonalCarousel();
       }
 
       lucide.createIcons();
@@ -1339,40 +1496,16 @@
         `).join('');
       }
 
-      // Seasonal
+      // Seasonal Carousel
       const seasonalProducts = products.filter(p => p.isSeasonal);
       const seasonGrid = document.getElementById('seasonal-cards-container');
       if (seasonGrid && seasonalProducts.length > 0) {
-        seasonGrid.innerHTML = seasonalProducts.map(prod => `
-          <div class="card-clean rounded-3xl p-6 border-amber-200 hover:border-amber-400 bg-white flex flex-col justify-between">
-            <div>
-              <div class="h-44 rounded-2xl bg-slate-100 border border-slate-200/60 relative overflow-hidden mb-5">
-                <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover">
-                <span class="absolute top-3 right-3 bg-red-600 text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                  Temporada
-                </span>
-              </div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">${prod.category}</span>
-              <h3 class="font-heading font-bold text-base text-slate-900 mb-2">${prod.title}</h3>
-              <p class="text-slate-600 text-xs leading-relaxed mb-4 line-clamp-2">
-                ${prod.description}
-              </p>
-              ${prod.price ? `
-                <div class="bg-amber-50 rounded-xl p-2.5 mb-4 text-xs text-amber-800 font-bold flex items-center justify-between">
-                  <span>Precio estimado:</span>
-                  <span>${prod.price}</span>
-                </div>
-              ` : ''}
-            </div>
-            <button onclick="prefillQuote('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl festive-gradient text-white font-heading font-bold text-xs hover:opacity-95 transition-all flex items-center justify-center gap-1.5 shadow-sm">
-              <i data-lucide="message-circle" class="w-4 h-4"></i> Cotizar este trabajo
-            </button>
-          </div>
-        `).join('');
+        seasonGrid.innerHTML = seasonalProducts.map(renderSeasonalCard).join('');
       }
 
       lucide.createIcons();
       updateCarousel();
+      updateSeasonalCarousel();
 
       // Galería Completa
       allGalleryProducts = products;
@@ -1461,8 +1594,13 @@
     let startX = 0, startY = 0;
     let translateX = 0, translateY = 0;
 
-    function openLightbox(productId) {
-      currentLightboxList = allGalleryProducts && allGalleryProducts.length > 0 ? allGalleryProducts : [];
+    function openLightbox(productId, listType = 'all') {
+      if (listType === 'seasonal') {
+        const seasonals = allGalleryProducts ? allGalleryProducts.filter(p => p.isSeasonal) : [];
+        currentLightboxList = seasonals.length > 0 ? seasonals : (allGalleryProducts || []);
+      } else {
+        currentLightboxList = allGalleryProducts && allGalleryProducts.length > 0 ? allGalleryProducts : [];
+      }
       let idx = currentLightboxList.findIndex(p => p.id === productId);
       if (idx === -1) idx = 0;
       currentLightboxIndex = idx;
@@ -1636,11 +1774,12 @@
       });
     }
 
-    window.addEventListener('resize', updateCarousel);
     window.addEventListener('DOMContentLoaded', () => {
       initDynamicCMS();
       updateCarousel();
+      updateSeasonalCarousel();
       startAutoPlay();
+      startSeasonalAutoPlay();
     });
 
     function sendWhatsAppQuote(e) {
