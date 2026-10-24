@@ -133,7 +133,11 @@
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
             <span>Temporada</span>
           </a>
-          <a href="#carrusel" class="hover:text-brand-teal transition-colors">Trabajos Reales</a>
+          <a href="#carrusel" class="hover:text-brand-teal transition-colors">Destacados</a>
+          <a href="#galeria" class="hover:text-brand-teal transition-colors flex items-center gap-1 font-bold text-slate-800">
+            <i data-lucide="grid" class="w-3.5 h-3.5 text-brand-teal"></i>
+            <span>Galería</span>
+          </a>
           <a href="#servicios" class="hover:text-brand-teal transition-colors">Servicios</a>
           <a href="#cotizador" class="hover:text-brand-teal transition-colors">Cotizador</a>
           <a href="#contacto" class="hover:text-brand-teal transition-colors">Contacto</a>
@@ -141,7 +145,7 @@
 
         <!-- CTA Buttons -->
         <div class="flex items-center gap-3">
-          <a href="https://wa.me/5210000000000?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
+          <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
              id="nav-wa-btn" 
              target="_blank" 
              class="brand-gradient hover:opacity-95 text-white font-heading font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all transform hover:-translate-y-0.5">
@@ -160,7 +164,8 @@
     <!-- Mobile Dropdown -->
     <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-6 py-6 space-y-3 shadow-lg">
       <a href="#temporada" class="block text-amber-600 font-bold py-1.5 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Catálogo de Temporada</a>
-      <a href="#carrusel" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Trabajos Realizados</a>
+      <a href="#carrusel" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Trabajos Destacados</a>
+      <a href="#galeria" class="block text-slate-700 hover:text-brand-teal font-bold py-1.5 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4 text-brand-teal"></i> Galería Completa (80+ Muestras)</a>
       <a href="#servicios" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Nuestros Servicios</a>
       <a href="#cotizador" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Cotizador Express a WhatsApp</a>
       <a href="#contacto" class="block text-slate-700 hover:text-brand-teal font-medium py-1.5">Contacto</a>
@@ -600,6 +605,59 @@
     </div>
   </section>
 
+  <!-- SECCIÓN DE GALERÍA COMPLETA (80+ TRABAJOS REALES) -->
+  <section id="galeria" class="py-20 bg-slate-50/70 border-t border-slate-200/80 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <span class="text-brand-teal font-heading font-bold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full inline-block mb-3">
+          ✨ Catálogo Visual Completo
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-heading font-black text-slate-900 tracking-tight">
+          Galería de Trabajos & Proyectos
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-2">
+          Explora más de 80 trabajos reales terminados en nuestro taller. Toca cualquier foto para cotizar o pedir uno igual por WhatsApp.
+        </p>
+
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mt-7" id="gallery-filters">
+          <button onclick="filterGallery('todos')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-teal text-white shadow-sm" data-filter="todos">
+            Todos (<span id="count-todos">0</span>)
+          </button>
+          <button onclick="filterGallery('Corte Láser MDF & Acrílico')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs" data-filter="Corte Láser MDF & Acrílico">
+            Corte Láser MDF
+          </button>
+          <button onclick="filterGallery('Sublimación')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs" data-filter="Sublimación">
+            Sublimación
+          </button>
+          <button onclick="filterGallery('Vinil & Gran Formato')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs" data-filter="Vinil & Gran Formato">
+            Corte Vinil & Lonas
+          </button>
+          <button onclick="filterGallery('temporada')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-amber-700 hover:text-amber-800 border border-amber-200 shadow-2xs" data-filter="temporada">
+            🎉 Día de Muertos & Navidad
+          </button>
+        </div>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="full-gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Injected dynamically from Supabase -->
+      </div>
+
+      <!-- WhatsApp CTA Footer of Gallery -->
+      <div class="mt-12 text-center">
+        <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20estoy%20viendo%20su%20galer%C3%ADa%20y%20me%20gustar%C3%ADa%20cotizar%20un%20proyecto" 
+           target="_blank" 
+           class="inline-flex items-center gap-2 brand-gradient hover:opacity-95 text-white font-heading font-bold text-sm px-6 py-3.5 rounded-2xl shadow-md transition-all transform hover:-translate-y-0.5">
+          <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
+          <span>¿Tienes un diseño o idea especial en mente? Escríbenos a WhatsApp (+52 221 587 3074)</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
   <!-- LOS 4 SERVICIOS CON FONDO LUMINOSO -->
   <section id="servicios" class="py-24 bg-[#F3F7F7]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -857,12 +915,12 @@
         <div>
           <h4 class="font-heading font-bold text-white text-sm mb-4">Atención Inmediata</h4>
           <p class="text-xs sm:text-sm text-slate-400 mb-3">Escríbenos para pedidos o dudas:</p>
-          <a href="https://wa.me/5210000000000?text=Hola%20Subli%20Art%20M,%20quisiera%20pedir%20informes" 
+          <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20quisiera%20pedir%20informes" 
              id="footer-wa-link" 
              target="_blank" 
              class="inline-flex items-center gap-2 text-brand-cyan text-sm font-bold hover:underline bg-white/10 px-4 py-2.5 rounded-xl border border-white/15">
             <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
-            <span>Chatear por WhatsApp</span>
+            <span>Chatear por WhatsApp (+52 221 587 3074)</span>
           </a>
         </div>
 
@@ -882,7 +940,7 @@
   </footer>
 
   <!-- BOTÓN FLOTANTE DE WHATSAPP -->
-  <a href="https://wa.me/5210000000000?text=Hola%20Subli%20Art%20M,%20vengo%20de%20su%20p%C3%A1gina%20web" 
+  <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20vengo%20de%20su%20p%C3%A1gina%20web" 
      id="floating-wa-btn" 
      target="_blank" 
      class="fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#20ba59] text-white p-4 rounded-2xl shadow-xl flex items-center justify-center transition-all transform hover:scale-110"
@@ -971,7 +1029,7 @@
     }
 
     // Configuración WhatsApp
-    let WHATSAPP_PHONE = '5210000000000';
+    let WHATSAPP_PHONE = '5212215873074';
 
     function initDynamicCMS() {
       // 1. Textos y configuración general
@@ -1212,6 +1270,78 @@
 
       lucide.createIcons();
       updateCarousel();
+
+      // Galería Completa
+      allGalleryProducts = products;
+      renderGalleryGrid(products);
+      const countEl = document.getElementById('count-todos');
+      if (countEl) countEl.textContent = products.length;
+    }
+
+    let allGalleryProducts = [];
+    let currentGalleryFilter = 'todos';
+
+    function renderGalleryGrid(items) {
+      const grid = document.getElementById('full-gallery-grid');
+      if (!grid) return;
+
+      grid.innerHTML = items.map(prod => `
+        <div class="card-clean rounded-2xl sm:rounded-3xl overflow-hidden group bg-white flex flex-col justify-between border border-slate-200/80 shadow-2xs hover:shadow-md transition-all">
+          <div>
+            <div class="relative h-44 sm:h-52 bg-slate-100 overflow-hidden">
+              <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+              <span class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md text-[10px] font-bold text-slate-800 px-2.5 py-0.5 rounded-full shadow-xs">
+                ${prod.category}
+              </span>
+              ${prod.isSeasonal ? `
+                <span class="absolute top-2.5 right-2.5 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                  Temporada
+                </span>
+              ` : ''}
+            </div>
+            <div class="p-3.5 sm:p-4">
+              <h4 class="font-heading font-bold text-xs sm:text-sm text-slate-900 line-clamp-1 mb-1">${prod.title}</h4>
+              <p class="text-[11px] sm:text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">${prod.description}</p>
+              ${prod.price ? `<span class="text-[11px] font-bold text-brand-teal block mb-2">${prod.price}</span>` : ''}
+            </div>
+          </div>
+          <div class="px-3.5 pb-3.5 sm:px-4 sm:pb-4 pt-0">
+            <button onclick="quoteSpecificProduct('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-brand-teal hover:text-white text-slate-700 font-bold text-[11px] sm:text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
+              <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+              <span>Cotizar por WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function filterGallery(category) {
+      currentGalleryFilter = category;
+
+      // Update button styles
+      document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === category) {
+          btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-teal text-white shadow-sm";
+        } else {
+          btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs";
+        }
+      });
+
+      if (category === 'todos') {
+        renderGalleryGrid(allGalleryProducts);
+      } else if (category === 'temporada') {
+        renderGalleryGrid(allGalleryProducts.filter(p => p.isSeasonal));
+      } else {
+        renderGalleryGrid(allGalleryProducts.filter(p => p.category === category));
+      }
+    }
+
+    function quoteSpecificProduct(title) {
+      const message = `¡Hola *Subli Art M*! 🎨✨\n\nVi este trabajo en su galería web y me gustaría cotizarlo:\n👉 *${title}*\n\n¿Me podrían dar precios y opciones de personalización, por favor?`;
+      const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
     }
 
     window.addEventListener('resize', updateCarousel);
