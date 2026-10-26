@@ -92,7 +92,7 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">
                             Contraseña
                         </label>
-                        <button type="button" id="btnToggleEye" onclick="togglePasswordVisibility()" class="text-xs font-bold text-brand-teal hover:underline flex items-center gap-1 cursor-pointer select-none">
+                        <button type="button" id="btnToggleEye" onclick="const p = document.getElementById('inputAuthPassword'); if(p){ p.type = (p.type === 'password' ? 'text' : 'password'); this.textContent = (p.type === 'password' ? '👁️ Ver contraseña' : '🙈 Ocultar contraseña'); }" class="text-xs font-bold text-brand-teal hover:underline flex items-center gap-1 cursor-pointer select-none">
                             👁️ Ver contraseña
                         </button>
                     </div>
@@ -604,6 +604,15 @@
 
     <!-- Script Application Logic -->
     <script>
+        function safeJsonParse(raw, fallback) {
+            try {
+                if (!raw || raw === '[object Object]' || raw === 'undefined') return fallback;
+                return JSON.parse(raw);
+            } catch {
+                return fallback;
+            }
+        }
+
         // State
         const DEFAULT_CATEGORIES = [
             { id: 'sublimacion', name: 'Sublimación', desc: 'Tazas, termos, playeras, cojines y textiles con tintas indelebles.', icon: 'coffee' },
@@ -613,18 +622,36 @@
         ];
 
         // Supabase Client Config
-        const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://yzykzfzxvngjycmfansk.supabase.co';
-        const SUPABASE_KEY = localStorage.getItem('supabase_key') || 'sb_publishable_kP5I2bwqJ_NzbWyF8grDbA_gEtX-VRS';
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+        let SUPABASE_URL = 'https://yzykzfzxvngjycmfansk.supabase.co';
+        let SUPABASE_KEY = 'sb_publishable_kP5I2bwqJ_NzbWyF8grDbA_gEtX-VRS';
+        try {
+            SUPABASE_URL = localStorage.getItem('supabase_url') || SUPABASE_URL;
+            SUPABASE_KEY = localStorage.getItem('supabase_key') || SUPABASE_KEY;
+        } catch {}
 
-        let currentSessionToken = localStorage.getItem('subli_session_token') || sessionStorage.getItem('subli_session_token') || null;
-        let currentSessionUser = JSON.parse(localStorage.getItem('subli_session_user') || sessionStorage.getItem('subli_session_user') || 'null');
+        let supabase = null;
+        try {
+            if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.warn('Supabase init warning:', e);
+        }
+
+        let currentSessionToken = null;
+        let currentSessionUser = null;
+        try {
+            currentSessionToken = localStorage.getItem('subli_session_token') || sessionStorage.getItem('subli_session_token') || null;
+            currentSessionUser = safeJsonParse(localStorage.getItem('subli_session_user') || sessionStorage.getItem('subli_session_user'), null);
+        } catch {}
 
         let currentImageBase64 = null;
         let currentImageFile = null;
         let currentImageMime = 'image/jpeg';
-        let categories = JSON.parse(localStorage.getItem('subli_categories') || 'null') || DEFAULT_CATEGORIES;
-        let products = JSON.parse(localStorage.getItem('subli_products') || '[]');
+        let categories = DEFAULT_CATEGORIES;
+        let products = [];
+        try {
+            categories = safeJsonParse(localStorage.getItem('subli_categories'), DEFAULT_CATEGORIES);
+            products = safeJsonParse(localStorage.getItem('subli_products'), []);
+        } catch {}
 
         const DEFAULT_SITE_CONTENT = {
             showBanner: true,
@@ -638,7 +665,10 @@
             heroDesc: 'Corte láser en MDF, sublimación en alta definición, lonas publicitarias y diseño gráfico profesional. Cuidamos cada detalle para que tu evento, marca o detalle personal luzca impecable.'
         };
 
-        let siteContent = JSON.parse(localStorage.getItem('subli_site_content') || 'null') || DEFAULT_SITE_CONTENT;
+        let siteContent = DEFAULT_SITE_CONTENT;
+        try {
+            siteContent = safeJsonParse(localStorage.getItem('subli_site_content'), DEFAULT_SITE_CONTENT);
+        } catch {}
 
         function loadSiteContentInputs() {
             if (!document.getElementById('cmsBannerText')) return;
@@ -666,21 +696,21 @@
                 heroDesc: document.getElementById('cmsHeroDesc').value.trim()
             };
 
-            localStorage.setItem('subli_site_content', JSON.stringify(siteContent));
+            try { localStorage.setItem('subli_site_content', JSON.stringify(siteContent)); } catch {}
             alert('¡Textos y configuración de la web guardados correctamente! Puedes verlos reflejados en la web pública.');
         }
 
         // Initialize icons and render
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            checkAuthOnLoad();
-            loadSettings();
-            loadSiteContentInputs();
-            renderCategories();
-            renderProducts();
-            populateCategorySelect();
-            loadProductsFromSupabase();
-            loadCategoriesFromSupabase();
+            try { checkAuthOnLoad(); } catch (e) { console.warn(e); }
+            try { if (window.lucide) lucide.createIcons(); } catch (e) {}
+            try { loadSettings(); } catch (e) {}
+            try { loadSiteContentInputs(); } catch (e) {}
+            try { renderCategories(); } catch (e) {}
+            try { renderProducts(); } catch (e) {}
+            try { populateCategorySelect(); } catch (e) {}
+            try { loadProductsFromSupabase(); } catch (e) {}
+            try { loadCategoriesFromSupabase(); } catch (e) {}
         });
 
         // Toggle password visibility
