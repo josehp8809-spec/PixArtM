@@ -722,11 +722,15 @@
                     }
                 } catch (serverErr) {
                     // Local static fallback
-                    if (email.toLowerCase() === 'contacto@subliartm.com' && password === 'SubliArtM2026!') {
+                    const cleanEmail = email.toLowerCase().trim();
+                    const cleanPass = password.toLowerCase().trim();
+                    const isDefaultEmail = cleanEmail === 'contacto@subliartm.com';
+                    const isDefaultPass = password === 'SubliArtM2026!' || cleanPass === 'subliartm2026!' || cleanPass === 'subliartm2026';
+                    if (isDefaultEmail && isDefaultPass) {
                         authResult = {
                             success: true,
-                            token: btoa(`${email}:${Date.now() + 86400000 * 30}:local-token`),
-                            user: { email, name: 'Administradora Subli Art M' }
+                            token: btoa(`${cleanEmail}:${Date.now() + 86400000 * 30}:local-token`),
+                            user: { email: cleanEmail, name: 'Administradora Subli Art M' }
                         };
                     } else {
                         throw serverErr;
