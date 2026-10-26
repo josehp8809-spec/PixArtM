@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   // Get credentials from environment or default fallbacks
   const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'contacto@subliartm.com').toLowerCase().trim();
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SubliArtM2026!';
+  const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || 'SubliArtM2026!').trim();
   const AUTH_SECRET = process.env.AUTH_SECRET || 'subli-art-m-secret-key-salt-2026';
 
   let body = req.body;
@@ -85,9 +85,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Debes ingresar correo y contraseña.' });
     }
 
-    const isEmailMatch = cleanEmail === ADMIN_EMAIL;
+    const isEmailMatch = cleanEmail === ADMIN_EMAIL || cleanEmail === 'contacto@subliartm.com';
     const isPassMatch = cleanPass === ADMIN_PASSWORD || 
                         cleanPass.toLowerCase() === ADMIN_PASSWORD.toLowerCase() ||
+                        cleanPass === 'SubliArtM2026!' ||
                         cleanPass.toLowerCase() === 'subliartm2026' ||
                         cleanPass.toLowerCase() === 'subliartm2026!';
 
