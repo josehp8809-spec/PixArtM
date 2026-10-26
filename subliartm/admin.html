@@ -80,7 +80,7 @@
                     </label>
                     <div class="relative">
                         <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
-                        <input type="email" id="inputAuthEmail" required placeholder="tu-correo@subliartm.com" 
+                        <input type="email" id="inputAuthEmail" required value="contacto@subliartm.com" placeholder="tu-correo@subliartm.com" 
                                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal transition-all">
                     </div>
                 </div>
@@ -757,7 +757,11 @@
         }
 
         function unlockAdminUI() {
-            document.getElementById('authOverlay').classList.add('hidden');
+            const overlay = document.getElementById('authOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.style.setProperty('display', 'none', 'important');
+            }
             document.getElementById('userHeaderBadge').classList.remove('hidden');
             document.getElementById('userEmailDisplay').textContent = currentSessionUser?.email || 'admin';
             lucide.createIcons();
@@ -771,7 +775,11 @@
                 sessionStorage.removeItem('subli_session_user');
                 currentSessionToken = null;
                 currentSessionUser = null;
-                document.getElementById('authOverlay').classList.remove('hidden');
+                const overlay = document.getElementById('authOverlay');
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                    overlay.style.display = 'flex';
+                }
                 document.getElementById('userHeaderBadge').classList.add('hidden');
                 document.getElementById('inputAuthPassword').value = '';
                 lucide.createIcons();
@@ -782,7 +790,11 @@
             if (currentSessionToken && currentSessionUser) {
                 unlockAdminUI();
             } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
+                const overlay = document.getElementById('authOverlay');
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                    overlay.style.display = 'flex';
+                }
             }
         }
 

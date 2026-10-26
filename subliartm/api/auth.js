@@ -28,7 +28,18 @@ export default async function handler(req, res) {
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SubliArtM2026!';
   const AUTH_SECRET = process.env.AUTH_SECRET || 'subli-art-m-secret-key-salt-2026';
 
-  const { action = 'login', email, password, token } = req.body || {};
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      body = {};
+    }
+  } else if (!body) {
+    body = {};
+  }
+
+  const { action = 'login', email, password, token } = body;
 
   // Helper to generate a verifiable signed token
   function generateSessionToken(userEmail) {
