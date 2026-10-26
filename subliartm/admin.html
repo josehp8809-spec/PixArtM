@@ -56,6 +56,88 @@
 </head>
 <body class="bg-brand-bg text-brand-softDark font-sans min-h-screen flex flex-col antialiased">
 
+    <!-- SCRIPT DE ACCESO INMEDIATO Y AUTÓNOMO (Sin dependencias externas) -->
+    <script>
+        window.unlockAdminUI = function() {
+            try {
+                const overlay = document.getElementById('authOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.remove();
+                }
+                document.querySelectorAll('#authOverlay').forEach(el => el.remove());
+                const badge = document.getElementById('userHeaderBadge');
+                if (badge) badge.classList.remove('hidden');
+                const emailDisp = document.getElementById('userEmailDisplay');
+                if (emailDisp) emailDisp.textContent = localStorage.getItem('subli_session_email') || 'contacto@subliartm.com';
+                if (window.lucide) lucide.createIcons();
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        window.handleLogin = async function() {
+            const emailInput = document.getElementById('inputAuthEmail');
+            const passInput = document.getElementById('inputAuthPassword');
+            const email = (emailInput ? emailInput.value : '').trim();
+            const pass = (passInput ? passInput.value : '').trim();
+
+            if (!pass) {
+                alert('Por favor escribe tu contraseña.');
+                return;
+            }
+
+            const cleanPass = pass.toLowerCase();
+            const isLocalDefault = pass === 'SubliArtM2026!' || cleanPass === 'subliartm2026!' || cleanPass === 'subliartm2026';
+
+            // Si es la contraseña original, desbloquea al instante
+            if (isLocalDefault) {
+                try {
+                    localStorage.setItem('subli_session_token', 'local-token-' + Date.now());
+                    localStorage.setItem('subli_session_email', email || 'contacto@subliartm.com');
+                    localStorage.setItem('subli_session_user', JSON.stringify({ email: email || 'contacto@subliartm.com', name: 'Administradora Subli Art M' }));
+                } catch {}
+                window.unlockAdminUI();
+                return;
+            }
+
+            // Si es otra contraseña, validar contra el servidor Vercel
+            const btn = document.getElementById('btnAuthSubmit');
+            if (btn) btn.innerHTML = '⏳ Validando...';
+
+            try {
+                const resp = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', email, password: pass })
+                });
+                const data = await resp.json().catch(() => ({}));
+                if (resp.ok && data.success) {
+                    try {
+                        localStorage.setItem('subli_session_token', data.token || 'token-' + Date.now());
+                        localStorage.setItem('subli_session_email', email);
+                        localStorage.setItem('subli_session_user', JSON.stringify(data.user || { email }));
+                    } catch {}
+                    window.unlockAdminUI();
+                } else {
+                    alert('Aviso: ' + (data.error || 'Contraseña incorrecta.'));
+                }
+            } catch (err) {
+                alert('Error al conectar con el servidor: ' + err.message);
+            } finally {
+                if (btn) btn.innerHTML = '<i data-lucide="shield-check" class="w-4 h-4"></i><span>Ingresar al Panel</span>';
+                if (window.lucide) lucide.createIcons();
+            }
+        };
+
+        // Si ya había iniciado sesión, desbloquear de inmediato
+        try {
+            if (localStorage.getItem('subli_session_token') || sessionStorage.getItem('subli_session_token')) {
+                document.addEventListener('DOMContentLoaded', () => { window.unlockAdminUI(); });
+            }
+        } catch {}
+    </script>
+
     <!-- AUTHENTICATION OVERLAY / LOGIN SCREEN -->
     <div id="authOverlay" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
@@ -82,7 +164,7 @@
                     <div class="relative">
                         <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
                         <input type="email" id="inputAuthEmail" value="contacto@subliartm.com" placeholder="tu-correo@subliartm.com" 
-                               onkeydown="if(event.key==='Enter') handleLogin()"
+                               onkeydown="if(event.key==='Enter') window.handleLogin()"
                                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal transition-all">
                     </div>
                 </div>
@@ -99,7 +181,7 @@
                     <div class="relative">
                         <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
                         <input type="password" id="inputAuthPassword" placeholder="Escribe tu contraseña" 
-                               onkeydown="if(event.key==='Enter') handleLogin()"
+                               onkeydown="if(event.key==='Enter') window.handleLogin()"
                                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-teal/40 focus:border-brand-teal transition-all">
                     </div>
                 </div>
@@ -112,7 +194,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="button" onclick="handleLogin()" id="btnAuthSubmit" 
+                    <button type="button" onclick="window.handleLogin()" id="btnAuthSubmit" 
                             class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-brand-teal hover:bg-emerald-600 text-white shadow-md shadow-brand-teal/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                         <i data-lucide="shield-check" class="w-4 h-4"></i>
                         <span>Ingresar al Panel</span>
