@@ -684,6 +684,10 @@
           <button onclick="filterGallery('todos')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-teal text-white shadow-sm" data-filter="todos">
             Todos (<span id="count-todos">0</span>)
           </button>
+          <button onclick="filterGallery('novedades')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent text-rose-700 hover:text-rose-800 border border-rose-300 shadow-2xs flex items-center gap-1.5" data-filter="novedades">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+            🔥 ¡Novedades! (<span id="count-novedades">0</span>)
+          </button>
           <button onclick="filterGallery('Corte Láser MDF & Acrílico')" class="gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs" data-filter="Corte Láser MDF & Acrílico">
             Corte Láser MDF
           </button>
@@ -1105,6 +1109,13 @@
                 <span class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
                   Edición Temporada
                 </span>
+                <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-10">
+                  ${(prod.isNew || prod.is_new) ? `
+                    <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white font-black text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                      🔥 ¡Nuevo!
+                    </span>
+                  ` : ''}
+                </div>
                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold pointer-events-none">
                   <i data-lucide="zoom-in" class="w-5 h-5"></i>
                   <span>Toca para Zoom</span>
@@ -1368,16 +1379,27 @@
             <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
               <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between">
                 <div>
-                  <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
+                  <div class="h-64 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100 cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en grande y hacer zoom">
                     <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[11px] font-bold text-brand-dark px-3 py-1 rounded-full border border-slate-200 shadow-sm">
                       ${prod.category}
                     </span>
+                    <div class="absolute top-4 right-4 flex flex-col items-end gap-1.5 z-10">
+                      ${(prod.isNew || prod.is_new) ? `
+                        <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                          🔥 ¡Nuevo!
+                        </span>
+                      ` : ''}
+                    </div>
                     ${prod.price ? `
                       <span class="absolute bottom-4 right-4 bg-black/75 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl">
                         ${prod.price}
                       </span>
                     ` : ''}
+                    <div class="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1 text-xs font-bold">
+                      <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                      <span>Ver en grande</span>
+                    </div>
                   </div>
                   <div class="p-6">
                     <h4 class="text-base font-heading font-black text-slate-900 mb-2 line-clamp-1">${prod.title}</h4>
@@ -1419,6 +1441,7 @@
                 price: p.price_range,
                 description: p.description,
                 isSeasonal: p.is_seasonal,
+                isNew: p.is_new !== false,
                 inCarousel: p.in_carousel,
                 image: p.image_url
               }));
@@ -1450,6 +1473,10 @@
         renderGalleryGrid(products);
         updateCarousel();
         updateSeasonalCarousel();
+        const countEl = document.getElementById('count-todos');
+        if (countEl) countEl.textContent = products.length;
+        const countNovedadesEl = document.getElementById('count-novedades');
+        if (countNovedadesEl) countNovedadesEl.textContent = products.filter(p => p.isNew || p.is_new).length;
       }
 
       lucide.createIcons();
@@ -1469,6 +1496,13 @@
                   <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[11px] font-bold text-brand-dark px-3 py-1 rounded-full border border-slate-200 shadow-sm">
                     ${prod.category}
                   </span>
+                  <div class="absolute top-4 right-4 flex flex-col items-end gap-1.5 z-10">
+                    ${(prod.isNew || prod.is_new) ? `
+                      <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                        🔥 ¡Nuevo!
+                      </span>
+                    ` : ''}
+                  </div>
                   ${prod.price ? `
                     <span class="absolute bottom-4 right-4 bg-black/75 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl">
                       ${prod.price}
@@ -1512,6 +1546,10 @@
       renderGalleryGrid(products);
       const countEl = document.getElementById('count-todos');
       if (countEl) countEl.textContent = products.length;
+      const countNovedadesEl = document.getElementById('count-novedades');
+      if (countNovedadesEl) {
+        countNovedadesEl.textContent = products.filter(p => p.isNew || p.is_new).length;
+      }
     }
 
     let allGalleryProducts = [];
@@ -1529,11 +1567,18 @@
               <span class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md text-[10px] font-bold text-slate-800 px-2.5 py-0.5 rounded-full shadow-xs">
                 ${prod.category}
               </span>
-              ${prod.isSeasonal ? `
-                <span class="absolute top-2.5 right-2.5 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs">
-                  Temporada
-                </span>
-              ` : ''}
+              <div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1 z-10">
+                ${(prod.isNew || prod.is_new) ? `
+                  <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                    🔥 ¡Nuevo!
+                  </span>
+                ` : ''}
+                ${prod.isSeasonal ? `
+                  <span class="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                    Temporada
+                  </span>
+                ` : ''}
+              </div>
               <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-bold">
                 <i data-lucide="zoom-in" class="w-5 h-5"></i>
                 <span>Ver y hacer zoom</span>
@@ -1562,15 +1607,28 @@
 
       // Update button styles
       document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
-        if (btn.getAttribute('data-filter') === category) {
-          btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-teal text-white shadow-sm";
+        const filterVal = btn.getAttribute('data-filter');
+        if (filterVal === category) {
+          if (category === 'novedades') {
+            btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md flex items-center gap-1.5";
+          } else {
+            btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-brand-teal text-white shadow-sm flex items-center gap-1.5";
+          }
         } else {
-          btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs";
+          if (filterVal === 'novedades') {
+            btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent text-rose-700 hover:text-rose-800 border border-rose-300 shadow-2xs flex items-center gap-1.5";
+          } else if (filterVal === 'temporada') {
+            btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-amber-700 hover:text-amber-800 border border-amber-200 shadow-2xs flex items-center gap-1.5";
+          } else {
+            btn.className = "gallery-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition-all bg-white text-slate-600 hover:text-brand-dark border border-slate-200 shadow-2xs flex items-center gap-1.5";
+          }
         }
       });
 
       if (category === 'todos') {
         renderGalleryGrid(allGalleryProducts);
+      } else if (category === 'novedades') {
+        renderGalleryGrid(allGalleryProducts.filter(p => p.isNew || p.is_new));
       } else if (category === 'temporada') {
         renderGalleryGrid(allGalleryProducts.filter(p => p.isSeasonal));
       } else {

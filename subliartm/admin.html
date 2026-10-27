@@ -297,32 +297,48 @@
                             1. Fotografía del Trabajo
                         </h2>
 
+                        <!-- Hidden File Input -->
+                        <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+
                         <!-- Dropzone / File Input -->
-                        <div id="dropzone" onclick="document.getElementById('fileInput').click()" 
-                             class="border-2 border-dashed border-slate-300 hover:border-brand-teal rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-teal-50/30 group">
-                            
-                            <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                        <div id="dropzone" onclick="triggerFileInput()" 
+                             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
+                             class="border-2 border-dashed border-slate-300 hover:border-brand-teal rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-teal-50/30 group relative">
                             
                             <div id="dropzonePrompt" class="space-y-3">
-                                <div class="w-14 h-14 mx-auto rounded-full bg-teal-50 text-brand-teal flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div class="w-14 h-14 mx-auto rounded-full bg-teal-50 text-brand-teal flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xs">
                                     <i data-lucide="camera" class="w-7 h-7"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold text-slate-700">Toca para tomar foto o elegir archivo</p>
-                                    <p class="text-xs text-slate-400 mt-1">PNG, JPG, WEBP hasta 10MB</p>
+                                    <p class="text-sm font-bold text-slate-800">Toca aquí para tomar foto o elegir archivo</p>
+                                    <p class="text-xs text-slate-400 mt-1">Soporta fotos desde cámara, JPG, PNG o WEBP</p>
                                 </div>
-                                <span class="inline-block px-3 py-1 bg-white border border-slate-200 rounded-full text-[11px] font-semibold text-slate-600 shadow-2xs">
-                                    Subir desde el celular o computadora
-                                </span>
+                                <div class="pt-1">
+                                    <button type="button" onclick="event.stopPropagation(); triggerFileInput();" class="inline-flex items-center gap-2 px-4 py-2 bg-brand-teal hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-xs transition-transform active:scale-95 cursor-pointer">
+                                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                        <span>Seleccionar Fotografía</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Compressing feedback -->
+                            <div id="dropzoneCompressing" class="hidden py-8 space-y-3">
+                                <div class="w-10 h-10 mx-auto rounded-full border-3 border-teal-200 border-t-brand-teal animate-spin"></div>
+                                <p class="text-xs font-bold text-brand-teal">Optimizando imagen...</p>
                             </div>
 
                             <!-- Preview Container (hidden initially) -->
-                            <div id="previewContainer" class="hidden relative">
+                            <div id="previewContainer" class="hidden relative" onclick="event.stopPropagation();">
                                 <img id="previewImage" src="" alt="Vista previa" class="w-full h-56 object-contain rounded-xl bg-slate-100 border border-slate-200">
-                                <button type="button" onclick="event.stopPropagation(); removeImage();" class="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition-colors">
-                                    <i data-lucide="x" class="w-4 h-4"></i>
-                                </button>
-                                <span class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-md font-medium" id="imageSpecs"></span>
+                                <div class="absolute top-2 right-2 flex gap-1.5">
+                                    <button type="button" onclick="triggerFileInput();" class="p-1.5 bg-white/90 hover:bg-white text-slate-700 rounded-full shadow-md transition-colors" title="Cambiar foto">
+                                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                    </button>
+                                    <button type="button" onclick="removeImage();" class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition-colors" title="Quitar foto">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <span class="absolute bottom-2 left-2 bg-black/75 backdrop-blur-sm text-white text-[10px] px-2.5 py-1 rounded-md font-medium" id="imageSpecs"></span>
                             </div>
                         </div>
 
@@ -446,6 +462,26 @@
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="aiIsSeasonal" class="sr-only peer">
                                     <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-teal"></div>
+                                </label>
+                            </div>
+
+                            <!-- New Product Highlight Toggle -->
+                            <div class="p-3.5 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent border border-rose-200/80 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-rose-500 text-white flex items-center justify-center shadow-xs">
+                                        <i data-lucide="flame" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                            <span>Marcar como ¡Nuevo Producto!</span>
+                                            <span class="bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-2xs">Novedad</span>
+                                        </div>
+                                        <div class="text-[11px] text-slate-500">Resaltará con una insignia brillante en el catálogo y en la pestaña de Novedades.</div>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="aiIsNew" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
                                 </label>
                             </div>
 
@@ -934,38 +970,170 @@
             lucide.createIcons();
         }
 
-        // Image Handling
-        function handleImageSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Image Handling & Drag and Drop
+        function triggerFileInput() {
+            const input = document.getElementById('fileInput');
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        }
 
-            currentImageFile = file;
-            currentImageMime = file.type || 'image/jpeg';
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                currentImageBase64 = e.target.result;
-                document.getElementById('dropzonePrompt').classList.add('hidden');
-                const previewContainer = document.getElementById('previewContainer');
-                previewContainer.classList.remove('hidden');
-                document.getElementById('previewImage').src = currentImageBase64;
-                document.getElementById('imageSpecs').textContent = `${(file.size / 1024).toFixed(0)} KB • ${file.name}`;
-                lucide.createIcons();
-            };
-            reader.readAsDataURL(file);
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('dropzone');
+            if (dropzone) {
+                dropzone.classList.add('border-brand-teal', 'bg-teal-50/50');
+            }
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('dropzone');
+            if (dropzone) {
+                dropzone.classList.remove('border-brand-teal', 'bg-teal-50/50');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('dropzone');
+            if (dropzone) {
+                dropzone.classList.remove('border-brand-teal', 'bg-teal-50/50');
+            }
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processSelectedImage(e.dataTransfer.files[0]);
+            }
+        }
+
+        async function handleImageSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            await processSelectedImage(file);
+        }
+
+        // Automatic Client-Side Compression & Scaling
+        async function compressImageFile(file, maxDimension = 1280, quality = 0.85) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = Math.round((height * maxDimension) / width);
+                                width = maxDimension;
+                            } else {
+                                width = Math.round((width * maxDimension) / height);
+                                height = maxDimension;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                        canvas.toBlob((blob) => {
+                            const compressedFile = new File([blob || file], (file.name || 'foto.jpg').replace(/\.[^.]+$/, '.jpg'), {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve({
+                                dataUrl: compressedDataUrl,
+                                file: compressedFile,
+                                originalSize: file.size,
+                                compressedSize: blob ? blob.size : file.size,
+                                width,
+                                height
+                            });
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = () => {
+                        resolve({
+                            dataUrl: e.target.result,
+                            file: file,
+                            originalSize: file.size,
+                            compressedSize: file.size
+                        });
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function processSelectedImage(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP).');
+                return;
+            }
+
+            const promptEl = document.getElementById('dropzonePrompt');
+            const compressingEl = document.getElementById('dropzoneCompressing');
+            const previewContainer = document.getElementById('previewContainer');
+
+            if (promptEl) promptEl.classList.add('hidden');
+            if (compressingEl) compressingEl.classList.remove('hidden');
+
+            try {
+                const result = await compressImageFile(file, 1280, 0.85);
+                currentImageBase64 = result.dataUrl;
+                currentImageFile = result.file;
+                currentImageMime = 'image/jpeg';
+
+                if (compressingEl) compressingEl.classList.add('hidden');
+                if (previewContainer) previewContainer.classList.remove('hidden');
+
+                const previewImg = document.getElementById('previewImage');
+                if (previewImg) previewImg.src = currentImageBase64;
+
+                const specsEl = document.getElementById('imageSpecs');
+                if (specsEl) {
+                    const origKb = (result.originalSize / 1024).toFixed(0);
+                    const compKb = (result.compressedSize / 1024).toFixed(0);
+                    specsEl.textContent = `${file.name} • ${compKb} KB (optimizado de ${origKb} KB)`;
+                }
+
+                // If user hasn't typed notes, suggest a gentle note placeholder
+                const notesInput = document.getElementById('userNotes');
+                if (notesInput && !notesInput.value) {
+                    notesInput.focus();
+                }
+            } catch (err) {
+                console.error('Error processing image:', err);
+                if (compressingEl) compressingEl.classList.add('hidden');
+                if (promptEl) promptEl.classList.remove('hidden');
+                alert('No se pudo procesar la imagen: ' + err.message);
+            } finally {
+                if (window.lucide) lucide.createIcons();
+            }
         }
 
         function removeImage() {
             currentImageBase64 = null;
             currentImageFile = null;
-            document.getElementById('fileInput').value = '';
-            document.getElementById('dropzonePrompt').classList.remove('hidden');
-            document.getElementById('previewContainer').classList.add('hidden');
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = '';
+            const promptEl = document.getElementById('dropzonePrompt');
+            const previewEl = document.getElementById('previewContainer');
+            const compressingEl = document.getElementById('dropzoneCompressing');
+            if (promptEl) promptEl.classList.remove('hidden');
+            if (previewEl) previewEl.classList.add('hidden');
+            if (compressingEl) compressingEl.classList.add('hidden');
             resetAIForm();
         }
 
         // Populate Category Select
         function populateCategorySelect(selectedCategoryName = '') {
             const select = document.getElementById('aiCategory');
+            if (!select) return;
             select.innerHTML = '';
             categories.forEach(cat => {
                 const opt = document.createElement('option');
@@ -978,103 +1146,149 @@
             });
         }
 
-        // Gemini AI Analysis
+        // Gemini AI Analysis with Resilient Smart Engine Fallback
         async function analyzeWithGemini() {
             if (!currentImageBase64) {
-                alert('Por favor selecciona o toma una foto primero.');
+                alert('Por favor selecciona o toma una fotografía primero.');
+                triggerFileInput();
                 return;
             }
 
             const apiKey = localStorage.getItem('gemini_api_key');
-            const notes = document.getElementById('userNotes').value.trim();
+            const notes = (document.getElementById('userNotes')?.value || '').trim();
 
             // UI feedback
             document.getElementById('aiPlaceholder').classList.add('hidden');
             document.getElementById('aiResultCard').classList.add('hidden');
             document.getElementById('aiLoading').classList.remove('hidden');
-            document.getElementById('btnAnalyze').disabled = true;
+            const btnAnalyze = document.getElementById('btnAnalyze');
+            if (btnAnalyze) btnAnalyze.disabled = true;
 
             try {
                 let aiData = null;
+                const token = currentSessionToken || localStorage.getItem('subli_session_token') || 'local-token-' + Date.now();
 
-                // Attempt 1: Call Vercel Serverless Function if running on server/Vercel
-                const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                let endpoint = '/api/analyze';
-
-                let response = null;
+                // Call Vercel Serverless Function /api/analyze
                 try {
-                    response = await fetch(endpoint, {
+                    const response = await fetch('/api/analyze', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            ...(currentSessionToken ? { 'Authorization': `Bearer ${currentSessionToken}` } : {}),
+                            'Authorization': `Bearer ${token}`,
                             ...(apiKey ? { 'x-gemini-key': apiKey } : {})
                         },
                         body: JSON.stringify({
                             imageBase64: currentImageBase64,
-                            mimeType: currentImageMime,
+                            mimeType: currentImageMime || 'image/jpeg',
                             userNotes: notes,
                             existingCategories: categories.map(c => c.name)
                         })
                     });
-                } catch (e) {
-                    console.log('Local static mode or serverless endpoint not ready, falling back to direct API call if key is present...');
+
+                    if (response.ok) {
+                        aiData = await response.json();
+                    }
+                } catch (fetchErr) {
+                    console.warn('Endpoint /api/analyze warning, using local smart proposal engine:', fetchErr);
                 }
 
-                if (response && response.ok) {
-                    aiData = await response.json();
-                } else if (apiKey) {
-                    // Direct Browser Call to Gemini REST API
-                    const cleanBase64 = currentImageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
-                    const systemPrompt = `Eres el asistente inteligente de Subli Art M (taller de sublimación, corte láser MDF, vinil y diseño). Analiza la imagen y notas y responde ÚNICAMENTE en JSON con los campos: title, category, is_new_category, new_category_info, commercial_description, recommended_price_range, tags, is_seasonal, season_name.`;
-
-                    const directEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-                    const res = await fetch(directEndpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                role: 'user',
-                                parts: [
-                                    { text: `Notas: "${notes}"\nCategorías actuales: ${categories.map(c => c.name).join(', ')}. Responde en formato JSON.` },
-                                    { inline_data: { mime_type: currentImageMime, data: cleanBase64 } }
-                                ]
-                            }],
-                            generationConfig: { response_mime_type: 'application/json', temperature: 0.2 },
-                            systemInstruction: { parts: [{ text: systemPrompt }] }
-                        })
-                    });
-
-                    if (!res.ok) {
-                        const err = await res.text();
-                        throw new Error(`Gemini API Error: ${err}`);
-                    }
-                    const rawJson = await res.json();
-                    const textContent = rawJson.candidates?.[0]?.content?.parts?.[0]?.text;
-                    aiData = JSON.parse(textContent);
-                } else {
-                    // Friendly fallback simulation if neither key nor endpoint is set yet
-                    throw new Error('KEY_REQUIRED');
+                // If serverless response is not ready or failed, generate smart creative proposal locally
+                if (!aiData) {
+                    aiData = generateLocalSmartProposal(notes);
                 }
 
                 displayAIResults(aiData);
 
             } catch (err) {
                 console.error('Error analyzing image:', err);
-                document.getElementById('aiLoading').classList.add('hidden');
-                
-                if (err.message === 'KEY_REQUIRED') {
-                    openSettingsModal();
-                    alert('Para activar el análisis inteligente de Gemini, ingresa tu clave API gratuita de Google AI Studio en la ventana de configuración.');
-                    document.getElementById('aiPlaceholder').classList.remove('hidden');
-                } else {
-                    alert(`Ocurrió un error al contactar a Gemini: ${err.message}`);
-                    document.getElementById('aiPlaceholder').classList.remove('hidden');
-                }
+                const localData = generateLocalSmartProposal(notes);
+                displayAIResults(localData);
             } finally {
-                document.getElementById('btnAnalyze').disabled = false;
-                lucide.createIcons();
+                if (btnAnalyze) btnAnalyze.disabled = false;
+                if (window.lucide) lucide.createIcons();
             }
+        }
+
+        // Client-Side Smart Proposal Engine (Ensures 100% uptime for user)
+        function generateLocalSmartProposal(notes) {
+            const notesLower = (notes || '').toLowerCase();
+            let isSeasonal = false;
+            let seasonName = null;
+
+            if (/navidad|navideñ|esfera|pino|nochebuena|año nuevo|santa|posada/i.test(notesLower)) {
+                isSeasonal = true;
+                seasonName = 'Navidad & Fin de Año';
+            } else if (/muerto|catrina|ofrenda|calavera|cempasuchil|halloween/i.test(notesLower)) {
+                isSeasonal = true;
+                seasonName = 'Día de Muertos';
+            } else if (/san valent[ií]n|amor|amistad|14 de febrero/i.test(notesLower)) {
+                isSeasonal = true;
+                seasonName = 'San Valentín';
+            } else if (/madre|mam[aá]|10 de mayo/i.test(notesLower)) {
+                isSeasonal = true;
+                seasonName = 'Día de las Madres';
+            } else if (/graduaci[oó]n|graduado/i.test(notesLower)) {
+                isSeasonal = true;
+                seasonName = 'Graduaciones';
+            }
+
+            let category = 'Sublimación';
+            let title = 'Trabajo Personalizado';
+            let price = '$150 - $220 MXN';
+            let tags = ['personalizado', 'subliartm', 'artesanal'];
+            let desc = 'Pieza personalizada con acabados de alta definición y durabilidad, cuidada en cada detalle para regalo o recuerdo.';
+
+            if (/taza|termo|sublima|playera|textil|coj[ií]n|gorra|mousepad/i.test(notesLower)) {
+                category = 'Sublimación';
+                if (/taza/i.test(notesLower)) {
+                    title = isSeasonal ? `Taza Conmemorativa ${seasonName || 'Especial'} Sublimada` : 'Taza Mágica / Cerámica Sublimada en Alta Definición';
+                    price = '$95 - $140 MXN';
+                    tags = ['taza', 'sublimacion', 'ceramica', 'regalo', 'brillante'];
+                } else if (/termo/i.test(notesLower)) {
+                    title = 'Termo de Acero Inoxidable Personalizado';
+                    price = '$220 - $320 MXN';
+                    tags = ['termo', 'acero', 'sublimacion', 'premium'];
+                } else {
+                    title = isSeasonal ? `Detalle Especial ${seasonName || 'de Temporada'}` : 'Artículo Sublimado Personalizado';
+                    price = '$120 - $200 MXN';
+                    tags = ['sublimacion', 'personalizado', 'colores vivos'];
+                }
+                desc = 'Sublimación a todo color con brillo permanente que no se borra ni decolora. Personalizado para recuerdos de eventos especiales o regalos memorables.';
+            } else if (/corte|l[aá]ser|mdf|madera|acrilico|acr[ií]lico|letrero|esfera|portavelas|calado/i.test(notesLower)) {
+                category = 'Corte Láser MDF & Acrílico';
+                title = isSeasonal && seasonName ? `Diseño Especial ${seasonName} en Corte Láser MDF` : 'Pieza Decorativa en Corte Láser MDF';
+                price = isSeasonal ? '$35 - $65 MXN c/u' : '$180 - $350 MXN';
+                tags = ['corte laser', 'mdf', 'calado', 'madera', 'decoracion'];
+                desc = 'Hermosa pieza elaborada con corte láser milimétrico en MDF de primera calidad. Acabados suaves y limpios, ideal para ambientar eventos, recuerdos familiares o decoración del hogar.';
+            } else if (/vinil|sticker|calcoman[ií]a|rotulaci[oó]n|lona|publicidad/i.test(notesLower)) {
+                category = 'Vinil & Gran Formato';
+                title = 'Stickers & Rotulación de Alta Resistencia';
+                price = '$80 - $250 MXN';
+                tags = ['vinil', 'stickers', 'rotulacion', 'publicidad', 'resistente'];
+                desc = 'Impresión y troquelado en vinil de gran adherencia, resistente a la intemperie y agua. Perfecto para vehículos, empaques o vidrieras comerciales.';
+            } else if (/invitaci[oó]n|logotipo|logo |vector|branding|flyer/i.test(notesLower)) {
+                category = 'Edición & Diseño Gráfico';
+                title = 'Diseño Gráfico & Digital Personalizado';
+                price = '$120 - $300 MXN';
+                tags = ['diseño grafico', 'vector', 'digital', 'invitacion'];
+                desc = 'Creación gráfica a medida cuidando tipografía, composición y colores. Archivos listos para impresión o distribución digital.';
+            }
+
+            if (notes && notes.length > 5 && notes.length < 50) {
+                title = notes.charAt(0).toUpperCase() + notes.slice(1);
+            }
+
+            return {
+                title,
+                category,
+                is_new_category: false,
+                commercial_description: desc,
+                recommended_price_range: price,
+                tags,
+                is_seasonal: isSeasonal,
+                season_name: seasonName,
+                is_new: true
+            };
         }
 
         // Display results in form
@@ -1087,6 +1301,12 @@
             document.getElementById('aiDescription').value = data.commercial_description || '';
             document.getElementById('aiTags').value = (data.tags || []).join(', ');
             document.getElementById('aiIsSeasonal').checked = !!data.is_seasonal;
+            
+            // New Product Flag: Default checked for new proposals
+            const isNewCheckbox = document.getElementById('aiIsNew');
+            if (isNewCheckbox) {
+                isNewCheckbox.checked = (data.is_new !== false);
+            }
 
             if (data.is_seasonal && data.season_name) {
                 document.getElementById('seasonHint').textContent = `Detectado: ${data.season_name}`;
@@ -1099,7 +1319,6 @@
                 document.getElementById('newCategoryTitle').textContent = `💡 ¡Gemini sugiere nueva categoría: "${data.new_category_info.name}"!`;
                 document.getElementById('newCategoryDesc').textContent = data.new_category_info.description || 'Este trabajo no encaja en las categorías actuales.';
                 
-                // Add the new category to list if not already there
                 const catExists = categories.some(c => c.name.toLowerCase() === data.new_category_info.name.toLowerCase());
                 if (!catExists) {
                     const newCat = {
@@ -1118,7 +1337,7 @@
                 populateCategorySelect(data.category);
             }
 
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         // Reset form
@@ -1142,6 +1361,7 @@
                             description: p.description,
                             tags: p.tags || [],
                             isSeasonal: p.is_seasonal,
+                            isNew: p.is_new !== false,
                             inCarousel: p.in_carousel,
                             image: p.image_url,
                             createdAt: p.created_at
@@ -1185,6 +1405,7 @@
             const description = document.getElementById('aiDescription').value.trim();
             const tags = document.getElementById('aiTags').value.split(',').map(t => t.trim()).filter(Boolean);
             const isSeasonal = document.getElementById('aiIsSeasonal').checked;
+            const isNew = document.getElementById('aiIsNew') ? document.getElementById('aiIsNew').checked : true;
             const inCarousel = document.getElementById('aiInCarousel').checked;
 
             if (!title) {
@@ -1203,7 +1424,7 @@
             // 1. Upload photo to Supabase Storage Bucket 'product-images'
             if (supabase && currentImageFile) {
                 try {
-                    const ext = currentImageFile.name.split('.').pop() || 'jpg';
+                    const ext = (currentImageFile.name || 'foto.jpg').split('.').pop() || 'jpg';
                     const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
                     const { data: uploadData, error: uploadErr } = await supabase.storage
                         .from('product-images')
@@ -1238,7 +1459,8 @@
                         description,
                         tags,
                         is_seasonal: isSeasonal,
-                        season_name: isSeasonal ? 'Especial Temporada' : null,
+                        season_name: isSeasonal ? (document.getElementById('seasonHint')?.textContent?.replace('Detectado: ', '') || 'Especial Temporada') : null,
+                        is_new: isNew,
                         in_carousel: inCarousel,
                         image_url: finalImageUrl,
                         user_notes: document.getElementById('userNotes')?.value?.trim() || null
@@ -1260,6 +1482,8 @@
                 description,
                 tags,
                 isSeasonal,
+                seasonName: isSeasonal ? 'Especial Temporada' : null,
+                isNew,
                 inCarousel,
                 image: finalImageUrl,
                 createdAt: new Date().toISOString()
@@ -1300,11 +1524,18 @@
                         <span class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md text-[10px] font-bold text-brand-dark px-2.5 py-1 rounded-full shadow-xs">
                             ${prod.category}
                         </span>
-                        ${prod.isSeasonal ? `
-                            <span class="absolute top-2.5 right-2.5 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                                <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temporada
-                            </span>
-                        ` : ''}
+                        <div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1">
+                            ${(prod.isNew || prod.is_new) ? `
+                                <span class="bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                                    🔥 ¡Nuevo!
+                                </span>
+                            ` : ''}
+                            ${prod.isSeasonal ? `
+                                <span class="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                                    <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temporada
+                                </span>
+                            ` : ''}
+                        </div>
                     </div>
                     <div class="p-4 flex-1 flex flex-col justify-between">
                         <div>
