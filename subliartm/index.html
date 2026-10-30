@@ -738,6 +738,9 @@
               <button type="button" onclick="toggleFilterTag('vinil', '🏷️ Stickers/Lonas')" class="quick-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-700 transition-all shadow-2xs" data-tag="vinil">
                 🏷️ Stickers/Lonas
               </button>
+              <button type="button" onclick="toggleFilterTag('plaquita', '🐾 Plaquitas')" class="quick-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-500 text-slate-700 hover:text-emerald-700 transition-all shadow-2xs" data-tag="plaquita">
+                🐾 Plaquitas
+              </button>
               <button type="button" onclick="toggleFilterTag('muertos', '💀 Día de Muertos')" class="quick-chip px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-400 text-slate-700 hover:text-rose-600 transition-all shadow-2xs" data-tag="muertos">
                 💀 Día de Muertos
               </button>
@@ -1909,7 +1912,9 @@
         return;
       }
 
-      grid.innerHTML = items.map(prod => `
+      grid.innerHTML = items.map(prod => {
+        const isPetTag = /plaquit|mascot|perro|gato/i.test(`${prod.title} ${prod.category} ${(prod.tags || []).join(' ')}`);
+        return `
         <div class="card-clean rounded-2xl sm:rounded-3xl overflow-hidden group bg-white flex flex-col justify-between border border-slate-200/80 shadow-2xs hover:shadow-md transition-all">
           <div>
             <div class="relative h-44 sm:h-52 bg-slate-100 overflow-hidden cursor-pointer" onclick="openLightbox('${prod.id}')" title="Toca para ver en pantalla completa y hacer zoom">
@@ -1936,18 +1941,26 @@
             </div>
             <div class="p-3.5 sm:p-4">
               <h4 class="font-heading font-bold text-xs sm:text-sm text-slate-900 line-clamp-1 mb-1">${prod.title}</h4>
+              
+              ${isPetTag ? `
+                <div class="mb-2 p-2 rounded-xl bg-amber-50/90 border border-amber-200 text-[10px] sm:text-[11px] text-amber-900 leading-snug flex items-start gap-1.5">
+                  <span class="text-xs">🐾</span>
+                  <span><strong>¡+100 diseños disponibles!</strong> Al cotizar tu plaquita te enviamos el catálogo completo a tu WhatsApp.</span>
+                </div>
+              ` : ''}
+
               <p class="text-[11px] sm:text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">${prod.description}</p>
               ${prod.price ? `<span class="text-[11px] font-bold text-brand-teal block mb-2">${prod.price}</span>` : ''}
             </div>
           </div>
           <div class="px-3.5 pb-3.5 sm:px-4 sm:pb-4 pt-0">
-            <button onclick="quoteSpecificProduct('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-brand-teal hover:text-white text-slate-700 font-bold text-[11px] sm:text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
+            <button onclick="quoteSpecificProduct('${prod.title.replace(/'/g, "\\'")}')" class="w-full py-2 px-2.5 rounded-xl ${isPetTag ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-100 hover:bg-brand-teal hover:text-white text-slate-700'} font-bold text-[11px] sm:text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
               <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
-              <span>Cotizar por WhatsApp</span>
+              <span>${isPetTag ? 'Ver Catálogo en WhatsApp' : 'Cotizar por WhatsApp'}</span>
             </button>
           </div>
         </div>
-      `).join('');
+      `;}).join('');
 
       if (window.lucide) lucide.createIcons();
     }
@@ -1979,7 +1992,13 @@
     }
 
     function quoteSpecificProduct(title) {
-      const message = `¡Hola *Subli Art M*! 🎨✨\n\nVi este trabajo en su galería web y me gustaría cotizarlo:\n👉 *${title}*\n\n¿Me podrían dar precios y opciones de personalización, por favor?`;
+      const isPetTag = /plaquit|mascot|perro|gato/i.test(title);
+      let message = `¡Hola *Subli Art M*! 🎨✨\n\nVi este trabajo en su galería web y me gustaría cotizarlo:\n👉 *${title}*\n\n`;
+      if (isPetTag) {
+        message += `🐾 *Me interesa ver el catálogo completo de plaquitas con más de 100 diseños para perros y gatos*, ¿me lo podrían compartir por favor?`;
+      } else {
+        message += `¿Me podrían dar precios y opciones de personalización, por favor?`;
+      }
       const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }
@@ -2020,9 +2039,20 @@
       document.getElementById('lbImage').src = item.image;
       document.getElementById('lbTitle').textContent = item.title;
       document.getElementById('lbCategory').textContent = item.category;
-      document.getElementById('lbDesc').textContent = item.description || '';
+      
+      const isPetTag = /plaquit|mascot|perro|gato/i.test(`${item.title} ${item.category} ${(item.tags || []).join(' ')}`);
+      const petBanner = isPetTag ? ' 🐾 [¡Contamos con más de 100 diseños en catálogo! Al cotizar por WhatsApp te lo enviamos completo]' : '';
+      document.getElementById('lbDesc').textContent = (item.description || '') + petBanner;
+      
       document.getElementById('lbPrice').textContent = item.price || '';
       document.getElementById('lbCounter').textContent = `${currentLightboxIndex + 1} / ${currentLightboxList.length}`;
+
+      const btnWa = document.getElementById('lbWhatsAppBtn');
+      if (btnWa) {
+        btnWa.innerHTML = isPetTag 
+          ? `<i data-lucide="message-circle" class="w-4 h-4 fill-current"></i><span>Pedir Catálogo de Plaquitas por WhatsApp</span>`
+          : `<i data-lucide="message-circle" class="w-4 h-4 fill-current"></i><span>Cotizar este trabajo por WhatsApp</span>`;
+      }
 
       resetZoom();
     }
