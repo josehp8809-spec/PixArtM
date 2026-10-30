@@ -900,6 +900,31 @@
             </div>
           </div>
 
+          <!-- Teléfono / WhatsApp de contacto -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-heading font-bold text-slate-700 uppercase tracking-wider">Tu Nombre y Teléfono / WhatsApp</label>
+              <span class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5 fill-current"></i> Seguimiento directo
+              </span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" id="quote-name" placeholder="Tu nombre o empresa (opcional)"
+                     class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3.5 text-slate-800 text-sm focus:border-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal/20 placeholder:text-slate-400 shadow-sm">
+              <input type="tel" id="quote-phone" placeholder="Ej: 222 123 4567"
+                     class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3.5 text-slate-800 text-sm focus:border-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal/20 placeholder:text-slate-400 shadow-sm">
+            </div>
+          </div>
+
+          <!-- Nota de seguimiento por WhatsApp -->
+          <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-bold">Todo el seguimiento personalizado se realiza por WhatsApp</p>
+              <p class="text-emerald-700 mt-0.5">Ahí te compartiremos muestras de diseño previas, confirmación de materiales y cotización final antes de comenzar.</p>
+            </div>
+          </div>
+
           <!-- ¿Tiene diseño listo? -->
           <div>
             <label class="block text-xs font-heading font-bold text-slate-700 uppercase tracking-wider mb-2">¿Ya cuentas con tu diseño o archivo?</label>
@@ -926,10 +951,17 @@
                       class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:border-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal/20 placeholder:text-slate-400 shadow-sm"></textarea>
           </div>
 
-          <button type="submit" class="w-full brand-gradient text-white font-heading font-black text-base py-4 rounded-xl shadow-md hover:opacity-95 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5">
-            <i data-lucide="send" class="w-5 h-5 fill-current"></i>
-            <span>Enviar Cotización a WhatsApp</span>
-          </button>
+          <div class="space-y-3">
+            <button type="submit" class="w-full brand-gradient text-white font-heading font-black text-base py-4 rounded-xl shadow-md hover:opacity-95 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5">
+              <i data-lucide="message-circle" class="w-5 h-5 fill-current"></i>
+              <span>Enviar Cotización por WhatsApp</span>
+            </button>
+
+            <button type="button" onclick="sendEmailQuote()" class="w-full py-3 px-4 rounded-xl border border-slate-200 hover:border-brand-teal bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4 text-brand-teal"></i>
+              <span>¿Prefieres cotizar por correo? Escribir a contacto@subliartm.com</span>
+            </button>
+          </div>
           
           <p class="text-center text-xs text-slate-500">
             💬 Al hacer clic se abrirá tu WhatsApp con el mensaje estructurado para recibir respuesta rápida.
@@ -945,9 +977,10 @@
   <!-- FOOTER ELEGANTE -->
   <footer id="contacto" class="bg-slate-900 text-white border-t border-slate-800 py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
         
-        <div class="md:col-span-2">
+        <!-- Info Marca -->
+        <div class="md:col-span-5">
           <div class="flex items-center gap-3.5 mb-4">
             <div class="bg-white p-2 rounded-2xl shadow-sm">
               <img src="assets/logo.png" alt="Subli Art M Logo" class="h-10 w-auto object-contain">
@@ -960,11 +993,16 @@
             </div>
           </div>
           <p class="text-slate-400 text-sm max-w-sm leading-relaxed mt-4">
-            Taller creativo respaldado por diseño gráfico profesional. Cuidamos la estética, los materiales y la puntualidad en cada entrega.
+            Taller creativo respaldado por diseño gráfico profesional. Cuidamos la estética, los materiales y la puntualidad en cada entrega para que tu evento o negocio destaque.
           </p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Dominio oficial verificado: <strong class="text-slate-200">subliartm.com</strong></span>
+          </div>
         </div>
 
-        <div>
+        <!-- Navegación -->
+        <div class="md:col-span-3">
           <h4 class="font-heading font-bold text-white text-sm mb-4">Navegación</h4>
           <ul class="text-xs sm:text-sm text-slate-400 space-y-2.5">
             <li><a href="#temporada" class="hover:text-amber-300 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Especial de Temporada</a></li>
@@ -975,16 +1013,50 @@
           </ul>
         </div>
 
-        <div>
-          <h4 class="font-heading font-bold text-white text-sm mb-4">Atención Inmediata</h4>
-          <p class="text-xs sm:text-sm text-slate-400 mb-3">Escríbenos para pedidos o dudas:</p>
-          <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20quisiera%20pedir%20informes" 
-             id="footer-wa-link" 
-             target="_blank" 
-             class="inline-flex items-center gap-2 text-brand-cyan text-sm font-bold hover:underline bg-white/10 px-4 py-2.5 rounded-xl border border-white/15">
-            <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
-            <span>Chatear por WhatsApp (+52 221 587 3074)</span>
-          </a>
+        <!-- Canales Oficiales / Correos -->
+        <div class="md:col-span-4 space-y-4">
+          <h4 class="font-heading font-bold text-white text-sm">Canales de Contacto</h4>
+          
+          <div class="space-y-2.5 text-xs">
+            <!-- WhatsApp -->
+            <a href="https://wa.me/5212215873074?text=Hola%20Subli%20Art%20M,%20quisiera%20pedir%20informes" 
+               id="footer-wa-link" 
+               target="_blank" 
+               class="flex items-center gap-2.5 text-brand-cyan hover:underline bg-white/5 hover:bg-white/10 p-2.5 rounded-xl border border-white/10 transition-colors">
+              <i data-lucide="message-circle" class="w-4 h-4 fill-current shrink-0"></i>
+              <span><strong>WhatsApp directo:</strong> +52 221 587 3074</span>
+            </a>
+
+            <!-- Correo Cotizaciones & Pedidos -->
+            <a href="mailto:contacto@subliartm.com" 
+               class="flex items-center gap-2.5 text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 p-2.5 rounded-xl border border-white/10 transition-colors">
+              <i data-lucide="mail" class="w-4 h-4 text-brand-cyan shrink-0"></i>
+              <div>
+                <span class="block text-[11px] text-slate-400">Cotizaciones & Pedidos:</span>
+                <strong class="font-mono text-xs">contacto@subliartm.com</strong>
+              </div>
+            </a>
+
+            <!-- Correo Ventas -->
+            <a href="mailto:ventas@subliartm.com" 
+               class="flex items-center gap-2.5 text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 p-2.5 rounded-xl border border-white/10 transition-colors">
+              <i data-lucide="file-text" class="w-4 h-4 text-brand-cyan shrink-0"></i>
+              <div>
+                <span class="block text-[11px] text-slate-400">Ventas & Mayoreo:</span>
+                <strong class="font-mono text-xs">ventas@subliartm.com</strong>
+              </div>
+            </a>
+
+            <!-- Soporte Técnico Web -->
+            <a href="mailto:soporte@subliartm.com" 
+               class="flex items-center gap-2.5 text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 p-2.5 rounded-xl border border-white/10 transition-colors">
+              <i data-lucide="wrench" class="w-4 h-4 text-slate-400 shrink-0"></i>
+              <div>
+                <span class="block text-[11px] text-slate-400">Soporte Técnico de la Web:</span>
+                <span class="font-mono text-xs text-slate-300">soporte@subliartm.com</span>
+              </div>
+            </a>
+          </div>
         </div>
 
       </div>
@@ -1844,10 +1916,18 @@
       e.preventDefault();
       const service = document.getElementById('quote-service').value;
       const quantity = document.getElementById('quote-quantity').value;
+      const clientName = document.getElementById('quote-name')?.value.trim();
+      const clientPhone = document.getElementById('quote-phone')?.value.trim();
       const designStatus = document.querySelector('input[name="design_status"]:checked')?.value || 'No especificado';
       const notes = document.getElementById('quote-notes').value.trim();
 
       let message = `¡Hola *Subli Art M*! 🎨✨\n\n`;
+      if (clientName) {
+        message += `Mi nombre es: *${clientName}*\n`;
+      }
+      if (clientPhone) {
+        message += `Mi WhatsApp de contacto: *${clientPhone}*\n\n`;
+      }
       message += `Me interesa una cotización con los siguientes datos:\n`;
       message += `• *Servicio:* ${service}\n`;
       message += `• *Cantidad o medida:* ${quantity}\n`;
@@ -1860,6 +1940,29 @@
       const encoded = encodeURIComponent(message);
       const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encoded}`;
       window.open(url, '_blank');
+    }
+
+    function sendEmailQuote() {
+      const service = document.getElementById('quote-service')?.value || 'Cotización de Trabajo';
+      const quantity = document.getElementById('quote-quantity')?.value || '1 pieza';
+      const clientName = document.getElementById('quote-name')?.value.trim() || '';
+      const clientPhone = document.getElementById('quote-phone')?.value.trim() || '';
+      const designStatus = document.querySelector('input[name="design_status"]:checked')?.value || 'No especificado';
+      const notes = document.getElementById('quote-notes')?.value.trim() || '';
+
+      const subject = encodeURIComponent(`Solicitud de Cotización: ${service} - Subli Art M`);
+      let body = `Hola Subli Art M,\n\n`;
+      if (clientName) body += `Nombre: ${clientName}\n`;
+      if (clientPhone) body += `WhatsApp de seguimiento: ${clientPhone}\n\n`;
+      body += `Datos del proyecto:\n`;
+      body += `- Servicio: ${service}\n`;
+      body += `- Cantidad/Medida estimada: ${quantity}\n`;
+      body += `- Estatus del diseño: ${designStatus}\n`;
+      if (notes) body += `- Detalles: ${notes}\n`;
+      body += `\nFavor de enviarme presupuesto y opciones. Gracias.`;
+
+      const mailtoUrl = `mailto:contacto@subliartm.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
     }
   </script>
 
