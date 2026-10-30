@@ -128,8 +128,8 @@
         </a>
 
         <!-- Desktop Navigation Links -->
-        <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-600">
-          <a href="#temporada" class="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 bg-amber-50 border border-amber-200/80 px-3.5 py-1.5 rounded-full transition-all">
+        <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
+          <a href="#temporada" class="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 bg-amber-50 border border-amber-200/80 px-3 py-1.5 rounded-full transition-all">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
             <span>Temporada</span>
           </a>
@@ -139,6 +139,10 @@
             <span>Galería</span>
           </a>
           <a href="#servicios" class="hover:text-brand-teal transition-colors">Servicios</a>
+          <a href="#entregas" class="hover:text-brand-teal transition-colors flex items-center gap-1">
+            <i data-lucide="truck" class="w-3.5 h-3.5 text-amber-600"></i>
+            <span>Entregas</span>
+          </a>
           <a href="#cotizador" class="hover:text-brand-teal transition-colors">Cotizador</a>
           <a href="#contacto" class="hover:text-brand-teal transition-colors">Contacto</a>
         </nav>
@@ -177,6 +181,7 @@
       <a href="#carrusel" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Trabajos Destacados</a>
       <a href="#galeria" class="text-slate-800 hover:text-brand-teal font-bold py-2 flex items-center gap-2 border-b border-slate-100"><i data-lucide="grid" class="w-4 h-4 text-brand-teal"></i> Galería Completa (80+ Muestras)</a>
       <a href="#servicios" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Nuestros Servicios</a>
+      <a href="#entregas" class="text-slate-800 hover:text-brand-teal font-bold py-2 flex items-center gap-2 border-b border-slate-100"><i data-lucide="truck" class="w-4 h-4 text-amber-600"></i> Métodos de Entrega (Puebla & México)</a>
       <a href="#cotizador" class="block text-slate-700 hover:text-brand-teal font-medium py-2 border-b border-slate-100">Cotizador Express a WhatsApp</a>
       <a href="#contacto" class="block text-slate-700 hover:text-brand-teal font-medium py-2">Contacto Directo</a>
       <div class="pt-2">
@@ -225,11 +230,20 @@
             </a>
           </div>
 
-          <!-- Mini Pills de Confianza -->
+          <!-- Mini Pills de Confianza (Clicables) -->
           <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs text-slate-600">
-            <span class="flex items-center gap-1.5 bg-white border border-slate-200/80 px-3.5 py-2 rounded-xl shadow-sm"><i data-lucide="check-circle" class="w-4 h-4 text-brand-teal"></i> Desde 1 pieza o mayoreo</span>
-            <span class="flex items-center gap-1.5 bg-white border border-slate-200/80 px-3.5 py-2 rounded-xl shadow-sm"><i data-lucide="palette" class="w-4 h-4 text-purple-600"></i> Asesoría de Diseñadora</span>
-            <span class="flex items-center gap-1.5 bg-white border border-slate-200/80 px-3.5 py-2 rounded-xl shadow-sm"><i data-lucide="truck" class="w-4 h-4 text-amber-600"></i> Entregas puntuales</span>
+            <a href="#cotizador" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200/80 hover:border-brand-teal px-3.5 py-2 rounded-xl shadow-sm transition-all cursor-pointer">
+              <i data-lucide="check-circle" class="w-4 h-4 text-brand-teal"></i>
+              <span>Desde 1 pieza o mayoreo</span>
+            </a>
+            <a href="#servicios" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200/80 hover:border-purple-400 px-3.5 py-2 rounded-xl shadow-sm transition-all cursor-pointer">
+              <i data-lucide="palette" class="w-4 h-4 text-purple-600"></i>
+              <span>Asesoría de Diseñadora</span>
+            </a>
+            <a href="#entregas" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200/80 hover:border-amber-400 px-3.5 py-2 rounded-xl shadow-sm transition-all cursor-pointer group" title="Ver puntos de entrega en Puebla y envíos nacionales">
+              <i data-lucide="truck" class="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform"></i>
+              <span class="font-bold text-slate-800">Entregas Puebla & Envíos México →</span>
+            </a>
           </div>
 
         </div>
