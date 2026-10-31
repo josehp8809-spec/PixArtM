@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Casa Aes - Carnitas Estilo Quiroga | Menú y Pedidos</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aes: {
+                            bg: '#F6F3EC',        /* Cantera clara / fondo artesanal */
+                            card: '#FFFFFF',
+                            surface: '#EDE8DE',
+                            olive: '#4D5B31',     /* Verde oliva de Casa Aes */
+                            oliveDark: '#3A4524',
+                            oliveLight: '#EEF2E6',
+                            copper: '#B2542D',    /* Cobre tradicional del cazo */
+                            copperDark: '#934221',
+                            gold: '#C49A6C',      /* Oro suave / mariposa */
+                            charcoal: '#262523',  /* Texto elegante */
+                            muted: '#6E6B65',
+                            border: '#E2DCD2'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(77, 91, 49, 0.08)',
+                        'floating': '0 12px 35px rgba(38, 37, 35, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F6F3EC;
+            background-image: radial-gradient(#E2DCD2 0.75px, transparent 0.75px);
+            background-size: 20px 20px;
+        }
+        .text-shadow-sm {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #D3CBBE;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-aes-charcoal font-sans antialiased pb-28 select-none">
+
+    <!-- BARRA SUPERIOR DE CONTACTO Y UBICACIÓN -->
+    <div class="bg-aes-olive text-white text-xs px-3 py-1.5 flex items-center justify-between font-medium">
+        <div class="flex items-center gap-1.5 truncate">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-aes-gold shrink-0"></i>
+            <span class="truncate">Calle 107 C Pte 1502, Galaxia La Laguna</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <a href="tel:2225495223" class="hover:text-aes-gold flex items-center gap-1">
+                <i data-lucide="phone" class="w-3 h-3"></i>
+                <span class="hidden sm:inline">222 549 5223</span>
+            </a>
+            <span class="opacity-40">|</span>
+            <a href="https://instagram.com/Casa_Aes" target="_blank" class="hover:text-aes-gold flex items-center gap-1">
+                <i data-lucide="instagram" class="w-3 h-3"></i>
+                <span>Casa_Aes</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- HERO PRINCIPAL (Con foto del cazo tradicional) -->
+    <header class="relative bg-aes-charcoal text-white overflow-hidden shadow-md">
+        <div class="absolute inset-0 z-0">
+            <img src="assets/hero-cazo.jpg" alt="Cazo de Carnitas Tradicionales" class="w-full h-full object-cover object-center opacity-45 scale-105 transform hover:scale-100 transition duration-1000">
+            <div class="absolute inset-0 bg-gradient-to-t from-aes-charcoal via-aes-charcoal/70 to-transparent"></div>
+        </div>
+
+        <div class="relative z-10 px-4 pt-8 pb-7 max-w-md mx-auto text-center">
+            <!-- LOGO CASA AES CON MARIPOSA DECORATIVA -->
+            <div class="inline-flex flex-col items-center mb-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-[1px] bg-aes-gold/60"></span>
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-aes-gold"></i>
+                    <span class="w-8 h-[1px] bg-aes-gold/60"></span>
+                </div>
+                <h1 class="font-serif text-3xl sm:text-4xl tracking-widest text-white mt-1 font-bold">
+                    CASA AES
+                </h1>
+                <p class="text-[11px] tracking-[0.25em] text-aes-gold font-medium uppercase mt-0.5">
+                    Carnitas Estilo Quiroga
+                </p>
+            </div>
+
+            <p class="font-display italic text-amber-100/90 text-sm mt-1">
+                "Donde la tradición se reúne"
+            </p>
+
+            <!-- Slogan del Flyer -->
+            <div class="mt-3 inline-flex items-center gap-2 bg-aes-olive/80 backdrop-blur-sm border border-aes-gold/30 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider text-white">
+                <span>MOMENTOS QUE UNEN</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-aes-copper"></span>
+                <span>SABORES QUE PERMANECEN</span>
+            </div>
+
+            <!-- Horarios y Estado -->
+            <div class="mt-3 flex items-center justify-center gap-2 text-xs text-white/90">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 px-2.5 py-0.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Abierto para pedidos
+                </span>
+                <span class="text-white/60">•</span>
+                <span class="text-xs text-amber-200/80">Fines de semana y Diario</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGACIÓN DE PESTAÑAS (FIN DE SEMANA VS COMIDA DEL DÍA) -->
+    <div class="sticky top-0 z-30 bg-aes-bg/95 backdrop-blur-md border-b border-aes-border shadow-sm">
+        <div class="max-w-md mx-auto px-4 py-2.5">
+            <div class="grid grid-cols-2 gap-2 p-1 bg-aes-surface/80 rounded-xl border border-aes-border/80">
+                <button id="tab-fin-de-semana" onclick="switchTab('fin_de_semana')" 
+                    class="py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 bg-aes-olive text-white shadow">
+                    <i data-lucide="flame" class="w-4 h-4 text-aes-gold"></i>
+                    <span>Fin de Semana</span>
+                </button>
+                <button id="tab-comida-del-dia" onclick="switchTab('comida_del_dia')" 
+                    class="py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 text-aes-charcoal hover:bg-white/60">
+                    <i data-lucide="utensils-crossed" class="w-4 h-4 text-aes-copper"></i>
+                    <span>Comida del Día</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DEL MENÚ -->
+    <main class="max-w-md mx-auto px-4 mt-4">
+
+        <!-- AVISO DE FIN DE SEMANA / CALIDAD -->
+        <div id="banner-fin-semana" class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 p-3.5 rounded-2xl mb-4 shadow-sm flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-aes-copper/15 text-aes-copper flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="crown" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="font-serif font-bold text-sm text-aes-copperDark">Recién saliditas del cazo</h3>
+                <p class="text-xs text-aes-charcoal/80 mt-0.5">Carnitas doradas a fuego lento, tortillas calientes, salsas caseras y limones incluidos.</p>
+            </div>
+        </div>
+
+        <!-- AVISO DE COMIDA DEL DÍA (Oculto por defecto) -->
+        <div id="banner-comida-dia" class="hidden bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 p-3.5 rounded-2xl mb-4 shadow-sm flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-aes-olive/15 text-aes-olive flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="soup" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="font-serif font-bold text-sm text-aes-oliveDark">Menú Casero del Día</h3>
+                <p class="text-xs text-aes-charcoal/80 mt-0.5">Preparado fresco esta mañana. Incluye agua fresca o guarniciones según el platillo.</p>
+            </div>
+        </div>
+
+        <!-- LISTA DE PLATILLOS DINÁMICOS -->
+        <div id="dishes-container" class="space-y-3.5">
+            <!-- Cargado dinámicamente con JavaScript -->
+            <div class="animate-pulse space-y-3">
+                <div class="h-28 bg-aes-surface rounded-2xl"></div>
+                <div class="h-28 bg-aes-surface rounded-2xl"></div>
+                <div class="h-28 bg-aes-surface rounded-2xl"></div>
+            </div>
+        </div>
+
+        <!-- NOTA AL PIE SOBRE ENTREGA Y MÉTODOS -->
+        <div class="mt-8 bg-white border border-aes-border p-4 rounded-2xl text-center shadow-soft">
+            <div class="flex items-center justify-center gap-3 text-aes-olive text-xs font-semibold mb-2">
+                <span class="flex items-center gap-1"><i data-lucide="truck" class="w-4 h-4 text-aes-copper"></i> Reparto a convenir</span>
+                <span>•</span>
+                <span class="flex items-center gap-1"><i data-lucide="banknote" class="w-4 h-4 text-aes-olive"></i> Efectivo</span>
+                <span>•</span>
+                <span class="flex items-center gap-1"><i data-lucide="smartphone" class="w-4 h-4 text-aes-gold"></i> Transferencia</span>
+            </div>
+            <p class="text-[11px] text-aes-muted">
+                Tu pedido se envía directamente al WhatsApp de la dueña de Casa Aes para confirmación inmediata y despacho.
+            </p>
+        </div>
+    </main>
+
+    <!-- BARRA FLOTANTE DE CARRITO (STICKY BOTTOM) -->
+    <div id="floating-cart-bar" class="fixed bottom-3 inset-x-3 max-w-md mx-auto z-40 transition-all duration-300 transform translate-y-32">
+        <button onclick="openCartModal()" class="w-full bg-gradient-to-r from-aes-olive to-aes-oliveDark text-white p-3.5 rounded-2xl shadow-floating flex items-center justify-between border border-aes-gold/30 hover:scale-[1.01] active:scale-[0.99] transition">
+            <div class="flex items-center gap-3">
+                <div class="relative bg-white/20 p-2 rounded-xl">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-aes-gold"></i>
+                    <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 bg-aes-copper text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-aes-olive">0</span>
+                </div>
+                <div class="text-left">
+                    <div class="font-serif font-bold text-sm tracking-wide">Ver mi pedido</div>
+                    <div id="cart-summary-text" class="text-[11px] text-amber-200/90 font-medium">0 platillos seleccionados</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-xl">
+                <span id="cart-total-price" class="font-serif font-bold text-base text-white">$0.00</span>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-aes-gold"></i>
+            </div>
+        </button>
+    </div>
+
+    <!-- MODAL PARA SELECCIONAR VARIANTES (CARNE / SALSA / NOTAS) -->
+    <div id="options-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <!-- Header Modal -->
+            <div class="p-4 border-b border-aes-border flex items-center justify-between bg-aes-bg">
+                <div>
+                    <h3 id="modal-dish-name" class="font-serif font-bold text-base text-aes-charcoal">Platillo</h3>
+                    <p id="modal-dish-price" class="text-xs font-semibold text-aes-copper">$0.00</p>
+                </div>
+                <button onclick="closeOptionsModal()" class="w-8 h-8 rounded-full bg-aes-surface flex items-center justify-center text-aes-muted hover:text-aes-charcoal">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo Modal -->
+            <div class="p-4 overflow-y-auto custom-scrollbar space-y-4">
+                <div id="modal-options-section">
+                    <label class="block font-serif text-xs font-bold text-aes-charcoal mb-2 uppercase tracking-wider">
+                        Elige tu tipo de carne o variante:
+                    </label>
+                    <div id="modal-options-list" class="grid grid-cols-2 gap-2">
+                        <!-- Opciones dinámicas -->
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-serif text-xs font-bold text-aes-charcoal mb-1.5 uppercase tracking-wider">
+                        Notas especiales para la cocina (Opcional):
+                    </label>
+                    <input type="text" id="modal-dish-notes" placeholder="Ej. bien doradito, salsa roja aparte, etc." 
+                        class="w-full text-xs p-3 rounded-xl border border-aes-border bg-aes-bg focus:outline-none focus:border-aes-olive focus:ring-1 focus:ring-aes-olive">
+                </div>
+
+                <!-- Selector de Cantidad -->
+                <div class="flex items-center justify-between p-3 bg-aes-surface/60 rounded-xl border border-aes-border">
+                    <span class="font-serif text-xs font-bold text-aes-charcoal">Cantidad:</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeModalQuantity(-1)" class="w-8 h-8 rounded-lg bg-white border border-aes-border flex items-center justify-center font-bold text-aes-charcoal active:scale-95">
+                            -
+                        </button>
+                        <span id="modal-dish-qty" class="font-serif font-bold text-sm w-6 text-center">1</span>
+                        <button onclick="changeModalQuantity(1)" class="w-8 h-8 rounded-lg bg-aes-olive text-white flex items-center justify-center font-bold active:scale-95">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="p-4 border-t border-aes-border bg-aes-bg">
+                <button id="btn-add-modal-dish" onclick="confirmAddModalDish()" 
+                    class="w-full bg-aes-olive hover:bg-aes-oliveDark text-white py-3 rounded-xl font-serif text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-md">
+                    <span>Agregar al pedido</span>
+                    <span id="modal-dish-total" class="font-sans font-normal opacity-90">• $0.00</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHECKOUT Y PRERREGISTRO DE CLIENTE -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <!-- Header Carrito -->
+            <div class="p-4 border-b border-aes-border flex items-center justify-between bg-aes-bg">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-aes-olive"></i>
+                    <h3 class="font-serif font-bold text-base text-aes-charcoal">Resumen de tu Pedido</h3>
+                </div>
+                <button onclick="closeCartModal()" class="w-8 h-8 rounded-full bg-aes-surface flex items-center justify-center text-aes-muted hover:text-aes-charcoal">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Lista de Artículos y Formulario de Cliente -->
+            <div class="p-4 overflow-y-auto custom-scrollbar space-y-4 flex-1">
+                <!-- Desglose de Platillos -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-serif text-xs font-bold uppercase tracking-wider text-aes-muted">Platillos</span>
+                        <button onclick="clearCart()" class="text-[11px] text-red-600 hover:underline">Vaciar</button>
+                    </div>
+                    <div id="cart-items-list" class="space-y-2">
+                        <!-- Generado por JS -->
+                    </div>
+                </div>
+
+                <!-- DATOS DEL CLIENTE (PRERREGISTRO) -->
+                <div class="border-t border-aes-border pt-3">
+                    <div class="flex items-center gap-1.5 mb-2.5">
+                        <i data-lucide="user-check" class="w-4 h-4 text-aes-copper"></i>
+                        <span class="font-serif text-xs font-bold uppercase tracking-wider text-aes-charcoal">Tus Datos de Entrega</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">Nombre completo:</label>
+                            <input type="text" id="cust-name" placeholder="Ej. Juan Pérez" required
+                                class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg focus:outline-none focus:border-aes-olive">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">WhatsApp / Teléfono (10 dígitos):</label>
+                            <input type="tel" id="cust-phone" placeholder="Ej. 2221234567" maxlength="10" required
+                                class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg focus:outline-none focus:border-aes-olive">
+                        </div>
+
+                        <!-- Tipo de Entrega -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">Tipo de Entrega:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer border border-aes-border p-2 rounded-xl flex items-center gap-2 has-[:checked]:border-aes-olive has-[:checked]:bg-aes-oliveLight transition">
+                                    <input type="radio" name="cust-delivery-type" value="domicilio" checked onchange="toggleDeliveryFields()" class="accent-aes-olive">
+                                    <span class="font-semibold text-xs">🛵 A Domicilio</span>
+                                </label>
+                                <label class="cursor-pointer border border-aes-border p-2 rounded-xl flex items-center gap-2 has-[:checked]:border-aes-olive has-[:checked]:bg-aes-oliveLight transition">
+                                    <input type="radio" name="cust-delivery-type" value="recoger" onchange="toggleDeliveryFields()" class="accent-aes-olive">
+                                    <span class="font-semibold text-xs">🥡 Recoger en Local</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Domicilio -->
+                        <div id="address-fields" class="space-y-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200/60">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">Dirección completa (Calle, Número, Colonia):</label>
+                                <input type="text" id="cust-address" placeholder="Ej. Calle 107 C Pte #1502, Galaxia La Laguna" 
+                                    class="w-full p-2 rounded-lg border border-amber-300/80 bg-white focus:outline-none focus:border-aes-copper">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">Referencias de entrega (Cruces, color de fachada):</label>
+                                <input type="text" id="cust-ref" placeholder="Ej. Frente al parque, portón café" 
+                                    class="w-full p-2 rounded-lg border border-amber-300/80 bg-white focus:outline-none focus:border-aes-copper">
+                            </div>
+                        </div>
+
+                        <!-- Método de Pago -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">Método de Pago:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer border border-aes-border p-2 rounded-xl flex items-center gap-2 has-[:checked]:border-aes-olive has-[:checked]:bg-aes-oliveLight transition">
+                                    <input type="radio" name="cust-payment-method" value="efectivo" checked onchange="togglePaymentFields()" class="accent-aes-olive">
+                                    <span class="font-semibold text-xs">💵 Efectivo</span>
+                                </label>
+                                <label class="cursor-pointer border border-aes-border p-2 rounded-xl flex items-center gap-2 has-[:checked]:border-aes-olive has-[:checked]:bg-aes-oliveLight transition">
+                                    <input type="radio" name="cust-payment-method" value="transferencia" onchange="togglePaymentFields()" class="accent-aes-olive">
+                                    <span class="font-semibold text-xs">📱 Transferencia</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="cash-change-field">
+                            <label class="block text-[11px] font-semibold text-aes-charcoal mb-1">¿Pagas con billete de cuánto? (Para cambio):</label>
+                            <input type="number" id="cust-cash-amount" placeholder="Ej. 500" 
+                                class="w-full p-2 rounded-lg border border-aes-border bg-aes-bg focus:outline-none focus:border-aes-olive">
+                        </div>
+
+                        <div id="transfer-info-field" class="hidden bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-950 text-[11px]">
+                            <p class="font-bold">Datos para Transferencia:</p>
+                            <p class="mt-0.5">Se te proporcionará la cuenta CLABE al enviar tu pedido por WhatsApp para que la dueña lo confirme al momento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Carrito con Botón WhatsApp -->
+            <div class="p-4 border-t border-aes-border bg-aes-bg space-y-2">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="font-serif font-bold text-aes-charcoal">Total estimado:</span>
+                    <span id="cart-modal-total" class="font-serif font-bold text-xl text-aes-copper">$0.00</span>
+                </div>
+                <p class="text-[10px] text-aes-muted text-center leading-tight">
+                    * El costo de envío en caso de requerir DiDi / Uber Envíos se acordará directamente con la dueña.
+                </p>
+
+                <button onclick="submitOrderToWhatsApp()" 
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-serif text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition">
+                    <i data-lucide="message-circle" class="w-5 h-5 fill-white"></i>
+                    <span>Confirmar Pedido por WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PEDIDO ENVIADO CON ÉXITO -->
+    <div id="success-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl animate-in zoom-in-95 duration-200">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <i data-lucide="check-circle" class="w-9 h-9"></i>
+            </div>
+            <h3 class="font-serif font-bold text-xl text-aes-charcoal">¡Pedido Registrado!</h3>
+            <p id="success-folio" class="text-xs font-semibold text-aes-copper mt-1">Folio #AES-1001</p>
+            <p class="text-xs text-aes-muted mt-2 leading-relaxed">
+                Se ha generado tu orden y se abrió WhatsApp para que la dueña de Casa Aes confirme tu entrega.
+            </p>
+            <button onclick="closeSuccessModal()" class="mt-5 w-full bg-aes-olive text-white py-2.5 rounded-xl font-serif text-xs font-bold uppercase tracking-wider">
+                Volver al Menú
+            </button>
+        </div>
+    </div>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        // CONFIGURACIÓN DE CASA AES
+        const STORE_PHONE = "522212811095"; // WhatsApp de la dueña
+        let currentTab = 'fin_de_semana';
+        let dishes = [];
+        let cart = [];
+        let selectedDishForModal = null;
+        let modalQty = 1;
+        let selectedOption = "";
+
+        // PLATILLOS BASE (Fieles a las fotos de Casa Aes)
+        const DEFAULT_DISHES = [
+            {
+                id: 'taco-carnitas',
+                nombre: 'Taco de carnitas',
+                descripcion: 'Tradicional taco con tortilla caliente, cebolla, cilantro y salsas de la casa.',
+                precio: 35.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Cuerito', 'Costilla', 'Buche', 'Campechano'],
+                imagen: 'assets/hero-cazo.jpg'
+            },
+            {
+                id: 'cemita-carnitas',
+                nombre: 'Cemita de carnitas',
+                descripcion: 'Deliciosa cemita poblana rellena de auténticas carnitas estilo Quiroga, pápalo y chipotle.',
+                precio: 45.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Cuerito', 'Costilla'],
+                imagen: null
+            },
+            {
+                id: 'kilo-carnitas',
+                nombre: 'kilo de carnitas',
+                descripcion: '1 Kilo de carnitas estilo Quiroga. Incluye tortillas calientes, salsas caseras y limones.',
+                precio: 350.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Costilla y Cuerito', 'A convenir'],
+                imagen: null
+            },
+            {
+                id: 'medio-carnitas',
+                nombre: '1/2 de carnitas',
+                descripcion: 'Medio kilo de carnitas para compartir con tortillas, salsas y limones.',
+                precio: 175.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Costilla y Cuerito', 'A convenir'],
+                imagen: null
+            },
+            {
+                id: 'chilaquiles-aes',
+                nombre: 'Chilaquiles Aes',
+                descripcion: 'Totopos crujientes con salsa especial, cubiertos con abundante carne de carnitas, crema y queso.',
+                precio: 75.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'especialidades',
+                disponible: true,
+                opciones: ['Salsa Roja', 'Salsa Verde', 'Mitad y Mitad'],
+                imagen: 'assets/menu-flyer.jpg'
+            },
+            {
+                id: 'quesacazo',
+                nombre: 'Quesacazo',
+                descripcion: 'Tortilla doradita al cazo rellena de queso fundido artesanal y jugosas carnitas.',
+                precio: 55.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'especialidades',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza'],
+                imagen: null
+            },
+            {
+                id: 'empanada',
+                nombre: 'Empanada (camarón y queso)',
+                descripcion: 'Crujiente empanada frita rellena de guisado de camarón y queso derretido.',
+                precio: 35.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'entradas',
+                disponible: true,
+                opciones: [],
+                imagen: null
+            },
+            // PLATILLOS DEL MENÚ DEL DÍA
+            {
+                id: 'menu-guisado-dia',
+                nombre: 'Guisado del Día: Pechuga Cordon Bleu',
+                descripcion: 'Acompañada de ensalada fresca y arroz rojo tradicional recién hecho.',
+                precio: 85.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'comida_corrida',
+                disponible: true,
+                opciones: ['Con Arroz', 'Con Frijoles', 'Con Ensalada'],
+                imagen: null
+            },
+            {
+                id: 'menu-sopa-dia',
+                nombre: 'Sopa Azteca Tradicional',
+                descripcion: 'Caldo de jitomate sazonado con tiras de tortilla dorada, queso, aguacate y crema.',
+                precio: 45.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'sopas',
+                disponible: true,
+                opciones: [],
+                imagen: null
+            },
+            {
+                id: 'agua-fresca-dia',
+                nombre: 'Agua Fresca del Día (1 Litro)',
+                descripcion: 'Agua artesanal de fruta fresca de temporada, fría y refrescante.',
+                precio: 30.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'bebidas',
+                disponible: true,
+                opciones: ['Horchata Artesanal', 'Jamaica Natural'],
+                imagen: null
+            }
+        ];
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDishes();
+            loadSavedCustomerInfo();
+            renderDishes();
+            updateCartUI();
+            lucide.createIcons();
+        });
+
+        // CARGAR PLATILLOS (DESDE STORAGE LOCAL O SUPABASE)
+        function loadDishes() {
+            const saved = localStorage.getItem('casa_aes_dishes');
+            if (saved) {
+                try {
+                    dishes = JSON.parse(saved);
+                } catch {
+                    dishes = DEFAULT_DISHES;
+                }
+            } else {
+                dishes = DEFAULT_DISHES;
+                localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
+            }
+        }
+
+        // CAMBIAR PESTAÑA ENTRE FIN DE SEMANA Y COMIDA DEL DÍA
+        function switchTab(tab) {
+            currentTab = tab;
+            const btnFin = document.getElementById('tab-fin-de-semana');
+            const btnDia = document.getElementById('tab-comida-del-dia');
+            const bannerFin = document.getElementById('banner-fin-semana');
+            const bannerDia = document.getElementById('banner-comida-dia');
+
+            if (tab === 'fin_de_semana') {
+                btnFin.className = "py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 bg-aes-olive text-white shadow";
+                btnDia.className = "py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 text-aes-charcoal hover:bg-white/60";
+                bannerFin.classList.remove('hidden');
+                bannerDia.classList.add('hidden');
+            } else {
+                btnDia.className = "py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 bg-aes-olive text-white shadow";
+                btnFin.className = "py-2.5 px-3 rounded-lg font-serif text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 flex items-center justify-center gap-1.5 text-aes-charcoal hover:bg-white/60";
+                bannerDia.classList.remove('hidden');
+                bannerFin.classList.add('hidden');
+            }
+            renderDishes();
+            lucide.createIcons();
+        }
+
+        // RENDERIZAR PLATILLOS
+        function renderDishes() {
+            const container = document.getElementById('dishes-container');
+            const filtered = dishes.filter(d => d.tipo_menu === currentTab && d.disponible !== false);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-aes-border text-center shadow-soft">
+                        <i data-lucide="clock" class="w-8 h-8 text-aes-muted mx-auto mb-2"></i>
+                        <p class="font-serif font-bold text-sm text-aes-charcoal">Menú en preparación</p>
+                        <p class="text-xs text-aes-muted mt-1">La cocina está actualizando los platillos de esta sección. ¡Regresa en unos momentos!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(dish => {
+                const hasOptions = dish.opciones && dish.opciones.length > 0;
+                return `
+                    <div class="bg-white rounded-2xl border border-aes-border/80 p-3.5 shadow-soft hover:border-aes-olive/40 transition duration-200 flex gap-3 items-center">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-serif font-bold text-sm text-aes-charcoal tracking-wide capitalize">${dish.nombre}</h4>
+                            </div>
+                            <p class="text-[11px] text-aes-muted mt-1 leading-snug line-clamp-2">${dish.descripcion || 'Especialidad tradicional de Casa Aes.'}</p>
+                            
+                            <div class="flex items-center justify-between mt-2.5">
+                                <span class="font-serif font-bold text-base text-aes-copper">$${Number(dish.precio).toFixed(2)}</span>
+                                
+                                <button onclick="handleDishClick('${dish.id}')" 
+                                    class="bg-aes-olive hover:bg-aes-oliveDark active:scale-95 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm transition">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>Agregar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // CLICK EN PLATILLO (ABRE MODAL DE OPCIONES O AGREGA DIRECTO)
+        function handleDishClick(dishId) {
+            const dish = dishes.find(d => d.id === dishId);
+            if (!dish) return;
+
+            selectedDishForModal = dish;
+            modalQty = 1;
+            selectedOption = (dish.opciones && dish.opciones.length > 0) ? dish.opciones[0] : "";
+
+            if (dish.opciones && dish.opciones.length > 0) {
+                // Abrir modal de personalización
+                document.getElementById('modal-dish-name').textContent = dish.nombre;
+                document.getElementById('modal-dish-price').textContent = `$${Number(dish.precio).toFixed(2)}`;
+                document.getElementById('modal-dish-qty').textContent = "1";
+                document.getElementById('modal-dish-notes').value = "";
+                document.getElementById('modal-dish-total').textContent = `• $${Number(dish.precio).toFixed(2)}`;
+
+                const optionsList = document.getElementById('modal-options-list');
+                optionsList.innerHTML = dish.opciones.map((opt, idx) => `
+                    <label class="cursor-pointer border border-aes-border p-2 rounded-xl flex items-center gap-2 has-[:checked]:border-aes-olive has-[:checked]:bg-aes-oliveLight text-xs font-medium transition">
+                        <input type="radio" name="modal-opt" value="${opt}" ${idx === 0 ? 'checked' : ''} onchange="selectedOption='${opt}'" class="accent-aes-olive">
+                        <span class="truncate">${opt}</span>
+                    </label>
+                `).join('');
+
+                const modal = document.getElementById('options-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                lucide.createIcons();
+            } else {
+                // Agregar directo
+                addToCart(dish, 1, "", "");
+            }
+        }
+
+        function closeOptionsModal() {
+            const modal = document.getElementById('options-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            selectedDishForModal = null;
+        }
+
+        function changeModalQuantity(delta) {
+            modalQty = Math.max(1, modalQty + delta);
+            document.getElementById('modal-dish-qty').textContent = modalQty;
+            if (selectedDishForModal) {
+                const total = selectedDishForModal.precio * modalQty;
+                document.getElementById('modal-dish-total').textContent = `• $${Number(total).toFixed(2)}`;
+            }
+        }
+
+        function confirmAddModalDish() {
+            if (!selectedDishForModal) return;
+            const notes = document.getElementById('modal-dish-notes').value.trim();
+            addToCart(selectedDishForModal, modalQty, selectedOption, notes);
+            closeOptionsModal();
+        }
+
+        // AGREGAR AL CARRITO
+        function addToCart(dish, qty, option, notes) {
+            const itemKey = `${dish.id}_${option}_${notes}`;
+            const existing = cart.find(item => item.key === itemKey);
+
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    dishId: dish.id,
+                    nombre: dish.nombre,
+                    precio: dish.precio,
+                    qty: qty,
+                    opcion: option,
+                    notas: notes
+                });
+            }
+
+            updateCartUI();
+        }
+
+        function updateCartQuantity(key, delta) {
+            const item = cart.find(i => i.key === key);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.key !== key);
+            }
+            updateCartUI();
+            renderCartModalItems();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            closeCartModal();
+        }
+
+        function updateCartUI() {
+            const bar = document.getElementById('floating-cart-bar');
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.precio * item.qty), 0);
+
+            document.getElementById('cart-badge-count').textContent = totalCount;
+            document.getElementById('cart-summary-text').textContent = `${totalCount} ${totalCount === 1 ? 'platillo' : 'platillos'}`;
+            document.getElementById('cart-total-price').textContent = `$${totalPrice.toFixed(2)}`;
+            document.getElementById('cart-modal-total').textContent = `$${totalPrice.toFixed(2)}`;
+
+            if (totalCount > 0) {
+                bar.classList.remove('translate-y-32');
+            } else {
+                bar.classList.add('translate-y-32');
+            }
+        }
+
+        // MODAL DE CHECKOUT
+        function openCartModal() {
+            if (cart.length === 0) return;
+            renderCartModalItems();
+            const modal = document.getElementById('cart-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeCartModal() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function renderCartModalItems() {
+            const container = document.getElementById('cart-items-list');
+            if (cart.length === 0) {
+                closeCartModal();
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between p-2.5 bg-aes-bg rounded-xl border border-aes-border">
+                    <div class="flex-1 pr-2">
+                        <div class="font-serif font-bold text-xs text-aes-charcoal">${item.nombre}</div>
+                        ${item.opcion ? `<span class="inline-block text-[10px] font-semibold text-aes-olive bg-aes-oliveLight px-1.5 py-0.5 rounded mt-0.5">${item.opcion}</span>` : ''}
+                        ${item.notas ? `<p class="text-[10px] text-aes-muted italic mt-0.5">"${item.notas}"</p>` : ''}
+                        <div class="text-[11px] font-bold text-aes-copper mt-0.5">$${(item.precio * item.qty).toFixed(2)}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateCartQuantity('${item.key}', -1)" class="w-6 h-6 rounded-lg bg-white border border-aes-border flex items-center justify-center font-bold text-xs">-</button>
+                        <span class="font-serif font-bold text-xs w-4 text-center">${item.qty}</span>
+                        <button onclick="updateCartQuantity('${item.key}', 1)" class="w-6 h-6 rounded-lg bg-aes-olive text-white flex items-center justify-center font-bold text-xs">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // CAMPOS DE ENTREGA Y PAGO
+        function toggleDeliveryFields() {
+            const isDelivery = document.querySelector('input[name="cust-delivery-type"]:checked').value === 'domicilio';
+            const addressFields = document.getElementById('address-fields');
+            if (isDelivery) {
+                addressFields.classList.remove('hidden');
+            } else {
+                addressFields.classList.add('hidden');
+            }
+        }
+
+        function togglePaymentFields() {
+            const paymentMethod = document.querySelector('input[name="cust-payment-method"]:checked').value;
+            const cashField = document.getElementById('cash-change-field');
+            const transferField = document.getElementById('transfer-info-field');
+
+            if (paymentMethod === 'efectivo') {
+                cashField.classList.remove('hidden');
+                transferField.classList.add('hidden');
+            } else {
+                cashField.classList.add('hidden');
+                transferField.classList.remove('hidden');
+            }
+        }
+
+        // RECORDAR DATOS DEL CLIENTE EN LOCALSTORAGE
+        function loadSavedCustomerInfo() {
+            const saved = localStorage.getItem('casa_aes_customer');
+            if (saved) {
+                try {
+                    const cust = JSON.parse(saved);
+                    if (cust.name) document.getElementById('cust-name').value = cust.name;
+                    if (cust.phone) document.getElementById('cust-phone').value = cust.phone;
+                    if (cust.address) document.getElementById('cust-address').value = cust.address;
+                    if (cust.ref) document.getElementById('cust-ref').value = cust.ref;
+                } catch(e) {}
+            }
+        }
+
+        function saveCustomerInfo(name, phone, address, ref) {
+            localStorage.setItem('casa_aes_customer', JSON.stringify({ name, phone, address, ref }));
+        }
+
+        // CONFIRMAR PEDIDO Y ENVIAR POR WHATSAPP
+        function submitOrderToWhatsApp() {
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const deliveryType = document.querySelector('input[name="cust-delivery-type"]:checked').value;
+            const address = document.getElementById('cust-address').value.trim();
+            const ref = document.getElementById('cust-ref').value.trim();
+            const paymentMethod = document.querySelector('input[name="cust-payment-method"]:checked').value;
+            const cashAmount = document.getElementById('cust-cash-amount').value.trim();
+
+            if (!name) {
+                alert('Por favor ingresa tu nombre completo.');
+                document.getElementById('cust-name').focus();
+                return;
+            }
+
+            if (!phone || phone.length < 10) {
+                alert('Por favor ingresa un número de WhatsApp a 10 dígitos.');
+                document.getElementById('cust-phone').focus();
+                return;
+            }
+
+            if (deliveryType === 'domicilio' && !address) {
+                alert('Por favor ingresa tu dirección para el reparto.');
+                document.getElementById('cust-address').focus();
+                return;
+            }
+
+            // Guardar datos para futuros pedidos
+            saveCustomerInfo(name, phone, address, ref);
+
+            // Generar Folio
+            const folioNumber = Math.floor(1000 + Math.random() * 9000);
+            const folio = `AES-${folioNumber}`;
+            const total = cart.reduce((sum, item) => sum + (item.precio * item.qty), 0);
+
+            // Guardar pedido localmente para el panel de administración
+            const newOrder = {
+                id: 'ord_' + Date.now(),
+                folio: folio,
+                cliente: name,
+                telefono: phone,
+                tipo_entrega: deliveryType,
+                direccion: address || 'Recoge en Local',
+                referencias: ref || 'Sin referencias adicionales',
+                metodo_pago: paymentMethod,
+                pago_con: cashAmount || null,
+                total: total,
+                estado: 'pendiente',
+                fecha: new Date().toISOString(),
+                items: cart.map(i => ({
+                    nombre: i.nombre,
+                    qty: i.qty,
+                    precio: i.precio,
+                    opcion: i.opcion,
+                    notas: i.notas
+                }))
+            };
+
+            const existingOrders = JSON.parse(localStorage.getItem('casa_aes_orders') || '[]');
+            existingOrders.unshift(newOrder);
+            localStorage.setItem('casa_aes_orders', JSON.stringify(existingOrders));
+
+            // Notificar a otras pestañas / admin si están abiertas
+            try {
+                window.dispatchEvent(new Event('storage'));
+            } catch(e) {}
+
+            // CONSTRUIR MENSAJE FORMATEADO PARA WHATSAPP
+            let itemsText = cart.map(i => {
+                let text = `• ${i.qty}x ${i.nombre}`;
+                if (i.opcion) text += ` (${i.opcion})`;
+                if (i.notas) text += ` [Nota: ${i.notas}]`;
+                text += ` = $${(i.precio * i.qty).toFixed(2)}`;
+                return text;
+            }).join('\n');
+
+            let deliveryText = deliveryType === 'domicilio' 
+                ? `🛵 *ENTREGA A DOMICILIO:*\n📍 *Dirección:* ${address}\n🔍 *Referencias:* ${ref || 'Ninguna'}`
+                : `🥡 *TIPO:* Recoger en el local`;
+
+            let paymentText = paymentMethod === 'efectivo'
+                ? `💵 *PAGO:* Efectivo ${cashAmount ? `(Paga con billete de $${cashAmount})` : ''}`
+                : `📱 *PAGO:* Transferencia bancaria (Solicito CLABE)`;
+
+            let msg = `*¡HOLA CASA AES! QUIERO CONFIRMAR MI PEDIDO 🌮*\n` +
+                      `━━━━━━━━━━━━━━━━━━━━\n` +
+                      `🏷️ *Folio:* #${folio}\n` +
+                      `👤 *Cliente:* ${name}\n` +
+                      `📞 *Teléfono:* ${phone}\n\n` +
+                      `📋 *DETALLE DEL PEDIDO:*\n${itemsText}\n\n` +
+                      `💰 *TOTAL A PAGAR:* $${total.toFixed(2)} MXN\n` +
+                      `━━━━━━━━━━━━━━━━━━━━\n` +
+                      `${deliveryText}\n` +
+                      `${paymentText}\n\n` +
+                      `_Enviado desde el Menú Digital Casa Aes_`;
+
+            const encodedMsg = encodeURIComponent(msg);
+            const waUrl = `https://wa.me/${STORE_PHONE}?text=${encodedMsg}`;
+
+            // Abrir WhatsApp
+            window.open(waUrl, '_blank');
+
+            // Mostrar modal de éxito
+            document.getElementById('success-folio').textContent = `Folio #${folio}`;
+            closeCartModal();
+            document.getElementById('success-modal').classList.remove('hidden');
+            document.getElementById('success-modal').classList.add('flex');
+            lucide.createIcons();
+            
+            // Limpiar carrito
+            cart = [];
+            updateCartUI();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            document.getElementById('success-modal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>

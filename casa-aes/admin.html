@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa Aes - Panel de Control & Comandero de Cocina</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aes: {
+                            bg: '#F6F3EC',
+                            card: '#FFFFFF',
+                            surface: '#EDE8DE',
+                            olive: '#4D5B31',
+                            oliveDark: '#3A4524',
+                            oliveLight: '#EEF2E6',
+                            copper: '#B2542D',
+                            copperDark: '#934221',
+                            gold: '#C49A6C',
+                            charcoal: '#262523',
+                            muted: '#6E6B65',
+                            border: '#E2DCD2'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F4F1EA;
+            background-image: radial-gradient(#E2DCD2 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #D3CBBE;
+            border-radius: 9999px;
+        }
+        @keyframes pulse-bell {
+            0%, 100% { transform: rotate(0deg); }
+            20%, 60% { transform: rotate(15deg); }
+            40%, 80% { transform: rotate(-15deg); }
+        }
+        .bell-ring {
+            animation: pulse-bell 0.8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-aes-charcoal font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- HEADER DE ADMINISTRACIÓN DESKTOP -->
+    <header class="bg-aes-charcoal text-white border-b-2 border-aes-gold/40 shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+            <!-- Brand & Identidad -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-aes-olive to-aes-copper flex items-center justify-center text-white shadow-md border border-aes-gold/40">
+                    <i data-lucide="utensils" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-serif font-bold text-lg tracking-wider text-white">CASA AES</h1>
+                        <span class="text-[10px] bg-aes-copper text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Panel Cocina & POS</span>
+                    </div>
+                    <p class="text-[11px] text-amber-200/90 font-medium">Control de Pedidos en Vivo & Gestión de Menús</p>
+                </div>
+            </div>
+
+            <!-- Navegación de Pestañas del Administrador -->
+            <nav class="hidden md:flex items-center gap-1 bg-black/30 p-1 rounded-xl border border-white/10">
+                <button onclick="switchAdminTab('pedidos')" id="nav-btn-pedidos" 
+                    class="px-4 py-2 rounded-lg font-serif text-xs font-bold tracking-wide transition flex items-center gap-1.5 bg-aes-olive text-white shadow">
+                    <i data-lucide="layout-grid" class="w-4 h-4 text-aes-gold"></i>
+                    <span>Tablero de Pedidos</span>
+                    <span id="badge-total-active" class="ml-1 bg-aes-copper text-white text-[10px] px-1.5 py-0.2 rounded-full font-sans">0</span>
+                </button>
+                <button onclick="switchAdminTab('menu')" id="nav-btn-menu" 
+                    class="px-4 py-2 rounded-lg font-serif text-xs font-bold tracking-wide transition flex items-center gap-1.5 text-white/80 hover:bg-white/10">
+                    <i data-lucide="book-open" class="w-4 h-4 text-aes-gold"></i>
+                    <span>Menú & Precios</span>
+                </button>
+                <button onclick="switchAdminTab('clientes')" id="nav-btn-clientes" 
+                    class="px-4 py-2 rounded-lg font-serif text-xs font-bold tracking-wide transition flex items-center gap-1.5 text-white/80 hover:bg-white/10">
+                    <i data-lucide="users" class="w-4 h-4 text-aes-gold"></i>
+                    <span>Clientes & Directorio</span>
+                </button>
+            </nav>
+
+            <!-- Acciones Rápidas y Sonido -->
+            <div class="flex items-center gap-2.5">
+                <!-- Botón de Audio de Campana -->
+                <button onclick="toggleAudio()" id="btn-audio" title="Alerta Sonora de Cocina"
+                    class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center gap-1.5 text-xs border border-white/10 transition">
+                    <i data-lucide="bell" id="audio-icon" class="w-4 h-4 text-aes-gold"></i>
+                    <span id="audio-label" class="hidden sm:inline text-[11px] font-semibold">Alerta: ON</span>
+                </button>
+
+                <!-- Ver Menú Público -->
+                <a href="index.html" target="_blank" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center gap-1.5 text-xs border border-white/10 transition" title="Ver menú del cliente en móvil">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-aes-gold"></i>
+                    <span class="hidden sm:inline text-[11px] font-semibold">Ver Menú Móvil</span>
+                </a>
+
+                <!-- Botón Venta en Mostrador -->
+                <button onclick="openWalkInOrderModal()" 
+                    class="bg-aes-copper hover:bg-aes-copperDark text-white px-3.5 py-2 rounded-xl font-serif text-xs font-bold tracking-wide flex items-center gap-1.5 shadow transition active:scale-95">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>+ Venta en Local</span>
+                </button>
+
+                <!-- Cerrar Sesión -->
+                <button onclick="handleLogout()" title="Cerrar Sesión"
+                    class="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 flex items-center gap-1.5 text-xs border border-red-500/30 transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="hidden xl:inline text-[11px] font-semibold">Salir</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- BARRA DE MÉTRICAS Y CORTE RÁPIDO DEL DÍA -->
+    <section class="bg-white border-b border-aes-border shadow-sm py-3 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-6">
+                <!-- Venta Total Hoy -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-aes-muted">Venta Total Hoy</div>
+                        <div id="stat-total-sales" class="font-serif font-bold text-lg text-emerald-800">$0.00</div>
+                    </div>
+                </div>
+
+                <div class="h-8 w-[1px] bg-aes-border hidden sm:block"></div>
+
+                <!-- Pedidos Concluidos -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-aes-oliveLight text-aes-olive flex items-center justify-center font-bold">
+                        <i data-lucide="check-check" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-aes-muted">Concluidos Hoy</div>
+                        <div id="stat-completed-orders" class="font-serif font-bold text-lg text-aes-oliveDark">0 pedidos</div>
+                    </div>
+                </div>
+
+                <div class="h-8 w-[1px] bg-aes-border hidden md:block"></div>
+
+                <!-- En Proceso Activo -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                        <i data-lucide="clock" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-aes-muted">En Preparación / Reparto</div>
+                        <div id="stat-pending-orders" class="font-serif font-bold text-lg text-amber-800">0 activos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción de IA y Configuración -->
+            <div class="flex items-center gap-2">
+                <button onclick="openAiMenuModal()" 
+                    class="bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 shadow-sm transition">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
+                    <span>📸 Actualizar Menú con Foto (IA)</span>
+                </button>
+
+                <button onclick="openConfigModal()" title="Configuración de Supabase"
+                    class="p-2 rounded-xl border border-aes-border hover:bg-aes-surface text-aes-charcoal text-xs flex items-center gap-1.5 transition">
+                    <i data-lucide="settings" class="w-4 h-4 text-aes-muted"></i>
+                    <span class="hidden xl:inline text-[11px]">Conexión</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAVEGACIÓN MÓVIL / TABLET -->
+    <div class="md:hidden flex border-b border-aes-border bg-aes-surface/70 px-4 py-2 gap-2">
+        <button onclick="switchAdminTab('pedidos')" id="m-nav-pedidos" class="flex-1 py-1.5 rounded-lg font-serif text-xs font-bold bg-aes-olive text-white shadow">Pedidos</button>
+        <button onclick="switchAdminTab('menu')" id="m-nav-menu" class="flex-1 py-1.5 rounded-lg font-serif text-xs font-bold bg-white text-aes-charcoal border border-aes-border">Menús</button>
+        <button onclick="switchAdminTab('clientes')" id="m-nav-clientes" class="flex-1 py-1.5 rounded-lg font-serif text-xs font-bold bg-white text-aes-charcoal border border-aes-border">Clientes</button>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-1 w-full">
+
+        <!-- ========================================== -->
+        <!-- VISTA 1: TABLERO COMANDERO DE PEDIDOS       -->
+        <!-- ========================================== -->
+        <section id="section-pedidos" class="space-y-4">
+            <!-- Barra de Filtros de Pedidos -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-aes-border shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="font-serif text-xs font-bold text-aes-muted uppercase tracking-wider">Filtro rápido:</span>
+                    <button onclick="filterOrders('todos')" id="filter-todos" class="px-3 py-1 rounded-lg text-xs font-bold bg-aes-olive text-white">Todos</button>
+                    <button onclick="filterOrders('domicilio')" id="filter-domicilio" class="px-3 py-1 rounded-lg text-xs font-bold bg-aes-surface text-aes-charcoal hover:bg-aes-border">🛵 Domicilio</button>
+                    <button onclick="filterOrders('local')" id="filter-local" class="px-3 py-1 rounded-lg text-xs font-bold bg-aes-surface text-aes-charcoal hover:bg-aes-border">🍽️ Local / Recoger</button>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="loadOrders()" class="p-1.5 rounded-lg border border-aes-border hover:bg-aes-surface text-aes-charcoal text-xs flex items-center gap-1" title="Actualizar">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-aes-olive"></i>
+                        <span class="text-[11px]">Refrescar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABLERO KANBAN EN 4 COLUMNAS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+                
+                <!-- COLUMNA 1: NUEVOS / POR CONFIRMAR -->
+                <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-3 flex flex-col min-h-[500px] shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-amber-200">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            <h3 class="font-serif font-bold text-xs uppercase tracking-wider text-amber-900">Nuevos por Confirmar</h3>
+                        </div>
+                        <span id="count-col-pendiente" class="bg-amber-200 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="col-pendiente" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                        <!-- Tarjetas inyectadas por JS -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA 2: EN COCINA / PREPARACIÓN -->
+                <div class="bg-orange-50/70 border border-orange-200/90 rounded-2xl p-3 flex flex-col min-h-[500px] shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-orange-200">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="flame" class="w-4 h-4 text-orange-600"></i>
+                            <h3 class="font-serif font-bold text-xs uppercase tracking-wider text-orange-950">En Cocina</h3>
+                        </div>
+                        <span id="count-col-cocina" class="bg-orange-200 text-orange-900 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="col-cocina" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                        <!-- Tarjetas inyectadas por JS -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA 3: POR ENTREGAR / EN CAMINO -->
+                <div class="bg-blue-50/70 border border-blue-200/90 rounded-2xl p-3 flex flex-col min-h-[500px] shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-blue-200">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="bike" class="w-4 h-4 text-blue-600"></i>
+                            <h3 class="font-serif font-bold text-xs uppercase tracking-wider text-blue-950">Por Entregar / En Camino</h3>
+                        </div>
+                        <span id="count-col-en_camino" class="bg-blue-200 text-blue-900 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="col-en_camino" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                        <!-- Tarjetas inyectadas por JS -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA 4: CONCLUIDOS -->
+                <div class="bg-emerald-50/60 border border-emerald-200/80 rounded-2xl p-3 flex flex-col min-h-[500px] shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-emerald-200">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                            <h3 class="font-serif font-bold text-xs uppercase tracking-wider text-emerald-950">Concluidos</h3>
+                        </div>
+                        <span id="count-col-concluido" class="bg-emerald-200 text-emerald-900 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="col-concluido" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                        <!-- Tarjetas inyectadas por JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VISTA 2: GESTOR DE MENÚS Y PRECIOS          -->
+        <!-- ========================================== -->
+        <section id="section-menu" class="hidden space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-aes-border shadow-sm">
+                <div>
+                    <h2 class="font-serif font-bold text-base text-aes-charcoal">Catálogo de Platillos de Casa Aes</h2>
+                    <p class="text-xs text-aes-muted">Activa o desactiva platillos si se agotan, o ajusta sus precios en cualquier momento.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openAddDishModal()" class="bg-aes-olive hover:bg-aes-oliveDark text-white px-3.5 py-2 rounded-xl text-xs font-serif font-bold flex items-center gap-1.5 shadow">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>+ Agregar Platillo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla / Lista de Platillos -->
+            <div class="bg-white rounded-2xl border border-aes-border shadow-sm overflow-hidden">
+                <div class="p-3 bg-aes-surface/50 border-b border-aes-border flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button onclick="filterMenuTab('todos')" id="menutab-todos" class="px-3 py-1 rounded-lg text-xs font-bold bg-aes-olive text-white">Todos</button>
+                        <button onclick="filterMenuTab('fin_de_semana')" id="menutab-fin" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-aes-charcoal border border-aes-border">Fin de Semana (Carnitas)</button>
+                        <button onclick="filterMenuTab('comida_del_dia')" id="menutab-dia" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-aes-charcoal border border-aes-border">Comida del Día</button>
+                    </div>
+                </div>
+                <div id="admin-dishes-table" class="divide-y divide-aes-border">
+                    <!-- Filas inyectadas por JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VISTA 3: DIRECTORIO DE CLIENTES             -->
+        <!-- ========================================== -->
+        <section id="section-clientes" class="hidden space-y-4">
+            <div class="bg-white p-4 rounded-2xl border border-aes-border shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="font-serif font-bold text-base text-aes-charcoal">Directorio de Clientes Registrados</h2>
+                    <p class="text-xs text-aes-muted">Identifica clientes recurrentes, direcciones guardadas y agrega notas internas.</p>
+                </div>
+                <div class="w-full sm:w-72">
+                    <input type="text" id="search-customer" oninput="filterCustomerList()" placeholder="Buscar por teléfono o nombre..." 
+                        class="w-full p-2 text-xs rounded-xl border border-aes-border bg-aes-bg focus:outline-none focus:border-aes-olive">
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-aes-border shadow-sm overflow-hidden">
+                <div id="admin-customers-list" class="divide-y divide-aes-border">
+                    <!-- Lista de clientes inyectada por JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: NUEVA VENTA EN MOSTRADOR (LOCAL) -->
+    <div id="walkin-order-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-aes-border bg-aes-bg flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="store" class="w-5 h-5 text-aes-copper"></i>
+                    <h3 class="font-serif font-bold text-base text-aes-charcoal">Nueva Venta Física (Mostrador / Local)</h3>
+                </div>
+                <button onclick="closeWalkInOrderModal()" class="w-8 h-8 rounded-full bg-aes-surface flex items-center justify-center text-aes-muted hover:text-aes-charcoal">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-4 overflow-y-auto custom-scrollbar space-y-4 flex-1">
+                <!-- Datos básicos del cliente en mostrador -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold mb-1 text-aes-charcoal">Nombre o Referencia de Cliente:</label>
+                        <input type="text" id="walkin-name" placeholder="Ej. Don Carlos / Mesa 2" class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1 text-aes-charcoal">Teléfono (Opcional):</label>
+                        <input type="tel" id="walkin-phone" placeholder="Ej. 222..." class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                    </div>
+                </div>
+
+                <!-- Selección rápida de platillos -->
+                <div>
+                    <label class="block font-serif text-xs font-bold uppercase tracking-wider text-aes-muted mb-2">Selecciona Platillos:</label>
+                    <div id="walkin-dishes-selector" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <!-- Botones de platillos generados por JS -->
+                    </div>
+                </div>
+
+                <!-- Carrito rápido de mostrador -->
+                <div class="bg-aes-surface/50 p-3 rounded-2xl border border-aes-border">
+                    <span class="font-serif text-xs font-bold uppercase tracking-wider text-aes-charcoal block mb-2">Artículos en la Comanda:</span>
+                    <div id="walkin-items-list" class="space-y-1.5 text-xs">
+                        <p class="text-aes-muted italic text-[11px]">No has seleccionado platillos aún.</p>
+                    </div>
+                    <div class="border-t border-aes-border mt-3 pt-2 flex items-center justify-between font-bold text-sm">
+                        <span>Total de la Venta:</span>
+                        <span id="walkin-total" class="font-serif text-base text-aes-copper">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div class="flex items-center gap-4 text-xs font-semibold">
+                    <span>Método de pago:</span>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="walkin-payment" value="efectivo" checked class="accent-aes-olive">
+                        <span>💵 Efectivo</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="walkin-payment" value="transferencia" class="accent-aes-olive">
+                        <span>📱 Transferencia</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-aes-border bg-aes-bg flex items-center justify-end gap-2">
+                <button onclick="closeWalkInOrderModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-aes-muted hover:text-aes-charcoal">Cancelar</button>
+                <button onclick="submitWalkInOrder()" class="bg-aes-olive hover:bg-aes-oliveDark text-white px-5 py-2.5 rounded-xl font-serif text-xs font-bold tracking-wide flex items-center gap-1.5 shadow">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Registrar y Mandar a Cocina</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ACTUALIZAR MENÚ DEL DÍA CON FOTO (IA GEMINI) -->
+    <div id="ai-menu-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-aes-border bg-gradient-to-r from-purple-900 to-indigo-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
+                    <div>
+                        <h3 class="font-serif font-bold text-base">Asistente IA: Escanear Menú del Día</h3>
+                        <p class="text-[11px] text-amber-200/90">Sube una foto del pizarrón o libreta y la IA creará el menú del día</p>
+                    </div>
+                </div>
+                <button onclick="closeAiMenuModal()" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold mb-1 text-aes-charcoal">1. Selecciona o toma foto del pizarrón / libreta:</label>
+                    <input type="file" id="ai-menu-file" accept="image/*" class="w-full text-xs p-2 rounded-xl border border-aes-border bg-aes-bg">
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1 text-aes-charcoal">2. Notas adicionales para la IA (Opcional):</label>
+                    <input type="text" id="ai-menu-notes" placeholder="Ej. El kilo incluye salsas y limones, etc." class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                </div>
+
+                <div id="ai-preview-zone" class="hidden p-3 bg-purple-50 rounded-xl border border-purple-200">
+                    <div class="flex items-center gap-2 text-purple-900 font-bold mb-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-purple-600"></i>
+                        <span>Platillos detectados listos para agregar:</span>
+                    </div>
+                    <div id="ai-detected-dishes" class="space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar text-[11px]">
+                        <!-- Platillos parseados -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-aes-border bg-aes-bg flex items-center justify-between">
+                <span id="ai-status-text" class="text-[11px] text-aes-muted font-medium">Listo para analizar</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeAiMenuModal()" class="px-3 py-2 text-xs font-semibold text-aes-muted hover:text-aes-charcoal">Cerrar</button>
+                    <button id="btn-run-ai" onclick="runAiMenuScan()" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-xl font-serif text-xs font-bold tracking-wide flex items-center gap-1.5 shadow">
+                        <i data-lucide="scan" class="w-4 h-4"></i>
+                        <span>Analizar Foto con IA</span>
+                    </button>
+                    <button id="btn-save-ai-dishes" onclick="saveAiDetectedDishes()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-serif text-xs font-bold tracking-wide flex items-center gap-1.5 shadow">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Aplicar al Menú del Día</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AGREGAR PLATILLO MANUAL -->
+    <div id="add-dish-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-aes-border bg-aes-bg flex items-center justify-between">
+                <h3 class="font-serif font-bold text-base text-aes-charcoal">Agregar Platillo al Menú</h3>
+                <button onclick="closeAddDishModal()" class="w-8 h-8 rounded-full bg-aes-surface flex items-center justify-center text-aes-muted hover:text-aes-charcoal">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold mb-1">Nombre del Platillo:</label>
+                    <input type="text" id="new-dish-name" placeholder="Ej. Torta de carnitas" class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold mb-1">Precio ($ MXN):</label>
+                        <input type="number" id="new-dish-price" placeholder="45.00" class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Categoría / Menú:</label>
+                        <select id="new-dish-type" class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                            <option value="fin_de_semana">Fin de Semana (Carnitas)</option>
+                            <option value="comida_del_dia">Comida del Día</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Descripción breve:</label>
+                    <input type="text" id="new-dish-desc" placeholder="Descripción apetitosa..." class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Opciones o Variantes (separadas por coma):</label>
+                    <input type="text" id="new-dish-options" placeholder="Ej. Maciza, Surtida, Cuerito" class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg">
+                </div>
+            </div>
+            <div class="p-4 border-t border-aes-border bg-aes-bg flex items-center justify-end gap-2">
+                <button onclick="closeAddDishModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-aes-muted">Cancelar</button>
+                <button onclick="saveManualDish()" class="bg-aes-olive hover:bg-aes-oliveDark text-white px-5 py-2 rounded-xl font-serif text-xs font-bold shadow">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIGURACIÓN DE SUPABASE & GEMINI -->
+    <div id="config-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-aes-border bg-aes-bg flex items-center justify-between">
+                <h3 class="font-serif font-bold text-base text-aes-charcoal">Configuración de Conexión</h3>
+                <button onclick="closeConfigModal()" class="w-8 h-8 rounded-full bg-aes-surface flex items-center justify-center text-aes-muted">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-3 text-xs">
+                <p class="text-aes-muted text-[11px] leading-relaxed">
+                    Casa Aes opera de forma 100% autónoma en tu navegador. Puedes vincular Supabase para sincronizar en tiempo real entre múltiples dispositivos.
+                </p>
+                <div>
+                    <label class="block font-semibold mb-1">Supabase Project URL:</label>
+                    <input type="text" id="cfg-supabase-url" placeholder="https://xyz.supabase.co" class="w-full p-2 rounded-xl border border-aes-border bg-aes-bg font-mono text-[11px]">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Supabase Anon Key:</label>
+                    <input type="password" id="cfg-supabase-key" placeholder="eyJhbGci..." class="w-full p-2 rounded-xl border border-aes-border bg-aes-bg font-mono text-[11px]">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Gemini API Key (Para la IA de fotos):</label>
+                    <input type="password" id="cfg-gemini-key" placeholder="AIzaSy..." class="w-full p-2 rounded-xl border border-aes-border bg-aes-bg font-mono text-[11px]">
+                </div>
+            </div>
+            <div class="p-4 border-t border-aes-border bg-aes-bg flex items-center justify-end gap-2">
+                <button onclick="closeConfigModal()" class="px-4 py-2 text-xs font-semibold text-aes-muted">Cancelar</button>
+                <button onclick="saveConfig()" class="bg-aes-olive hover:bg-aes-oliveDark text-white px-5 py-2 rounded-xl font-serif text-xs font-bold shadow">Guardar Conexión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA / MODAL DE AUTENTICACIÓN (LOGIN) -->
+    <div id="login-overlay" class="fixed inset-0 z-50 bg-aes-charcoal/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-aes-gold/40 text-center animate-in zoom-in-95 duration-200">
+            <!-- Brand Icon -->
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-aes-olive to-aes-copper flex items-center justify-center text-white shadow-lg mx-auto mb-3 border border-aes-gold/40">
+                <i data-lucide="lock" class="w-7 h-7"></i>
+            </div>
+            
+            <h2 class="font-serif font-bold text-xl text-aes-charcoal tracking-wide">CASA AES</h2>
+            <p class="text-[11px] uppercase tracking-widest text-aes-copper font-bold mt-0.5">Acceso Administrativo</p>
+            <p class="text-xs text-aes-muted mt-2">Ingresa tus credenciales para acceder al panel de cocina y pedidos.</p>
+
+            <form id="login-form" onsubmit="handleLoginSubmit(event)" class="mt-5 space-y-3 text-left">
+                <div>
+                    <label class="block text-[11px] font-bold text-aes-charcoal mb-1">Correo Electrónico:</label>
+                    <input type="email" id="login-email" required placeholder="contacto@casaaes.com" value="contacto@casaaes.com"
+                        class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg text-xs focus:outline-none focus:border-aes-olive">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-aes-charcoal mb-1">Contraseña:</label>
+                    <input type="password" id="login-password" required placeholder="••••••••"
+                        class="w-full p-2.5 rounded-xl border border-aes-border bg-aes-bg text-xs focus:outline-none focus:border-aes-olive">
+                </div>
+
+                <div id="login-error" class="hidden text-[11px] text-red-600 font-semibold bg-red-50 p-2 rounded-lg border border-red-200 text-center"></div>
+
+                <button type="submit" id="btn-login-submit"
+                    class="w-full bg-aes-olive hover:bg-aes-oliveDark text-white py-3 rounded-xl font-serif text-xs font-bold uppercase tracking-wider shadow-md transition active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Entrar al Panel</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICACIÓN FLOTANTE -->
+    <div id="toast" class="fixed bottom-4 right-4 z-50 bg-aes-charcoal text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-medium border border-aes-gold/40 transform translate-y-24 transition-all duration-300">
+        <i data-lucide="check" id="toast-icon" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Notificación</span>
+    </div>
+
+    <!-- LÓGICA DEL PANEL ADMINISTRATIVO -->
+    <script>
+        let orders = [];
+        let dishes = [];
+        let customers = [];
+        let audioEnabled = true;
+        let audioContext = null;
+        let walkinCart = [];
+        let aiDetectedCache = [];
+        let activeFilter = 'todos';
+        let activeMenuFilter = 'todos';
+
+        // ==========================================
+        // AUTENTICACIÓN Y SEGURIDAD
+        // ==========================================
+        const EXPECTED_EMAIL = 'contacto@casaaes.com';
+        const EXPECTED_PASS = 'Casa123456*';
+
+        function checkAuth() {
+            const token = localStorage.getItem('casa_aes_admin_token');
+            const overlay = document.getElementById('login-overlay');
+            if (token) {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            } else {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            }
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errDiv = document.getElementById('login-error');
+            const btn = document.getElementById('btn-login-submit');
+
+            errDiv.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Verificando...</span>`;
+            lucide.createIcons();
+
+            try {
+                // 1. Intentar con Vercel Serverless Function /api/auth si estamos en servidor
+                let authenticated = false;
+                try {
+                    const res = await fetch('/api/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'login', email, password })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success && data.token) {
+                            localStorage.setItem('casa_aes_admin_token', data.token);
+                            authenticated = true;
+                        }
+                    }
+                } catch(netErr) {
+                    // Fallback directo fuera de Vercel (local / offline)
+                }
+
+                // 2. Validación directa resiliente
+                if (!authenticated) {
+                    if (email.toLowerCase() === EXPECTED_EMAIL.toLowerCase() && password === EXPECTED_PASS) {
+                        localStorage.setItem('casa_aes_admin_token', 'local-token-casaaes-' + Date.now());
+                        authenticated = true;
+                    }
+                }
+
+                if (authenticated) {
+                    const overlay = document.getElementById('login-overlay');
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    showToast('¡Bienvenida al Panel de Casa Aes!', 'check');
+                } else {
+                    errDiv.textContent = 'Credenciales incorrectas. Verifica tu correo y contraseña.';
+                    errDiv.classList.remove('hidden');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i><span>Entrar al Panel</span>`;
+                lucide.createIcons();
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('¿Deseas cerrar tu sesión del panel administrativo?')) {
+                localStorage.removeItem('casa_aes_admin_token');
+                checkAuth();
+                showToast('Sesión cerrada');
+            }
+        }
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadDishes();
+            loadOrders();
+            loadCustomers();
+            updateStats();
+            renderOrdersBoard();
+            lucide.createIcons();
+
+            // Escuchar pedidos entrantes de la vista móvil vía storage
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'casa_aes_orders') {
+                    const oldLen = orders.length;
+                    loadOrders();
+                    if (orders.length > oldLen) {
+                        playKitchenChime();
+                        showToast('¡Nuevo pedido recibido de la web!', 'bell');
+                    }
+                }
+            });
+
+            // Polling suave cada 4 segundos por si acaso
+            setInterval(() => {
+                const saved = localStorage.getItem('casa_aes_orders');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (parsed.length !== orders.length) {
+                            if (parsed.length > orders.length) {
+                                playKitchenChime();
+                                showToast('¡Nuevo pedido recibido!', 'bell');
+                            }
+                            orders = parsed;
+                            updateStats();
+                            renderOrdersBoard();
+                        }
+                    } catch(e) {}
+                }
+            }, 4000);
+        });
+
+        // SONIDO DE COCINA SINTETIZADO (Web Audio API autónomo)
+        function playKitchenChime() {
+            if (!audioEnabled) return;
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const now = audioContext.currentTime;
+                // Nota 1
+                const osc1 = audioContext.createOscillator();
+                const gain1 = audioContext.createGain();
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(587.33, now); // D5
+                gain1.gain.setValueAtTime(0.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                osc1.connect(gain1);
+                gain1.connect(audioContext.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.8);
+
+                // Nota 2 (Campana alegre)
+                const osc2 = audioContext.createOscillator();
+                const gain2 = audioContext.createGain();
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(880.00, now + 0.15); // A5
+                gain2.gain.setValueAtTime(0.35, now + 0.15);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                osc2.start(now + 0.15);
+                osc2.stop(now + 1.2);
+            } catch(e) {
+                console.warn('Audio chime fallback:', e);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const label = document.getElementById('audio-label');
+            const icon = document.getElementById('audio-icon');
+            if (audioEnabled) {
+                label.textContent = "Alerta: ON";
+                icon.className = "w-4 h-4 text-aes-gold";
+                showToast("Campana sonora activada");
+                playKitchenChime();
+            } else {
+                label.textContent = "Alerta: OFF";
+                icon.className = "w-4 h-4 text-white/50";
+                showToast("Campana silenciada");
+            }
+        }
+
+        // CARGA DE DATOS
+        function loadOrders() {
+            const saved = localStorage.getItem('casa_aes_orders');
+            if (saved) {
+                try {
+                    orders = JSON.parse(saved);
+                } catch(e) {
+                    orders = [];
+                }
+            } else {
+                // Pedido demo para probar el flujo de inmediato
+                orders = [
+                    {
+                        id: 'demo_101',
+                        folio: 'AES-1002',
+                        cliente: 'Carlos Domínguez',
+                        telefono: '2225495223',
+                        tipo_entrega: 'domicilio',
+                        direccion: 'Calle 107 C Poniente #1502, Galaxia La Laguna',
+                        referencias: 'Portón café frente al parque',
+                        metodo_pago: 'efectivo',
+                        pago_con: '500',
+                        total: 350.00,
+                        estado: 'pendiente',
+                        fecha: new Date().toISOString(),
+                        items: [
+                            { nombre: 'Kilo de carnitas', qty: 1, precio: 350.00, opcion: 'Surtida y Costilla', notas: 'Bien doradita' }
+                        ]
+                    }
+                ];
+                localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+            }
+            updateStats();
+            renderOrdersBoard();
+        }
+
+        function loadDishes() {
+            const saved = localStorage.getItem('casa_aes_dishes');
+            if (saved) {
+                try { dishes = JSON.parse(saved); } catch(e) { dishes = []; }
+            }
+            renderMenuTable();
+        }
+
+        function loadCustomers() {
+            // Extraer clientes únicos desde los pedidos
+            const custMap = {};
+            orders.forEach(ord => {
+                if (ord.telefono && !custMap[ord.telefono]) {
+                    custMap[ord.telefono] = {
+                        codigo: 'AES-' + (100 + Object.keys(custMap).length),
+                        nombre: ord.cliente,
+                        telefono: ord.telefono,
+                        direccion: ord.direccion,
+                        referencias: ord.referencias,
+                        total_pedidos: 1,
+                        gasto_total: ord.total,
+                        alias: ''
+                    };
+                } else if (ord.telefono) {
+                    custMap[ord.telefono].total_pedidos += 1;
+                    custMap[ord.telefono].gasto_total += ord.total;
+                }
+            });
+            customers = Object.values(custMap);
+            renderCustomersList();
+        }
+
+        // ACTUALIZAR MÉTRICAS DEL DÍA
+        function updateStats() {
+            const completed = orders.filter(o => o.estado === 'concluido');
+            const pending = orders.filter(o => o.estado !== 'concluido' && o.estado !== 'cancelado');
+            const totalSales = completed.reduce((sum, o) => sum + (o.total || 0), 0);
+
+            document.getElementById('stat-total-sales').textContent = `$${totalSales.toFixed(2)}`;
+            document.getElementById('stat-completed-orders').textContent = `${completed.length} pedidos`;
+            document.getElementById('stat-pending-orders').textContent = `${pending.length} activos`;
+            document.getElementById('badge-total-active').textContent = pending.length;
+        }
+
+        // RENDERIZAR TABLERO KANBAN
+        function renderOrdersBoard() {
+            const cols = {
+                pendiente: document.getElementById('col-pendiente'),
+                cocina: document.getElementById('col-cocina'),
+                en_camino: document.getElementById('col-en_camino'),
+                concluido: document.getElementById('col-concluido')
+            };
+
+            const counts = { pendiente: 0, cocina: 0, en_camino: 0, concluido: 0 };
+            Object.values(cols).forEach(col => col.innerHTML = '');
+
+            let filteredOrders = orders;
+            if (activeFilter === 'domicilio') {
+                filteredOrders = orders.filter(o => o.tipo_entrega === 'domicilio');
+            } else if (activeFilter === 'local') {
+                filteredOrders = orders.filter(o => o.tipo_entrega !== 'domicilio');
+            }
+
+            filteredOrders.forEach(order => {
+                const targetCol = cols[order.estado] || cols.pendiente;
+                counts[order.estado] = (counts[order.estado] || 0) + 1;
+
+                const timeAgo = formatTimeAgo(new Date(order.fecha));
+                const isDelivery = order.tipo_entrega === 'domicilio';
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-3.5 rounded-2xl border border-aes-border shadow-sm space-y-2.5 hover:shadow-md transition text-xs";
+                
+                // Formato para DiDi / Uber Envíos
+                const copyText = `Cliente: ${order.cliente} | Tel: ${order.telefono} | Entrega: ${order.direccion} | Ref: ${order.referencias || 'Ninguna'}`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-serif font-bold text-xs text-aes-charcoal">#${order.folio}</span>
+                            <span class="text-[10px] text-aes-muted">• ${timeAgo}</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isDelivery ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                            ${isDelivery ? '🛵 A Domicilio' : '🥡 En Local'}
+                        </span>
+                    </div>
+
+                    <div>
+                        <div class="font-bold text-aes-charcoal text-sm flex items-center justify-between">
+                            <span>${order.cliente}</span>
+                            <span class="font-serif text-aes-copper text-sm font-bold">$${Number(order.total).toFixed(2)}</span>
+                        </div>
+                        <a href="https://wa.me/52${order.telefono}" target="_blank" class="text-[11px] text-aes-olive hover:underline flex items-center gap-1 mt-0.5">
+                            <i data-lucide="phone" class="w-3 h-3"></i>
+                            <span>${order.telefono}</span>
+                        </a>
+                    </div>
+
+                    <!-- Items del pedido -->
+                    <div class="bg-aes-bg p-2 rounded-xl space-y-1 border border-aes-border/60">
+                        ${order.items.map(i => `
+                            <div class="flex items-start justify-between text-[11px]">
+                                <span class="font-medium text-aes-charcoal">
+                                    <strong class="text-aes-olive">${i.qty}x</strong> ${i.nombre}
+                                    ${i.opcion ? `<span class="text-aes-muted text-[10px]">(${i.opcion})</span>` : ''}
+                                    ${i.notas ? `<span class="italic text-[10px] text-amber-900 block font-normal">"${i.notas}"</span>` : ''}
+                                </span>
+                                <span class="text-aes-muted font-bold text-[10px]">$${(i.precio * i.qty).toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${isDelivery ? `
+                        <div class="text-[11px] bg-amber-50/80 p-2 rounded-xl border border-amber-200/60 text-amber-950">
+                            <p class="font-semibold truncate">📍 ${order.direccion}</p>
+                            ${order.referencias ? `<p class="text-[10px] text-amber-800 mt-0.5 truncate">🔍 ${order.referencias}</p>` : ''}
+                        </div>
+                    ` : ''}
+
+                    <div class="flex items-center justify-between text-[10px] text-aes-muted border-t border-aes-border/80 pt-2">
+                        <span>Pago: <strong class="capitalize text-aes-charcoal">${order.metodo_pago}</strong> ${order.pago_con ? `(con $${order.pago_con})` : ''}</span>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN RÁPIDA -->
+                    <div class="pt-1 flex flex-col gap-1.5">
+                        ${isDelivery ? `
+                            <button onclick="copyToClipboard('${escapeJs(copyText)}')" 
+                                class="w-full bg-blue-50 hover:bg-blue-100 text-blue-800 py-1.5 rounded-xl font-semibold text-[11px] flex items-center justify-center gap-1.5 border border-blue-200 transition">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span>Copiar para DiDi / Uber Envíos</span>
+                            </button>
+                        ` : ''}
+
+                        <div class="grid grid-cols-2 gap-1.5">
+                            ${order.estado === 'pendiente' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'cocina')" class="bg-orange-600 hover:bg-orange-700 text-white py-1.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1">
+                                    <i data-lucide="flame" class="w-3 h-3"></i> A Cocina
+                                </button>
+                                <button onclick="updateOrderStatus('${order.id}', 'concluido')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1">
+                                    <i data-lucide="check" class="w-3 h-3"></i> Concluir
+                                </button>
+                            ` : order.estado === 'cocina' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'en_camino')" class="bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1">
+                                    <i data-lucide="bike" class="w-3 h-3"></i> A Reparto
+                                </button>
+                                <button onclick="updateOrderStatus('${order.id}', 'concluido')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1">
+                                    <i data-lucide="check" class="w-3 h-3"></i> Concluir
+                                </button>
+                            ` : order.estado === 'en_camino' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'concluido')" class="col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 shadow">
+                                    <i data-lucide="check-check" class="w-4 h-4"></i> ✅ Concluir Pedido (Entregado)
+                                </button>
+                            ` : `
+                                <span class="col-span-2 text-center text-[11px] text-emerald-700 font-bold py-1 bg-emerald-100 rounded-lg">
+                                    ✓ Pedido Concluido
+                                </span>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                targetCol.appendChild(card);
+            });
+
+            // Actualizar contadores por columna
+            document.getElementById('count-col-pendiente').textContent = counts.pendiente || 0;
+            document.getElementById('count-col-cocina').textContent = counts.cocina || 0;
+            document.getElementById('count-col-en_camino').textContent = counts.en_camino || 0;
+            document.getElementById('count-col-concluido').textContent = counts.concluido || 0;
+
+            lucide.createIcons();
+        }
+
+        // CAMBIAR ESTADO DE PEDIDO
+        function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === orderId);
+            if (!ord) return;
+            ord.estado = newStatus;
+            localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+            updateStats();
+            renderOrdersBoard();
+            showToast(`Pedido #${ord.folio} pasado a: ${newStatus.toUpperCase()}`);
+        }
+
+        // FILTROS DE PEDIDOS
+        function filterOrders(filter) {
+            activeFilter = filter;
+            ['todos', 'domicilio', 'local'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === filter) {
+                    btn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-aes-olive text-white";
+                } else {
+                    btn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-aes-surface text-aes-charcoal hover:bg-aes-border";
+                }
+            });
+            renderOrdersBoard();
+        }
+
+        // GESTOR DE MENÚ EN PANEL
+        function renderMenuTable() {
+            const container = document.getElementById('admin-dishes-table');
+            let filtered = dishes;
+            if (activeMenuFilter !== 'todos') {
+                filtered = dishes.filter(d => d.tipo_menu === activeMenuFilter);
+            }
+
+            container.innerHTML = filtered.map(dish => `
+                <div class="p-3.5 flex items-center justify-between hover:bg-aes-surface/30 transition text-xs">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-serif font-bold text-sm text-aes-charcoal capitalize">${dish.nombre}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${dish.tipo_menu === 'fin_de_semana' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${dish.tipo_menu === 'fin_de_semana' ? 'Fin de Semana' : 'Comida del Día'}
+                            </span>
+                        </div>
+                        <p class="text-aes-muted text-[11px] mt-0.5">${dish.descripcion || 'Sin descripción'}</p>
+                        ${dish.opciones && dish.opciones.length ? `<span class="text-[10px] text-aes-olive">Variantes: ${dish.opciones.join(', ')}</span>` : ''}
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <span class="font-serif font-bold text-base text-aes-copper">$${Number(dish.precio).toFixed(2)}</span>
+                        
+                        <!-- Switch de Disponible / Agotado -->
+                        <button onclick="toggleDishAvailability('${dish.id}')" 
+                            class="px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 ${dish.disponible !== false ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-red-100 text-red-800 hover:bg-red-200'}">
+                            <span class="w-2 h-2 rounded-full ${dish.disponible !== false ? 'bg-emerald-500' : 'bg-red-500'}"></span>
+                            <span>${dish.disponible !== false ? 'Disponible' : 'Agotado'}</span>
+                        </button>
+
+                        <button onclick="deleteDish('${dish.id}')" class="text-red-500 hover:text-red-700 p-1" title="Eliminar platillo">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function toggleDishAvailability(dishId) {
+            const dish = dishes.find(d => d.id === dishId);
+            if (!dish) return;
+            dish.disponible = (dish.disponible === false);
+            localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
+            renderMenuTable();
+            showToast(`Platillo marcado como: ${dish.disponible ? 'Disponible' : 'Agotado'}`);
+        }
+
+        function deleteDish(dishId) {
+            if (!confirm('¿Deseas eliminar este platillo del menú?')) return;
+            dishes = dishes.filter(d => d.id !== dishId);
+            localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
+            renderMenuTable();
+            showToast('Platillo eliminado');
+        }
+
+        function filterMenuTab(tab) {
+            activeMenuFilter = tab;
+            ['todos', 'fin', 'dia'].forEach(t => {
+                const btn = document.getElementById(`menutab-${t}`);
+                btn.className = (t === tab || (t === 'fin' && tab === 'fin_de_semana') || (t === 'dia' && tab === 'comida_del_dia'))
+                    ? "px-3 py-1 rounded-lg text-xs font-bold bg-aes-olive text-white"
+                    : "px-3 py-1 rounded-lg text-xs font-bold bg-white text-aes-charcoal border border-aes-border";
+            });
+            renderMenuTable();
+        }
+
+        // AGREGAR PLATILLO MANUAL
+        function openAddDishModal() {
+            document.getElementById('add-dish-modal').classList.remove('hidden');
+            document.getElementById('add-dish-modal').classList.add('flex');
+        }
+        function closeAddDishModal() {
+            document.getElementById('add-dish-modal').classList.add('hidden');
+            document.getElementById('add-dish-modal').classList.remove('flex');
+        }
+        function saveManualDish() {
+            const name = document.getElementById('new-dish-name').value.trim();
+            const price = parseFloat(document.getElementById('new-dish-price').value);
+            const type = document.getElementById('new-dish-type').value;
+            const desc = document.getElementById('new-dish-desc').value.trim();
+            const optionsRaw = document.getElementById('new-dish-options').value.trim();
+
+            if (!name || isNaN(price)) {
+                alert('Ingresa el nombre y precio del platillo');
+                return;
+            }
+
+            const options = optionsRaw ? optionsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+            dishes.push({
+                id: 'dish_' + Date.now(),
+                nombre: name,
+                precio: price,
+                tipo_menu: type,
+                descripcion: desc,
+                disponible: true,
+                opciones: options
+            });
+
+            localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
+            renderMenuTable();
+            closeAddDishModal();
+            showToast('Platillo agregado al menú');
+        }
+
+        // DIRECTORIO DE CLIENTES
+        function renderCustomersList() {
+            const container = document.getElementById('admin-customers-list');
+            if (customers.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-aes-muted text-xs">No hay clientes registrados aún.</div>`;
+                return;
+            }
+
+            container.innerHTML = customers.map(c => `
+                <div class="p-4 flex items-center justify-between hover:bg-aes-surface/30 transition text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-serif font-bold text-sm text-aes-charcoal">${c.nombre}</span>
+                            <span class="text-[10px] bg-aes-oliveLight text-aes-olive font-bold px-2 py-0.5 rounded-full">${c.codigo}</span>
+                            ${c.total_pedidos >= 3 ? `<span class="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full">⭐ Cliente Frecuente</span>` : ''}
+                        </div>
+                        <p class="text-aes-olive font-medium text-[11px] mt-0.5">📞 ${c.telefono}</p>
+                        ${c.direccion ? `<p class="text-aes-muted text-[11px] mt-0.5">📍 ${c.direccion} ${c.referencias ? `(${c.referencias})` : ''}</p>` : ''}
+                    </div>
+
+                    <div class="text-right">
+                        <div class="font-serif font-bold text-sm text-aes-charcoal">${c.total_pedidos} pedidos</div>
+                        <div class="text-aes-copper font-bold text-xs mt-0.5">Acumulado: $${Number(c.gasto_total).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCustomerList() {
+            const q = document.getElementById('search-customer').value.toLowerCase();
+            const filtered = customers.filter(c => 
+                c.nombre.toLowerCase().includes(q) || 
+                c.telefono.includes(q) || 
+                c.codigo.toLowerCase().includes(q)
+            );
+            const container = document.getElementById('admin-customers-list');
+            container.innerHTML = filtered.map(c => `
+                <div class="p-4 flex items-center justify-between hover:bg-aes-surface/30 transition text-xs">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-serif font-bold text-sm text-aes-charcoal">${c.nombre}</span>
+                            <span class="text-[10px] bg-aes-oliveLight text-aes-olive font-bold px-2 py-0.5 rounded-full">${c.codigo}</span>
+                        </div>
+                        <p class="text-aes-olive font-medium text-[11px] mt-0.5">📞 ${c.telefono}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-serif font-bold text-sm text-aes-charcoal">${c.total_pedidos} pedidos</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // VENTA EN MOSTRADOR (LOCAL)
+        function openWalkInOrderModal() {
+            walkinCart = [];
+            renderWalkInDishesSelector();
+            updateWalkInCart();
+            document.getElementById('walkin-order-modal').classList.remove('hidden');
+            document.getElementById('walkin-order-modal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeWalkInOrderModal() {
+            document.getElementById('walkin-order-modal').classList.add('hidden');
+            document.getElementById('walkin-order-modal').classList.remove('flex');
+        }
+
+        function renderWalkInDishesSelector() {
+            const container = document.getElementById('walkin-dishes-selector');
+            container.innerHTML = dishes.filter(d => d.disponible !== false).map(dish => `
+                <button onclick="addWalkInItem('${dish.id}')" 
+                    class="p-2 bg-aes-bg hover:bg-aes-surface border border-aes-border rounded-xl text-left text-xs transition active:scale-95">
+                    <div class="font-serif font-bold text-aes-charcoal truncate">${dish.nombre}</div>
+                    <div class="font-bold text-aes-copper text-[11px] mt-0.5">$${Number(dish.precio).toFixed(2)}</div>
+                </button>
+            `).join('');
+        }
+
+        function addWalkInItem(dishId) {
+            const dish = dishes.find(d => d.id === dishId);
+            if (!dish) return;
+
+            const existing = walkinCart.find(i => i.dishId === dishId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                walkinCart.push({ dishId, nombre: dish.nombre, precio: dish.precio, qty: 1 });
+            }
+            updateWalkInCart();
+        }
+
+        function updateWalkInCart() {
+            const container = document.getElementById('walkin-items-list');
+            if (walkinCart.length === 0) {
+                container.innerHTML = `<p class="text-aes-muted italic text-[11px]">No has seleccionado platillos aún.</p>`;
+                document.getElementById('walkin-total').textContent = `$0.00`;
+                return;
+            }
+
+            const total = walkinCart.reduce((sum, i) => sum + (i.precio * i.qty), 0);
+            container.innerHTML = walkinCart.map(i => `
+                <div class="flex items-center justify-between">
+                    <span>${i.qty}x ${i.nombre}</span>
+                    <span class="font-bold text-aes-copper">$${(i.precio * i.qty).toFixed(2)}</span>
+                </div>
+            `).join('');
+            document.getElementById('walkin-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function submitWalkInOrder() {
+            if (walkinCart.length === 0) {
+                alert('Selecciona al menos un platillo.');
+                return;
+            }
+
+            const name = document.getElementById('walkin-name').value.trim() || 'Cliente en Mostrador';
+            const phone = document.getElementById('walkin-phone').value.trim() || '2220000000';
+            const payment = document.querySelector('input[name="walkin-payment"]:checked').value;
+            const total = walkinCart.reduce((sum, i) => sum + (i.precio * i.qty), 0);
+
+            const newOrder = {
+                id: 'ord_' + Date.now(),
+                folio: 'AES-' + Math.floor(1000 + Math.random() * 9000),
+                cliente: name,
+                telefono: phone,
+                tipo_entrega: 'local',
+                direccion: 'Venta Física en Mostrador',
+                referencias: '',
+                metodo_pago: payment,
+                total: total,
+                estado: 'cocina',
+                fecha: new Date().toISOString(),
+                items: walkinCart.map(i => ({ nombre: i.nombre, qty: i.qty, precio: i.precio, opcion: '', notas: '' }))
+            };
+
+            orders.unshift(newOrder);
+            localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+            updateStats();
+            renderOrdersBoard();
+            closeWalkInOrderModal();
+            showToast('Venta en mostrador registrada y mandada a cocina');
+        }
+
+        // ESCÁNER DE MENÚ CON IA (GEMINI VISION)
+        function openAiMenuModal() {
+            document.getElementById('ai-menu-modal').classList.remove('hidden');
+            document.getElementById('ai-menu-modal').classList.add('flex');
+            document.getElementById('ai-preview-zone').classList.add('hidden');
+            document.getElementById('btn-save-ai-dishes').classList.add('hidden');
+            document.getElementById('btn-run-ai').classList.remove('hidden');
+            document.getElementById('ai-status-text').textContent = 'Listo para analizar foto';
+        }
+
+        function closeAiMenuModal() {
+            document.getElementById('ai-menu-modal').classList.add('hidden');
+            document.getElementById('ai-menu-modal').classList.remove('flex');
+        }
+
+        async function runAiMenuScan() {
+            const fileInput = document.getElementById('ai-menu-file');
+            const notes = document.getElementById('ai-menu-notes').value.trim();
+            const status = document.getElementById('ai-status-text');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                // Simulación inteligente si no hay foto seleccionada
+                status.textContent = 'Analizando con motor inteligente...';
+            } else {
+                status.textContent = 'Procesando imagen con Gemini Vision...';
+            }
+
+            try {
+                let base64 = "";
+                let mimeType = "image/jpeg";
+                if (fileInput.files && fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    mimeType = file.type || "image/jpeg";
+                    base64 = await toBase64(file);
+                }
+
+                const res = await fetch('/api/ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task: 'ocr_menu',
+                        imageBase64: base64,
+                        userNotes: notes,
+                        mimeType: mimeType
+                    })
+                });
+
+                const data = await res.json();
+                if (data && data.menu_del_dia) {
+                    aiDetectedCache = data.menu_del_dia;
+                    const preview = document.getElementById('ai-detected-dishes');
+                    preview.innerHTML = aiDetectedCache.map(d => `
+                        <div class="p-2 bg-white rounded-lg border border-purple-200 flex justify-between">
+                            <div>
+                                <strong class="text-purple-950">${d.nombre}</strong>
+                                <p class="text-[10px] text-purple-700">${d.descripcion || ''}</p>
+                            </div>
+                            <span class="font-bold text-purple-900">$${Number(d.precio).toFixed(2)}</span>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('ai-preview-zone').classList.remove('hidden');
+                    document.getElementById('btn-run-ai').classList.add('hidden');
+                    document.getElementById('btn-save-ai-dishes').classList.remove('hidden');
+                    status.textContent = '¡Platillos detectados con éxito!';
+                    lucide.createIcons();
+                }
+            } catch(e) {
+                console.error(e);
+                status.textContent = 'Error al analizar. Intenta de nuevo.';
+            }
+        }
+
+        function saveAiDetectedDishes() {
+            if (aiDetectedCache.length === 0) return;
+
+            // Reemplazar o añadir los platillos de comida del día
+            aiDetectedCache.forEach(d => {
+                dishes.push({
+                    id: 'ai_' + Date.now() + Math.random(),
+                    nombre: d.nombre,
+                    descripcion: d.descripcion,
+                    precio: d.precio,
+                    tipo_menu: 'comida_del_dia',
+                    disponible: true,
+                    opciones: d.opciones || []
+                });
+            });
+
+            localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
+            renderMenuTable();
+            closeAiMenuModal();
+            showToast('¡Menú del día actualizado con IA!');
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // CONFIGURACIÓN SUPABASE MODAL
+        function openConfigModal() {
+            document.getElementById('cfg-supabase-url').value = localStorage.getItem('casa_aes_sb_url') || '';
+            document.getElementById('cfg-supabase-key').value = localStorage.getItem('casa_aes_sb_key') || '';
+            document.getElementById('cfg-gemini-key').value = localStorage.getItem('casa_aes_gemini_key') || '';
+            document.getElementById('config-modal').classList.remove('hidden');
+            document.getElementById('config-modal').classList.add('flex');
+        }
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+            document.getElementById('config-modal').classList.remove('flex');
+        }
+        function saveConfig() {
+            localStorage.setItem('casa_aes_sb_url', document.getElementById('cfg-supabase-url').value.trim());
+            localStorage.setItem('casa_aes_sb_key', document.getElementById('cfg-supabase-key').value.trim());
+            localStorage.setItem('casa_aes_gemini_key', document.getElementById('cfg-gemini-key').value.trim());
+            closeConfigModal();
+            showToast('Configuración de conexión guardada');
+        }
+
+        // CAMBIO DE PESTAÑAS PRINCIPALES
+        function switchAdminTab(tab) {
+            ['pedidos', 'menu', 'clientes'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const btn = document.getElementById(`nav-btn-${t}`);
+                const mBtn = document.getElementById(`m-nav-${t}`);
+
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-lg font-serif text-xs font-bold tracking-wide transition flex items-center gap-1.5 bg-aes-olive text-white shadow";
+                    if (mBtn) mBtn.className = "flex-1 py-1.5 rounded-lg font-serif text-xs font-bold bg-aes-olive text-white shadow";
+                } else {
+                    sec.classList.add('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-lg font-serif text-xs font-bold tracking-wide transition flex items-center gap-1.5 text-white/80 hover:bg-white/10";
+                    if (mBtn) mBtn.className = "flex-1 py-1.5 rounded-lg font-serif text-xs font-bold bg-white text-aes-charcoal border border-aes-border";
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // UTILIDADES: CLIPBOARD & TOAST
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('¡Datos copiados para DiDi / Uber Envíos!');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('¡Datos copiados!');
+            });
+        }
+
+        function showToast(msg, icon = 'check') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-24');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24');
+            }, 3000);
+        }
+
+        function formatTimeAgo(date) {
+            const secs = Math.floor((new Date() - date) / 1000);
+            if (secs < 60) return 'Hace un momento';
+            const mins = Math.floor(secs / 60);
+            if (mins < 60) return `Hace ${mins} min`;
+            const hours = Math.floor(mins / 60);
+            return `Hace ${hours} h`;
+        }
+
+        function escapeJs(str) {
+            return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+    </script>
+</body>
+</html>
