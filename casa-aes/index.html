@@ -430,6 +430,16 @@
     <script>
         // CONFIGURACIÓN DE CASA AES
         const STORE_PHONE = "522212811095"; // WhatsApp de la dueña
+        const SUPABASE_URL = 'https://yzykzfzxvngjycmfansk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_kP5I2bwqJ_NzbWyF8grDbA_gEtX-VRS';
+        let supabaseClient = null;
+        if (window.supabase) {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch(e) {
+                console.warn('Supabase init:', e);
+            }
+        }
         let currentTab = 'fin_de_semana';
         let dishes = [];
         let cart = [];
@@ -901,7 +911,34 @@
             existingOrders.unshift(newOrder);
             localStorage.setItem('casa_aes_orders', JSON.stringify(existingOrders));
 
-            // Notificar a otras pestañas / admin si están abiertas
+            // Sincronizar en la nube con la API Serverless para que llegue a la computadora de la dueña
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order: newOrder })
+            }).catch(e => console.warn('Error al sincronizar con /api/orders:', e));
+
+            // Sincronizar también con Supabase
+            if (supabaseClient) {
+                try {
+                    supabaseClient.from('orders').insert([{
+                        folio: parseInt(folioNumber, 10),
+                        nombre_cliente: name,
+                        telefono: phone,
+                        tipo_entrega: deliveryType,
+                        direccion: address || 'Recoge en Local',
+                        referencias: ref || '',
+                        metodo_pago: paymentMethod,
+                        pago_con: cashAmount ? parseFloat(cashAmount) : null,
+                        total: total,
+                        estado: 'pendiente'
+                    }]).then(({ error }) => {
+                        if (error) console.warn('Supabase insert notice:', error.message);
+                    });
+                } catch(e) {}
+            }
+
+            // Notificar a otras pestañas / admin si están abiertas en el mismo navegador
             try {
                 window.dispatchEvent(new Event('storage'));
             } catch(e) {}

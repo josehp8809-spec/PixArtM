@@ -616,6 +616,130 @@
         // ==========================================
         const EXPECTED_EMAIL = 'contacto@casaaes.com';
         const EXPECTED_PASS = 'Casa123456*';
+        const SUPABASE_URL = 'https://yzykzfzxvngjycmfansk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_kP5I2bwqJ_NzbWyF8grDbA_gEtX-VRS';
+        let supabaseClient = null;
+        if (window.supabase) {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch(e) {
+                console.warn('Supabase client error:', e);
+            }
+        }
+
+        // PLATILLOS POR DEFECTO DE CASA AES (Siempre disponibles en cualquier laptop/dispositivo)
+        const DEFAULT_DISHES = [
+            {
+                id: 'taco-carnitas',
+                nombre: 'Taco de carnitas',
+                descripcion: 'Tradicional taco con tortilla caliente, cebolla, cilantro y salsas de la casa.',
+                precio: 35.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Cuerito', 'Costilla', 'Buche', 'Campechano'],
+                imagen: 'assets/hero-cazo.jpg'
+            },
+            {
+                id: 'cemita-carnitas',
+                nombre: 'Cemita de carnitas',
+                descripcion: 'Deliciosa cemita poblana rellena de auténticas carnitas estilo Quiroga, pápalo y chipotle.',
+                precio: 45.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Cuerito', 'Costilla'],
+                imagen: null
+            },
+            {
+                id: 'kilo-carnitas',
+                nombre: 'kilo de carnitas',
+                descripcion: '1 Kilo de carnitas estilo Quiroga. Incluye tortillas calientes, salsas caseras y limones.',
+                precio: 350.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Costilla y Cuerito', 'A convenir'],
+                imagen: null
+            },
+            {
+                id: 'medio-carnitas',
+                nombre: '1/2 de carnitas',
+                descripcion: 'Medio kilo de carnitas para compartir con tortillas, salsas y limones.',
+                precio: 175.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'carnitas',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza', 'Costilla y Cuerito', 'A convenir'],
+                imagen: null
+            },
+            {
+                id: 'chilaquiles-aes',
+                nombre: 'Chilaquiles Aes',
+                descripcion: 'Totopos crujientes con salsa especial, cubiertos con abundante carne de carnitas, crema y queso.',
+                precio: 75.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'especialidades',
+                disponible: true,
+                opciones: ['Salsa Roja', 'Salsa Verde', 'Mitad y Mitad'],
+                imagen: 'assets/menu-flyer.jpg'
+            },
+            {
+                id: 'quesacazo',
+                nombre: 'Quesacazo',
+                descripcion: 'Tortilla doradita al cazo rellena de queso fundido artesanal y jugosas carnitas.',
+                precio: 55.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'especialidades',
+                disponible: true,
+                opciones: ['Surtida', 'Maciza'],
+                imagen: null
+            },
+            {
+                id: 'empanada',
+                nombre: 'Empanada (camarón y queso)',
+                descripcion: 'Crujiente empanada frita rellena de guisado de camarón y queso derretido.',
+                precio: 35.00,
+                tipo_menu: 'fin_de_semana',
+                categoria: 'entradas',
+                disponible: true,
+                opciones: [],
+                imagen: null
+            },
+            {
+                id: 'menu-guisado-dia',
+                nombre: 'Guisado del Día: Pechuga Cordon Bleu',
+                descripcion: 'Acompañada de ensalada fresca y arroz rojo tradicional recién hecho.',
+                precio: 85.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'comida_corrida',
+                disponible: true,
+                opciones: ['Con Arroz', 'Con Frijoles', 'Con Ensalada'],
+                imagen: null
+            },
+            {
+                id: 'menu-sopa-dia',
+                nombre: 'Sopa Azteca Tradicional',
+                descripcion: 'Caldo de jitomate sazonado con tiras de tortilla dorada, queso, aguacate y crema.',
+                precio: 45.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'sopas',
+                disponible: true,
+                opciones: [],
+                imagen: null
+            },
+            {
+                id: 'agua-fresca-dia',
+                nombre: 'Agua Fresca del Día (1 Litro)',
+                descripcion: 'Agua artesanal de fruta fresca de temporada, fría y refrescante.',
+                precio: 30.00,
+                tipo_menu: 'comida_del_dia',
+                categoria: 'bebidas',
+                disponible: true,
+                opciones: ['Horchata Artesanal', 'Jamaica Natural'],
+                imagen: null
+            }
+        ];
 
         function checkAuth() {
             const token = localStorage.getItem('casa_aes_admin_token');
@@ -715,24 +839,10 @@
                 }
             });
 
-            // Polling suave cada 4 segundos por si acaso
+            // Sincronización en la nube periódica cada 3 segundos
             setInterval(() => {
-                const saved = localStorage.getItem('casa_aes_orders');
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        if (parsed.length !== orders.length) {
-                            if (parsed.length > orders.length) {
-                                playKitchenChime();
-                                showToast('¡Nuevo pedido recibido!', 'bell');
-                            }
-                            orders = parsed;
-                            updateStats();
-                            renderOrdersBoard();
-                        }
-                    } catch(e) {}
-                }
-            }, 4000);
+                fetchCloudOrders();
+            }, 3000);
         });
 
         // SONIDO DE COCINA SINTETIZADO (Web Audio API autónomo)
@@ -797,36 +907,91 @@
                     orders = [];
                 }
             } else {
-                // Pedido demo para probar el flujo de inmediato
-                orders = [
-                    {
-                        id: 'demo_101',
-                        folio: 'AES-1002',
-                        cliente: 'Carlos Domínguez',
-                        telefono: '2225495223',
-                        tipo_entrega: 'domicilio',
-                        direccion: 'Calle 107 C Poniente #1502, Galaxia La Laguna',
-                        referencias: 'Portón café frente al parque',
-                        metodo_pago: 'efectivo',
-                        pago_con: '500',
-                        total: 350.00,
-                        estado: 'pendiente',
-                        fecha: new Date().toISOString(),
-                        items: [
-                            { nombre: 'Kilo de carnitas', qty: 1, precio: 350.00, opcion: 'Surtida y Costilla', notas: 'Bien doradita' }
-                        ]
-                    }
-                ];
-                localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+                orders = [];
             }
             updateStats();
             renderOrdersBoard();
+            fetchCloudOrders();
+        }
+
+        async function fetchCloudOrders() {
+            // 1. Consultar a la API Serverless /api/orders (Sincronización multi-dispositivo)
+            try {
+                const res = await fetch('/api/orders');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.orders)) {
+                        let hasNew = false;
+                        data.orders.forEach(co => {
+                            const idx = orders.findIndex(o => o.id === co.id || o.folio === co.folio);
+                            if (idx >= 0) {
+                                orders[idx] = { ...orders[idx], ...co };
+                            } else {
+                                orders.unshift(co);
+                                hasNew = true;
+                            }
+                        });
+                        if (hasNew) {
+                            playKitchenChime();
+                            showToast('¡Nuevo pedido recibido en la nube!', 'bell');
+                        }
+                        localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+                        updateStats();
+                        renderOrdersBoard();
+                    }
+                }
+            } catch(err) {
+                // Silencioso
+            }
+
+            // 2. Consultar a Supabase
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                        data.forEach(so => {
+                            const folioStr = 'AES-' + so.folio;
+                            const idx = orders.findIndex(o => o.folio === folioStr || o.id === so.id);
+                            if (idx >= 0) {
+                                orders[idx].estado = so.estado;
+                            } else {
+                                orders.unshift({
+                                    id: so.id,
+                                    folio: folioStr,
+                                    cliente: so.nombre_cliente,
+                                    telefono: so.telefono,
+                                    tipo_entrega: so.tipo_entrega,
+                                    direccion: so.direccion,
+                                    referencias: so.referencias,
+                                    metodo_pago: so.metodo_pago,
+                                    pago_con: so.pago_con,
+                                    total: parseFloat(so.total) || 0,
+                                    estado: so.estado,
+                                    fecha: so.created_at,
+                                    items: []
+                                });
+                            }
+                        });
+                        localStorage.setItem('casa_aes_orders', JSON.stringify(orders));
+                        updateStats();
+                        renderOrdersBoard();
+                    }
+                } catch(e) {}
+            }
         }
 
         function loadDishes() {
             const saved = localStorage.getItem('casa_aes_dishes');
             if (saved) {
-                try { dishes = JSON.parse(saved); } catch(e) { dishes = []; }
+                try { 
+                    dishes = JSON.parse(saved); 
+                    if (!dishes || dishes.length === 0) dishes = DEFAULT_DISHES;
+                } catch(e) { 
+                    dishes = DEFAULT_DISHES; 
+                }
+            } else {
+                dishes = DEFAULT_DISHES;
+                localStorage.setItem('casa_aes_dishes', JSON.stringify(dishes));
             }
             renderMenuTable();
         }
@@ -1042,6 +1207,19 @@
             updateStats();
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} cancelado (No registrado en ventas)`);
+
+            // Sincronizar en la nube
+            fetch('/api/orders', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: ord.id, estado: 'cancelado' })
+            }).catch(e => {});
+
+            if (supabaseClient) {
+                try {
+                    supabaseClient.from('orders').update({ estado: 'cancelado' }).eq('id', ord.id).then(() => {});
+                } catch(e) {}
+            }
         }
 
         function reactivateOrder(orderId) {
@@ -1052,6 +1230,19 @@
             updateStats();
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} reactivado`);
+
+            // Sincronizar en la nube
+            fetch('/api/orders', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: ord.id, estado: 'pendiente' })
+            }).catch(e => {});
+
+            if (supabaseClient) {
+                try {
+                    supabaseClient.from('orders').update({ estado: 'pendiente' }).eq('id', ord.id).then(() => {});
+                } catch(e) {}
+            }
         }
 
         // CAMBIAR ESTADO DE PEDIDO
@@ -1063,6 +1254,19 @@
             updateStats();
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} pasado a: ${newStatus.toUpperCase()}`);
+
+            // Sincronizar en la nube
+            fetch('/api/orders', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: ord.id, estado: newStatus })
+            }).catch(e => {});
+
+            if (supabaseClient) {
+                try {
+                    supabaseClient.from('orders').update({ estado: newStatus }).eq('id', ord.id).then(() => {});
+                } catch(e) {}
+            }
         }
 
         // FILTROS DE PEDIDOS
