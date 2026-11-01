@@ -347,6 +347,19 @@
             }
 
             if (found) {
+                // Sincronizar el estado con el almacenamiento local para que nunca regrese a 'pendiente'
+                try {
+                    const localOrders = JSON.parse(localStorage.getItem('casa_aes_orders') || '[]');
+                    const lIdx = localOrders.findIndex(o => 
+                        (o.folio && o.folio.toUpperCase() === (found.folio || '').toUpperCase()) ||
+                        (o.id && o.id === found.id)
+                    );
+                    if (lIdx >= 0) {
+                        localOrders[lIdx].estado = found.estado;
+                        localStorage.setItem('casa_aes_orders', JSON.stringify(localOrders));
+                    }
+                } catch(e) {}
+
                 if (lastStatus && lastStatus !== found.estado) {
                     playStatusDing();
                 }

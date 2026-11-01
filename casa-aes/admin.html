@@ -843,6 +843,17 @@
             setInterval(() => {
                 fetchCloudOrders();
             }, 3000);
+
+            // Mantener la nube permanentemente sincronizada cada 10 segundos para evitar reinicios fríos de Vercel
+            setInterval(() => {
+                if (orders && orders.length > 0) {
+                    fetch('/api/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'sync_all', orders: orders })
+                    }).catch(e => {});
+                }
+            }, 10000);
         });
 
         // SONIDO DE COCINA SINTETIZADO (Web Audio API autónomo)
@@ -1214,16 +1225,17 @@
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} cancelado (No registrado en ventas)`);
 
-            // Sincronizar en la nube
+            // Sincronizar en la nube con ID y Folio
             fetch('/api/orders', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: ord.id, estado: 'cancelado' })
+                body: JSON.stringify({ id: ord.id, folio: ord.folio, estado: 'cancelado' })
             }).catch(e => {});
 
             if (supabaseClient) {
                 try {
-                    supabaseClient.from('orders').update({ estado: 'cancelado' }).eq('id', ord.id).then(() => {});
+                    const numFolio = parseInt((ord.folio || '').replace(/\D/g, ''), 10);
+                    supabaseClient.from('orders').update({ estado: 'cancelado' }).eq('folio', numFolio).then(() => {});
                 } catch(e) {}
             }
         }
@@ -1237,16 +1249,17 @@
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} reactivado`);
 
-            // Sincronizar en la nube
+            // Sincronizar en la nube con ID y Folio
             fetch('/api/orders', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: ord.id, estado: 'pendiente' })
+                body: JSON.stringify({ id: ord.id, folio: ord.folio, estado: 'pendiente' })
             }).catch(e => {});
 
             if (supabaseClient) {
                 try {
-                    supabaseClient.from('orders').update({ estado: 'pendiente' }).eq('id', ord.id).then(() => {});
+                    const numFolio = parseInt((ord.folio || '').replace(/\D/g, ''), 10);
+                    supabaseClient.from('orders').update({ estado: 'pendiente' }).eq('folio', numFolio).then(() => {});
                 } catch(e) {}
             }
         }
@@ -1261,16 +1274,17 @@
             renderOrdersBoard();
             showToast(`Pedido #${ord.folio} pasado a: ${newStatus.toUpperCase()}`);
 
-            // Sincronizar en la nube
+            // Sincronizar en la nube con ID y Folio para que el enlace del cliente actualice al instante
             fetch('/api/orders', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: ord.id, estado: newStatus })
+                body: JSON.stringify({ id: ord.id, folio: ord.folio, estado: newStatus })
             }).catch(e => {});
 
             if (supabaseClient) {
                 try {
-                    supabaseClient.from('orders').update({ estado: newStatus }).eq('id', ord.id).then(() => {});
+                    const numFolio = parseInt((ord.folio || '').replace(/\D/g, ''), 10);
+                    supabaseClient.from('orders').update({ estado: newStatus }).eq('folio', numFolio).then(() => {});
                 } catch(e) {}
             }
         }
