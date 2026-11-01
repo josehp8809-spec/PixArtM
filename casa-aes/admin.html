@@ -844,6 +844,17 @@
                 fetchCloudOrders();
             }, 3000);
 
+            // Supabase Realtime: escuchar pedidos nuevos y cambios al segundo
+            if (supabaseClient) {
+                try {
+                    supabaseClient.channel('realtime:orders')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+                            fetchCloudOrders();
+                        })
+                        .subscribe();
+                } catch(e) {}
+            }
+
             // Mantener la nube permanentemente sincronizada cada 10 segundos para evitar reinicios fríos de Vercel
             setInterval(() => {
                 if (orders && orders.length > 0) {

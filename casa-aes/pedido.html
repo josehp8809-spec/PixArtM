@@ -293,6 +293,20 @@
                 }
             }, 3500);
 
+            // Escuchar cambios en vivo desde Supabase Realtime
+            if (supabaseClient && orderKey) {
+                try {
+                    const numFolio = parseInt(orderKey.replace(/\D/g, ''), 10);
+                    supabaseClient.channel('realtime:tracking')
+                        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+                            if (payload.new && (payload.new.folio === numFolio)) {
+                                fetchOrderDetails(orderKey, true);
+                            }
+                        })
+                        .subscribe();
+                } catch(e) {}
+            }
+
             lucide.createIcons();
         });
 
