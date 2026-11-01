@@ -1,8 +1,9 @@
 /**
  * Casa Aes - Serverless Function: Gestión y Sincronización de Pedidos en la Nube
  * 
- * Permite recibir pedidos desde el celular de cualquier cliente (POST)
- * y listarlos en la computadora de la dueña (GET), manteniendo sincronía entre dispositivos.
+ * Permite recibir pedidos desde el celular de cualquier cliente (POST),
+ * consultar todos los pedidos para la administración (GET),
+ * o consultar un pedido individual para el rastreo del cliente (GET ?id=AES-XXXX).
  */
 
 // Memoria global temporal compartida por instancia de Vercel
@@ -21,8 +22,29 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // 1. GET: Consultar todos los pedidos actuales
+  // 1. GET: Consultar todos los pedidos O consultar uno específico por id/folio
   if (req.method === 'GET') {
+    const { id, folio } = req.query || {};
+    const searchKey = id || folio;
+
+    // Si el cliente pide rastrear un pedido específico
+    if (searchKey) {
+      const cleanKey = searchKey.trim().toUpperCase();
+      const target = cloudOrders.find(o => 
+        (o.folio && o.folio.toUpperCase() === cleanKey) ||
+        (o.id && o.id.toUpperCase() === cleanKey) ||
+        (o.folio && o.folio.toUpperCase() === 'AES-' + cleanKey) ||
+        (o.folio && cleanKey.includes(o.folio.toUpperCase()))
+      );
+
+      if (target) {
+        return res.status(200).json({ success: true, order: target });
+      } else {
+        return res.status(404).json({ success: false, error: 'Pedido no encontrado en el sistema activo' });
+      }
+    }
+
+    // Retornar lista completa para el panel de administración
     return res.status(200).json({
       success: true,
       orders: cloudOrders,
@@ -68,14 +90,14 @@ export default async function handler(req, res) {
     });
   }
 
-  // 3. PUT: Actualizar estado de un pedido (ej. de 'pendiente' a 'cocina', 'concluido' o 'cancelado')
+  // 3. PUT: Actualizar estado de un pedido (ej. de 'pendiente' a 'cocina', 'en_camino', 'concluido' o 'cancelado')
   if (req.method === 'PUT') {
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
     const { id, estado } = body;
-    const target = cloudOrders.find(o => o.id === id);
+    const target = cloudOrders.find(o => o.id === id || o.folio === id);
     if (target) {
       target.estado = estado;
       return res.status(200).json({ success: true, order: target });
