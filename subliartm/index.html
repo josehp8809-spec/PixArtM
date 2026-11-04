@@ -1424,8 +1424,19 @@
       });
     }
 
+    // Helper para verificar que un producto sea genuinamente de Navidad y descartar Día de Muertos/Halloween
+    function isChristmasProduct(prod) {
+      if (!prod) return false;
+      const text = `${prod.title || ''} ${prod.description || ''} ${(prod.tags || []).join(' ')} ${prod.seasonName || prod.season_name || ''}`;
+      if (/muerto|catrina|ofrenda|calavera|cempasuchil|halloween/i.test(text)) {
+        return false;
+      }
+      return true;
+    }
+
     // Helper para tarjeta del Carrusel de Temporada (Navidad & Fin de Año)
     function renderSeasonalCard(prod) {
+      if (!isChristmasProduct(prod)) return '';
       return `
         <div class="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0">
           <div class="card-clean rounded-3xl overflow-hidden group h-full flex flex-col justify-between border border-red-200/80 hover:border-red-400 bg-white shadow-sm transition-all duration-300">
@@ -1706,7 +1717,20 @@
       }
 
       // 3. Productos dinámicos en el Carrusel
-      const products = JSON.parse(localStorage.getItem('subli_products') || '[]');
+      let products = JSON.parse(localStorage.getItem('subli_products') || '[]');
+      // Limpiar automáticamente de memoria local cualquier producto de Día de Muertos que haya quedado marcado como seasonal
+      if (Array.isArray(products) && products.length > 0) {
+        let changed = false;
+        products.forEach(p => {
+          if (p.isSeasonal && !isChristmasProduct(p)) {
+            p.isSeasonal = false;
+            changed = true;
+          }
+        });
+        if (changed) {
+          try { localStorage.setItem('subli_products', JSON.stringify(products)); } catch(e) {}
+        }
+      }
       const carouselProducts = products.filter(p => p.inCarousel !== false);
       if (carouselProducts.length > 0) {
         const track = document.getElementById('carousel-track');
@@ -1755,8 +1779,8 @@
         }
       }
 
-      // 4. Productos de Temporada dinámicos (Carrusel)
-      const seasonalProducts = products.filter(p => p.isSeasonal);
+      // 4. Productos de Temporada dinámicos (Carrusel Navideño)
+      const seasonalProducts = products.filter(p => p.isSeasonal && isChristmasProduct(p));
       if (seasonalProducts.length > 0) {
         const seasonGrid = document.getElementById('seasonal-cards-container');
         if (seasonGrid) {
@@ -1866,8 +1890,8 @@
         `).join('');
       }
 
-      // Seasonal Carousel
-      const seasonalProducts = products.filter(p => p.isSeasonal);
+      // Seasonal Carousel (Exclusivo Navidad)
+      const seasonalProducts = products.filter(p => p.isSeasonal && isChristmasProduct(p));
       const seasonGrid = document.getElementById('seasonal-cards-container');
       if (seasonGrid && seasonalProducts.length > 0) {
         seasonGrid.innerHTML = seasonalProducts.map(renderSeasonalCard).join('');
@@ -2014,7 +2038,7 @@
         if (currentGalleryFilter === 'novedades') {
           passesCategory = (prod.isNew || prod.is_new);
         } else if (currentGalleryFilter === 'temporada') {
-          passesCategory = prod.isSeasonal;
+          passesCategory = prod.isSeasonal && isChristmasProduct(prod);
         } else if (currentGalleryFilter !== 'todos') {
           passesCategory = (prod.category === currentGalleryFilter);
         }

@@ -1128,7 +1128,7 @@
                 isSeasonal = true;
                 seasonName = 'Navidad & Fin de Año';
             } else if (/muerto|catrina|ofrenda|calavera|cempasuchil|halloween/i.test(notesLower)) {
-                isSeasonal = true;
+                isSeasonal = false; // Temporada pasada, ya no es activa
                 seasonName = 'Día de Muertos';
             } else if (/san valent[ií]n|amor|amistad|14 de febrero/i.test(notesLower)) {
                 isSeasonal = true;
