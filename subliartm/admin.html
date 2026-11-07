@@ -1256,12 +1256,90 @@
             document.getElementById('userNotes').value = '';
         }
 
-        // Load cloud products from Supabase
+        // Helper para convertir base64 dataURL a Blob
+        function dataURLtoBlob(dataurl) {
+            try {
+                if (!dataurl || typeof dataurl !== 'string') return null;
+                const arr = dataurl.split(',');
+                if (arr.length < 2) return null;
+                const mimeMatch = arr[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], { type: mime });
+            } catch (e) {
+                console.warn('Error converting dataURL to Blob:', e);
+                return null;
+            }
+        }
+
+        // Load cloud products from Supabase (con recuperación y auto-sincronización de productos pendientes)
         async function loadProductsFromSupabase() {
             if (sbClient) {
                 try {
+                    const localProducts = safeJsonParse(localStorage.getItem('subli_products'), []);
                     const { data, error } = await sbClient.from('products').select('*').order('created_at', { ascending: false });
-                    if (!error && data && data.length > 0) {
+                    
+                    if (!error && data) {
+                        // 1. Detectar si hay productos creados localmente que no llegaron a Supabase
+                        const cloudIds = new Set(data.map(d => d.id));
+                        const cloudTitles = new Set(data.map(d => (d.title || '').toLowerCase().trim()));
+                        const unsynced = localProducts.filter(p => {
+                            if (!p || !p.title) return false;
+                            const isLocal = typeof p.id === 'string' && p.id.startsWith('prod-');
+                            return isLocal && !cloudIds.has(p.id) && !cloudTitles.has((p.title || '').toLowerCase().trim());
+                        });
+
+                        // 2. Auto-recuperar y subir productos pendientes a la nube
+                        if (unsynced.length > 0) {
+                            console.log(`Detectados ${unsynced.length} productos locales pendientes por subir a Supabase. Sincronizando...`);
+                            for (const unp of unsynced) {
+                                try {
+                                    let imgUrl = unp.image;
+                                    // Si la imagen está en base64 en localStorage, subirla al bucket product-images
+                                    if (imgUrl && imgUrl.startsWith('data:image')) {
+                                        const blob = dataURLtoBlob(imgUrl);
+                                        if (blob) {
+                                            const ext = (blob.type || 'image/jpeg').split('/')[1] || 'jpg';
+                                            const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+                                            const { data: upData, error: upErr } = await sbClient.storage
+                                                .from('product-images')
+                                                .upload(fileName, blob, { contentType: blob.type || 'image/jpeg', upsert: true });
+                                            if (!upErr) {
+                                                const { data: urlData } = sbClient.storage.from('product-images').getPublicUrl(fileName);
+                                                if (urlData?.publicUrl) imgUrl = urlData.publicUrl;
+                                            }
+                                        }
+                                    }
+
+                                    const { data: inserted, error: insErr } = await sbClient.from('products').insert([{
+                                        title: unp.title,
+                                        category: unp.category,
+                                        price_range: unp.price || unp.price_range || '',
+                                        description: unp.description || '',
+                                        tags: unp.tags || [],
+                                        is_seasonal: !!unp.isSeasonal,
+                                        season_name: unp.seasonName || null,
+                                        in_carousel: unp.inCarousel !== false,
+                                        image_url: imgUrl,
+                                        ai_metadata: { is_new: unp.isNew !== false }
+                                    }]).select();
+
+                                    if (!insErr && inserted && inserted[0]) {
+                                        data.unshift(inserted[0]);
+                                        console.log('Producto pendiente sincronizado a la nube con éxito:', unp.title);
+                                    }
+                                } catch (e) {
+                                    console.warn('Error al auto-sincronizar producto pendiente:', e);
+                                }
+                            }
+                        }
+
+                        // 3. Mapear y guardar productos actualizados en memoria
                         products = data.map(p => ({
                             id: p.id,
                             title: p.title,
@@ -1270,7 +1348,7 @@
                             description: p.description,
                             tags: p.tags || [],
                             isSeasonal: p.is_seasonal,
-                            isNew: p.is_new !== false,
+                            isNew: (p.ai_metadata?.is_new !== undefined ? p.ai_metadata.is_new : (p.is_new !== undefined ? p.is_new : true)),
                             inCarousel: p.in_carousel,
                             image: p.image_url,
                             createdAt: p.created_at
@@ -1359,9 +1437,10 @@
 
             // 2. Insert into Supabase 'products' Table
             let savedId = 'prod-' + Date.now();
+            let cloudSaved = false;
             if (sbClient) {
                 try {
-                    const { data: dbItem, error: dbErr } = await sbClient.from('products').insert([{
+                    const insertPayload = {
                         title,
                         category,
                         price_range: price,
@@ -1369,17 +1448,24 @@
                         tags,
                         is_seasonal: isSeasonal,
                         season_name: isSeasonal ? (document.getElementById('seasonHint')?.textContent?.replace('Detectado: ', '') || 'Especial Temporada') : null,
-                        is_new: isNew,
                         in_carousel: inCarousel,
                         image_url: finalImageUrl,
-                        user_notes: document.getElementById('userNotes')?.value?.trim() || null
-                    }]).select();
+                        user_notes: document.getElementById('userNotes')?.value?.trim() || null,
+                        ai_metadata: { is_new: isNew }
+                    };
 
-                    if (dbItem && dbItem[0]?.id) {
+                    const { data: dbItem, error: dbErr } = await sbClient.from('products').insert([insertPayload]).select();
+
+                    if (dbErr) {
+                        console.error('Error saving row to Supabase products table:', dbErr);
+                        alert('Atención al guardar en la nube: ' + (dbErr.message || JSON.stringify(dbErr)));
+                    } else if (dbItem && dbItem[0]?.id) {
                         savedId = dbItem[0].id;
+                        cloudSaved = true;
                     }
                 } catch (e) {
-                    console.warn('Error saving row to Supabase products table:', e);
+                    console.error('Error saving row to Supabase products table:', e);
+                    alert('Error de conexión con la base de datos: ' + (e.message || e));
                 }
             }
 
@@ -1391,7 +1477,7 @@
                 description,
                 tags,
                 isSeasonal,
-                seasonName: isSeasonal ? 'Especial Temporada' : null,
+                seasonName: isSeasonal ? (document.getElementById('seasonHint')?.textContent?.replace('Detectado: ', '') || 'Especial Temporada') : null,
                 isNew,
                 inCarousel,
                 image: finalImageUrl,
@@ -1406,7 +1492,11 @@
                 publishBtn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> Publicar en el Catálogo Web`;
             }
 
-            alert('¡Trabajo y foto guardados en la nube con éxito! Ya son visibles en la web pública.');
+            if (cloudSaved) {
+                alert('¡Trabajo y foto guardados en la nube con éxito! Ya son visibles en la web pública.');
+            } else {
+                alert('El producto se guardó en la memoria local de tu navegador, pero falló la subida a la nube de Supabase.');
+            }
             removeImage();
             renderProducts();
             switchTab('catalog');

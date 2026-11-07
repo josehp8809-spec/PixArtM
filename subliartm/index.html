@@ -1800,8 +1800,10 @@
                 category: p.category,
                 price: p.price_range,
                 description: p.description,
+                tags: p.tags || [],
                 isSeasonal: p.is_seasonal,
-                isNew: p.is_new !== false,
+                seasonName: p.season_name,
+                isNew: (p.ai_metadata?.is_new !== undefined ? p.ai_metadata.is_new : (p.is_new !== undefined ? p.is_new : true)),
                 inCarousel: p.in_carousel,
                 image: p.image_url
               }));
