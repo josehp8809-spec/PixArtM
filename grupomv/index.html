@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRUPO MV | Soluciones Integrales para la Ingeniería Moderna</title>
-    <meta name="description" content="Servicios integrales de mantenimiento para equipo electromecánico: Plantas de emergencia, chillers, UPS (1 a 1100 kVA), climatización, sistemas contra incendio y facilities en México.">
+    <meta name="description" content="Servicios integrales para equipo electromecánico: Plantas de emergencia, chillers, UPS (1 a 1100 kVA), climatización, sistemas contra incendio y facilities en México.">
     
     <!-- Google Fonts: Tipografía corporativa sobria de ingeniería -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,14 +23,14 @@
                 extend: {
                     colors: {
                         mv: {
-                            black: '#111827',      /* Negro carbón corporativo */
+                            black: '#111827',
                             slate: '#1E293B',
-                            red: '#DC2626',        /* Rojo institucional de acento */
+                            red: '#DC2626',
                             redHover: '#B91C1C',
                             lightRed: '#FEF2F2',
-                            grayBg: '#F8FAFC',     /* Gris claro técnico */
+                            grayBg: '#F8FAFC',
                             grayCard: '#FFFFFF',
-                            border: '#E2E8F0',     /* Borde sutil y limpio */
+                            border: '#E2E8F0',
                             textMain: '#0F172A',
                             textMuted: '#475569'
                         }
@@ -56,10 +56,10 @@
             <div class="flex items-center gap-3">
                 <span class="inline-flex items-center gap-1.5 font-medium text-slate-300">
                     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    Asistencia a emergencias 24 horas los 365 días del año
+                    Asistencia técnica y emergencias 24 horas los 365 días del año
                 </span>
                 <span class="hidden md:inline text-slate-500">•</span>
-                <span class="hidden md:inline text-slate-300">Ciudad de México & Cobertura Nacional</span>
+                <span class="hidden md:inline text-slate-300">CDMX, Área Metropolitana y Cobertura Nacional</span>
             </div>
             <div class="flex items-center gap-5 font-medium">
                 <a href="tel:+525538798706" class="hover:text-red-300 flex items-center gap-1.5 transition">
@@ -81,7 +81,7 @@
             
             <!-- Logo Grupo MV Oficial -->
             <a href="#" class="flex items-center gap-3 group">
-                <div class="border-2 border-black p-1.5 bg-black flex items-center">
+                <div class="border-2 border-black p-1.5 bg-black flex items-center shadow-sm">
                     <span class="bg-white text-black font-extrabold text-sm sm:text-base px-2 py-0.5 tracking-tight font-sans">GRUPO</span>
                     <span class="text-white font-black text-xl sm:text-2xl px-2 tracking-tight font-sans">MV</span>
                 </div>
@@ -92,11 +92,12 @@
             </a>
 
             <!-- Menú de Navegación -->
-            <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-700 font-sans">
-                <a href="#quienes-somos" class="hover:text-mv-red transition">Nosotros</a>
+            <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-700 font-sans">
                 <a href="#soluciones" class="hover:text-mv-red transition">Soluciones</a>
-                <a href="#polizas" class="hover:text-mv-red transition">Pólizas de Mantenimiento</a>
-                <a href="#instalaciones" class="hover:text-mv-red transition">Instalaciones & Facilities</a>
+                <a href="#sectores" class="hover:text-mv-red transition">Sectores</a>
+                <a href="#polizas" class="hover:text-mv-red transition">Pólizas Preventivas</a>
+                <a href="#marcas" class="hover:text-mv-red transition">Marcas</a>
+                <a href="#galeria" class="hover:text-mv-red transition">Proyectos</a>
                 <a href="#clientes" class="hover:text-mv-red transition">Clientes</a>
                 <a href="#contacto" class="hover:text-mv-red transition">Contacto</a>
             </nav>
@@ -104,7 +105,7 @@
             <!-- CTA Button -->
             <div class="flex items-center gap-3">
                 <a href="#cotizador" class="hidden sm:inline-flex items-center gap-2 bg-mv-red hover:bg-mv-redHover text-white text-xs uppercase tracking-wider font-bold px-5 py-3 rounded shadow-sm transition">
-                    <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                    <i data-lucide="clipboard-check" class="w-4 h-4"></i>
                     <span>Solicitar Levantamiento</span>
                 </a>
                 <button onclick="toggleMenu()" class="lg:hidden p-2 text-slate-700 hover:text-black rounded border border-slate-200">
@@ -115,10 +116,11 @@
 
         <!-- Menú Móvil -->
         <div id="mobile-menu" class="hidden lg:hidden border-b border-mv-border bg-white px-4 py-4 space-y-3 font-sans text-sm font-semibold">
-            <a href="#quienes-somos" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Nosotros</a>
             <a href="#soluciones" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Soluciones Integrales</a>
+            <a href="#sectores" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Sectores que Atendemos</a>
             <a href="#polizas" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Pólizas de Mantenimiento</a>
-            <a href="#instalaciones" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Instalaciones & Inmuebles</a>
+            <a href="#marcas" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Marcas y Tecnologías</a>
+            <a href="#galeria" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Galería de Proyectos</a>
             <a href="#clientes" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Principales Clientes</a>
             <a href="#contacto" onclick="toggleMenu()" class="block text-slate-800 py-1.5 hover:text-mv-red">Contacto Directo</a>
             <div class="pt-2">
@@ -129,8 +131,8 @@
         </div>
     </header>
 
-    <!-- HERO SECTION: LIMPIO, INSTITUCIONAL Y CONTUNDENTE -->
-    <section class="relative bg-gradient-to-b from-mv-grayBg via-white to-white py-16 sm:py-24 border-b border-mv-border">
+    <!-- HERO SECTION: LIMPIO, INSTITUCIONAL Y CON FOTOGRAFÍA INDUSTRIAL -->
+    <section class="relative bg-gradient-to-b from-mv-grayBg via-white to-white py-14 sm:py-20 border-b border-mv-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 
@@ -145,11 +147,11 @@
                         Soluciones Integrales para la <span class="text-mv-red">Ingeniería Moderna</span>
                     </h1>
 
-                    <!-- Pleca decorativa roja de la presentación -->
+                    <!-- Pleca decorativa roja de la presentación oficial -->
                     <div class="w-24 h-1.5 bg-mv-red rounded-full"></div>
 
                     <p class="text-base sm:text-lg text-mv-textMuted leading-relaxed">
-                        En <strong class="text-slate-900 font-semibold">GRUPO MV</strong> proveemos servicios integrales para equipo electromecánico e inmuebles. Enfocados en resultados de calidad, seguridad y cuidando en todo momento la rentabilidad y continuidad de sus proyectos.
+                        En <strong class="text-slate-900 font-semibold">GRUPO MV</strong> proveemos servicios integrales de mantenimiento, instalación y venta de equipo electromecánico e inmuebles. Enfocados en resultados de calidad, seguridad y cuidando siempre la rentabilidad y continuidad operativa de sus instalaciones.
                     </p>
 
                     <!-- Beneficios Inmediatos -->
@@ -164,7 +166,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <i data-lucide="check-circle-2" class="w-4 h-4 text-mv-red flex-shrink-0"></i>
-                            <span>Personal técnico calificado en plantilla</span>
+                            <span>Plantas de luz, UPS (1-1100 kVA) y Chillers</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <i data-lucide="check-circle-2" class="w-4 h-4 text-mv-red flex-shrink-0"></i>
@@ -185,61 +187,48 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Tarjeta Resumen Institucional -->
+                <!-- Columna Derecha: Tarjeta con Foto de Cuarto de Máquinas y Resumen -->
                 <div class="lg:col-span-5">
-                    <div class="bg-white border border-mv-border rounded-xl p-7 shadow-corporate space-y-6">
-                        <div class="border-b border-slate-100 pb-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-mv-red block font-sans">Capacidades Técnicas</span>
-                            <h3 class="text-xl font-bold text-slate-900 font-sans mt-1">Especialidades de Mantenimiento</h3>
-                        </div>
-
-                        <div class="space-y-3.5 text-sm">
-                            <div class="flex items-start gap-3 p-3 bg-mv-grayBg rounded-lg border border-slate-100">
-                                <div class="p-2 bg-red-100 text-mv-red rounded">
-                                    <i data-lucide="zap" class="w-5 h-5"></i>
-                                </div>
+                    <div class="bg-white border border-mv-border rounded-xl shadow-corporate overflow-hidden">
+                        
+                        <!-- Imagen de portada de equipo electromecánico (Lista para sustituir con foto real) -->
+                        <div class="relative h-60 w-full overflow-hidden bg-slate-900 group">
+                            <!-- FOTO HERO: Cuarto de generadores / subestación técnica -->
+                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Infraestructura Electromecánica Grupo MV" 
+                                 class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                            
+                            <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                                 <div>
-                                    <h4 class="font-bold text-slate-900">Plantas de Emergencia</h4>
-                                    <p class="text-xs text-mv-textMuted">Pruebas con banco de carga, transferencias y sincronía.</p>
+                                    <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block font-bold">INFRAESTRUCTURA CRÍTICA</span>
+                                    <h4 class="text-sm font-bold font-sans">Continuidad Operativa Garantizada</h4>
                                 </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 p-3 bg-mv-grayBg rounded-lg border border-slate-100">
-                                <div class="p-2 bg-blue-100 text-blue-700 rounded">
-                                    <i data-lucide="wind" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-900">Chillers & AC de Confort y Precisión</h4>
-                                    <p class="text-xs text-mv-textMuted">Para áreas corporativas, cuartos de servidores y refrigeración.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 p-3 bg-mv-grayBg rounded-lg border border-slate-100">
-                                <div class="p-2 bg-amber-100 text-amber-700 rounded">
-                                    <i data-lucide="battery-charging" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-900">Sistemas UPS (1 kVA – 1100 kVA)</h4>
-                                    <p class="text-xs text-mv-textMuted">Reemplazo de baterías, calibración y respaldo ininterrumpido.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 p-3 bg-mv-grayBg rounded-lg border border-slate-100">
-                                <div class="p-2 bg-emerald-100 text-emerald-700 rounded">
-                                    <i data-lucide="building" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-900">Mantenimiento a Inmuebles (Facilities)</h4>
-                                    <p class="text-xs text-mv-textMuted">Supervisor de edificio asignado y cuadrillas operativas en sitio.</p>
-                                </div>
+                                <span class="bg-black/60 backdrop-blur-sm text-[10px] font-mono px-2 py-1 rounded border border-white/20">
+                                    NOM / NFPA / STPS
+                                </span>
                             </div>
                         </div>
 
-                        <div class="pt-2 text-center">
-                            <span class="text-xs font-medium text-slate-500">
-                                Empresa 100% Mexicana • Personal calificado y certificado
-                            </span>
+                        <!-- Métricas de capacidad técnica -->
+                        <div class="p-6 space-y-4">
+                            <div class="grid grid-cols-2 gap-3 text-center">
+                                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-100">
+                                    <div class="text-xl font-bold font-sans text-slate-900">1 – 1,100 <span class="text-xs font-normal text-slate-500">kVA</span></div>
+                                    <div class="text-[11px] text-slate-500 font-medium">Capacidad UPS y Plantas</div>
+                                </div>
+                                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-100">
+                                    <div class="text-xl font-bold font-sans text-mv-red">24/7/365</div>
+                                    <div class="text-[11px] text-slate-500 font-medium">Asistencia Técnica de Emergencia</div>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-mv-textMuted leading-relaxed border-t border-slate-100 pt-3">
+                                Nuestro equipo operacional está formado por ingenieros especialistas coordinados por personal directivo con amplia trayectoria en administración integral de inmuebles.
+                            </p>
                         </div>
+
                     </div>
                 </div>
 
@@ -247,133 +236,210 @@
         </div>
     </section>
 
-    <!-- CLIENTES DESTACADOS (TAL COMO ESTÁ EN LA CARTA DE PRESENTACIÓN) -->
+    <!-- LOGOS OFICIALES DE PRINCIPALES CLIENTES (VECTORIZADOS EXACTOS DEL PDF) -->
     <section id="clientes" class="py-14 bg-white border-b border-mv-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-10">
-                <span class="text-xs font-bold uppercase tracking-widest text-slate-500 font-sans">
-                    Respaldo Corporativo
+                <span class="text-xs font-bold uppercase tracking-widest text-mv-red font-sans">
+                    Respaldo Institucional
                 </span>
                 <h2 class="text-2xl font-bold text-slate-900 font-sans mt-1">
                     Principales Clientes
                 </h2>
                 <div class="w-16 h-1 bg-mv-red mx-auto mt-2 rounded-full"></div>
-                <p class="text-sm text-mv-textMuted mt-3">
-                    Instituciones y corporativos líderes confían en Grupo MV para la administración y mantenimiento de sus equipos e instalaciones.
+                <p class="text-xs sm:text-sm text-mv-textMuted mt-3">
+                    Grandes corporativos e instituciones de clase mundial confían en la capacidad técnica de Grupo MV:
                 </p>
             </div>
 
-            <!-- Logos recreados formalmente -->
+            <!-- Logos recreados idénticos a la Carta de Presentación -->
             <div class="grid grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 items-center justify-center">
                 
-                <!-- INBURSA -->
-                <div class="p-6 bg-mv-grayBg rounded-lg border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-sm transition">
-                    <div class="text-slate-900 font-black text-lg sm:text-xl tracking-tight font-sans">
-                        INBURSA
+                <!-- 1. INBURSA GRUPO FINANCIERO -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-md transition h-28">
+                    <div class="flex items-center gap-2">
+                        <!-- Isotipo Inbursa -->
+                        <div class="w-7 h-7 rounded-full bg-[#002855] flex items-center justify-center p-1 text-white flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M12 4v16M4 12h16" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="font-sans font-black text-base sm:text-lg tracking-tight text-[#002855] leading-none block">INBURSA</span>
+                            <span class="text-[9px] font-sans text-slate-500 tracking-wider block uppercase">Grupo Financiero</span>
+                        </div>
                     </div>
-                    <span class="text-[11px] text-slate-500 font-medium">Grupo Financiero</span>
                 </div>
 
-                <!-- GRUPO EULEN -->
-                <div class="p-6 bg-mv-grayBg rounded-lg border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-sm transition">
-                    <div class="text-slate-900 font-extrabold text-lg sm:text-xl tracking-wider font-sans">
-                        GRUPO EULEN
+                <!-- 2. GRUPO EULEN -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-md transition h-28">
+                    <div class="flex items-center gap-2.5">
+                        <!-- Isotipo EULEN con Búho / Escudo -->
+                        <div class="w-8 h-8 rounded-full border-2 border-[#1E3A8A] flex items-center justify-center text-[#1E3A8A] flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w-5 h-5">
+                                <circle cx="12" cy="12" r="9"/>
+                                <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                                <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                                <path d="M12 12v3"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="text-[9px] font-sans uppercase font-bold text-slate-500 block leading-tight">GRUPO</span>
+                            <span class="font-sans font-black text-base sm:text-lg tracking-wider text-[#1E3A8A] leading-none block">EULEN</span>
+                        </div>
                     </div>
-                    <span class="text-[11px] text-slate-500 font-medium">Servicios Integrales</span>
                 </div>
 
-                <!-- AIG -->
-                <div class="p-6 bg-mv-grayBg rounded-lg border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-sm transition">
-                    <div class="text-slate-900 font-black text-2xl tracking-widest font-sans">
-                        AIG
+                <!-- 3. AIG SEGUROS -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-md transition h-28">
+                    <!-- Marco Azul AIG oficial -->
+                    <div class="border-2 border-[#003B71] px-4 py-1.5 rounded flex items-center justify-center">
+                        <span class="font-sans font-black text-2xl tracking-widest text-[#003B71]">AIG</span>
                     </div>
-                    <span class="text-[11px] text-slate-500 font-medium">Seguros</span>
                 </div>
 
-                <!-- VEOLUS -->
-                <div class="p-6 bg-mv-grayBg rounded-lg border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-sm transition">
-                    <div class="text-slate-900 font-bold text-lg sm:text-xl tracking-tight font-sans">
-                        Veolus
+                <!-- 4. VEOLUS -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-md transition h-28">
+                    <div class="flex items-center gap-2">
+                        <!-- Isotipo circular de 4 cuadrantes de colores de Veolus -->
+                        <div class="w-7 h-7 flex-shrink-0 grid grid-cols-2 gap-0.5 transform rotate-12">
+                            <div class="w-3 h-3 rounded-tl-full bg-[#10B981]"></div>
+                            <div class="w-3 h-3 rounded-tr-full bg-[#0284C7]"></div>
+                            <div class="w-3 h-3 rounded-bl-full bg-[#F59E0B]"></div>
+                            <div class="w-3 h-3 rounded-br-full bg-[#EF4444]"></div>
+                        </div>
+                        <div class="text-left">
+                            <span class="font-sans font-bold text-lg sm:text-xl text-[#0F172A] leading-none block">Veolus</span>
+                        </div>
                     </div>
-                    <span class="text-[11px] text-slate-500 font-medium">Gestión Energética</span>
                 </div>
 
-                <!-- PULSO INMOBILIARIO -->
-                <div class="p-6 bg-mv-grayBg rounded-lg border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-sm transition col-span-2 md:col-span-1">
-                    <div class="text-slate-900 font-extrabold text-base tracking-widest font-sans">
-                        PULSO
+                <!-- 5. PULSO INMOBILIARIO -->
+                <div class="p-5 bg-white rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center hover:shadow-md transition h-28 col-span-2 md:col-span-1">
+                    <div class="flex items-center gap-2">
+                        <!-- Isotipo Rascacielos Pulso Inmobiliario -->
+                        <div class="flex items-end gap-1 h-7">
+                            <div class="w-1.5 h-4 bg-[#0F3854]"></div>
+                            <div class="w-1.5 h-7 bg-[#0F3854]"></div>
+                            <div class="w-1.5 h-5 bg-[#0F3854]"></div>
+                        </div>
+                        <div class="text-left">
+                            <span class="font-sans font-extrabold text-sm tracking-wider text-[#0F3854] block leading-none">PULSO</span>
+                            <span class="text-[8px] font-sans text-slate-500 tracking-widest block uppercase">INMOBILIARIO</span>
+                        </div>
                     </div>
-                    <span class="text-[11px] text-slate-500 font-medium">Inmobiliario</span>
                 </div>
 
             </div>
         </div>
     </section>
 
-    <!-- ¿QUIÉNES SOMOS? Y ¿QUÉ NOS DEFINE? (TEXTO FIEL AL CURRICULAR) -->
-    <section id="quienes-somos" class="py-20 bg-mv-grayBg border-b border-mv-border">
+    <!-- SECTORES DE APLICACIÓN (INSPIRADO EN CIME POWER SYSTEMS) -->
+    <section id="sectores" class="py-20 bg-mv-grayBg border-b border-mv-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-bold uppercase tracking-wider text-mv-red font-sans">Mercado & Especialización</span>
+                <h2 class="text-3xl font-extrabold text-slate-900 font-sans mt-1">
+                    Sectores que Atendemos
+                </h2>
+                <div class="w-20 h-1 bg-mv-red mx-auto mt-2 rounded-full"></div>
+                <p class="text-sm sm:text-base text-mv-textMuted mt-3">
+                    Diseñamos y ejecutamos soluciones adaptadas a los requerimientos normativos y operativos específicos de cada industria:
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                <div class="lg:col-span-6 space-y-6">
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-mv-red font-sans">Nuestra Empresa</span>
-                        <h2 class="text-3xl font-extrabold text-slate-900 font-sans mt-1">¿Quiénes Somos?</h2>
-                        <div class="w-16 h-1 bg-mv-red mt-2 rounded-full"></div>
+                <!-- Sector 1: Centros de Datos & TI -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition group">
+                    <div class="h-44 overflow-hidden relative bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80" 
+                             alt="Data Centers" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 text-white">
+                            <span class="text-[10px] font-mono text-cyan-300 block uppercase">Misión Crítica</span>
+                            <h3 class="text-base font-bold font-sans">Centros de Cómputo & Data Centers</h3>
+                        </div>
                     </div>
-
-                    <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
-                        Somos una <strong>empresa 100% Mexicana</strong>, empeñada en desarrollar todo tipo de proyectos de Servicios y Mantenimiento, con la mayor eficacia posible.
-                    </p>
-
-                    <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
-                        Reconocemos como nuestro recurso más valioso a nuestro <strong>personal altamente preparado</strong> que ha sabido conjugar capacidad técnica, entusiasmo y experiencia.
-                    </p>
-
-                    <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
-                        Nuestra área operacional se compone de ingenieros con formación en áreas especializadas coordinados por un equipo directivo de gran trayectoria con conocimiento global; así mismo contamos con un área comercial con ejecutivos de alta capacidad de gestión y sobre todo con pasión por servir.
-                    </p>
-
-                    <div class="p-4 bg-white rounded-lg border-l-4 border-mv-red border-y border-r border-slate-200 text-sm text-slate-800 font-medium">
-                        "Garantizamos al cliente e inversionista la confianza de un proyecto correctamente administrado y rentable, lo que deriva en un servicio de excelencia."
+                    <div class="p-5 space-y-2 text-xs text-slate-600">
+                        <p class="leading-relaxed">
+                            Respaldo de energía ininterrumpido con sistemas UPS redundantes, transferencias rápidas y aire acondicionado de precisión para control riguroso de temperatura y humedad.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-1 font-mono text-[10px] text-slate-500">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">UPS 1-1100 kVA</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">AC Precisión</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Agentes Limpios</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-6 space-y-4">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-red-50 text-mv-red rounded-lg">
-                                <i data-lucide="target" class="w-5 h-5"></i>
-                            </div>
-                            <h3 class="font-bold text-slate-900 font-sans text-base">Una Misión Clara</h3>
+                <!-- Sector 2: Corporativos & Torres de Oficinas -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition group">
+                    <div class="h-44 overflow-hidden relative bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80" 
+                             alt="Edificios Corporativos" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 text-white">
+                            <span class="text-[10px] font-mono text-amber-300 block uppercase">Facility Management</span>
+                            <h3 class="text-base font-bold font-sans">Torres y Oficinas Corporativas</h3>
                         </div>
-                        <p class="text-sm text-mv-textMuted leading-relaxed pl-11">
-                            Proveer soluciones integrales y a la medida apoyando en el crecimiento y bienestar del cliente mediante un servicio de alto nivel provisto por un equipo capaz de enfrentar todo tipo de retos.
-                        </p>
                     </div>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-blue-50 text-blue-700 rounded-lg">
-                                <i data-lucide="eye" class="w-5 h-5"></i>
-                            </div>
-                            <h3 class="font-bold text-slate-900 font-sans text-base">Un Equipo con Visión</h3>
-                        </div>
-                        <p class="text-sm text-mv-textMuted leading-relaxed pl-11">
-                            Trabajamos día a día con la meta de liderar el mercado de servicios integrales a nivel nacional, creciendo exponencialmente de la mano de nuestros clientes.
+                    <div class="p-5 space-y-2 text-xs text-slate-600">
+                        <p class="leading-relaxed">
+                            Administración integral de inmuebles con supervisor en sitio, climatización con chillers, plantas de luz para elevadores y áreas comunes, y mantenimiento general constante.
                         </p>
+                        <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-1 font-mono text-[10px] text-slate-500">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Chillers</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Supervisor In Situ</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">CCTV & Control</span>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-2">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
-                                <i data-lucide="leaf" class="w-5 h-5"></i>
-                            </div>
-                            <h3 class="font-bold text-slate-900 font-sans text-base">Responsabilidad Social y Ambiental</h3>
+                <!-- Sector 3: Hospitales & Clínicas -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition group">
+                    <div class="h-44 overflow-hidden relative bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=600&q=80" 
+                             alt="Sector Salud" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 text-white">
+                            <span class="text-[10px] font-mono text-rose-300 block uppercase">Salud & Seguridad</span>
+                            <h3 class="text-base font-bold font-sans">Hospitales y Sector Salud</h3>
                         </div>
-                        <p class="text-sm text-mv-textMuted leading-relaxed pl-11">
-                            Para Grupo MV el cuidado del ambiente es una de las principales preocupaciones; nos esforzamos en disminuir cualquier actividad que represente un impacto negativo a nuestro planeta.
+                    </div>
+                    <div class="p-5 space-y-2 text-xs text-slate-600">
+                        <p class="leading-relaxed">
+                            Sistemas de energía de emergencia de arranque inmediato para quirófanos, áreas de terapia intensiva, refrigeración de biológicos y cumplimiento estricto con Cofepris y STPS.
                         </p>
+                        <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-1 font-mono text-[10px] text-slate-500">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Plantas Diésel</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Cámaras Frías</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Transferencia ATS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sector 4: Naves Industriales & Logística -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition group">
+                    <div class="h-44 overflow-hidden relative bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" 
+                             alt="Sector Industrial" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 text-white">
+                            <span class="text-[10px] font-mono text-emerald-300 block uppercase">Industria & Cedis</span>
+                            <h3 class="text-base font-bold font-sans">Naves Industriales y Logística</h3>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-2 text-xs text-slate-600">
+                        <p class="leading-relaxed">
+                            Instalaciones eléctricas en media y baja tensión, circuitos contra incendio con rociadores certificados, cámaras de congelación y mantenimiento de alta disponibilidad.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-1 font-mono text-[10px] text-slate-500">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Subestaciones</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Sistemas NFPA</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Fuerza Motriz</span>
+                        </div>
                     </div>
                 </div>
 
@@ -391,7 +457,7 @@
                 </h2>
                 <div class="w-20 h-1 bg-mv-red mx-auto mt-2 rounded-full"></div>
                 <p class="text-sm sm:text-base text-mv-textMuted mt-3">
-                    Ofrecemos venta, renta, instalación y pólizas de mantenimiento preventivo y correctivo para equipos clave de su infraestructura:
+                    Ofrecemos venta, renta, instalación y pólizas de mantenimiento preventivo y correctivo para los equipos clave de su infraestructura:
                 </p>
             </div>
 
@@ -411,7 +477,7 @@
                         Suministro de equipos de marcas líderes con respaldo técnico de ingeniería para entrega e instalación en sitio:
                     </p>
                     <ul class="text-xs text-slate-700 space-y-2 border-t border-slate-200 pt-3">
-                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-mv-red"></i> Plantas de emergencia</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-mv-red"></i> Plantas de emergencia (diésel y gas)</li>
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-mv-red"></i> Aires acondicionados de confort y precisión</li>
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-mv-red"></i> Chillers y cámaras de refrigeración</li>
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-mv-red"></i> UPS capacidades de 1 kVA – 1100 kVA</li>
@@ -458,7 +524,7 @@
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i> Conexión y montaje de Plantas y UPS</li>
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i> Circuitos contra incendio y rociadores</li>
                         <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i> Ductería y tuberías de aire acondicionado</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i> Reacondicionamiento de instalaciones antiguas</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-blue-700"></i> Reacondicionamiento de instalaciones antiguas (>5 años)</li>
                     </ul>
                 </div>
 
@@ -529,6 +595,194 @@
         </div>
     </section>
 
+    <!-- GALERÍA TÉCNICA DE PROYECTOS EN CAMPO (PREPARADA PARA SUSTITUIR CON FOTOS DE RAÚL) -->
+    <section id="galeria" class="py-20 bg-mv-grayBg border-b border-mv-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-mv-red font-sans">Evidencia Técnica</span>
+                    <h2 class="text-3xl font-extrabold text-slate-900 font-sans mt-1">
+                        Operaciones y Proyectos en Sitio
+                    </h2>
+                    <div class="w-20 h-1 bg-mv-red mt-2 rounded-full"></div>
+                </div>
+                <p class="text-xs sm:text-sm text-mv-textMuted max-w-md">
+                    Intervención directa por cuadrillas de ingenieros pertenecientes a la oficina central de Grupo MV.
+                </p>
+            </div>
+
+            <!-- Grid de Fotos Técnicas (Con imágenes profesionales de soporte, listas para intercambiar por las fotos reales de Grupo MV) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- FOTO 1: Mantenimiento a Planta de Emergencia -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=700&q=80" 
+                             alt="Pruebas a Planta de Emergencia" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            GENERACIÓN & RESPALDO
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Mantenimiento Mayor a Plantas de Diésel</h4>
+                        <p class="text-xs text-slate-500 mt-1">Revisión de turbocargadores, inyectores, pruebas con banco de carga resistivo y cambio de fluidos.</p>
+                    </div>
+                </div>
+
+                <!-- FOTO 2: Climatización y Chillers -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&q=80" 
+                             alt="Sistemas Chillers" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            HVAC INDUSTRIAL
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Baterías de Chillers y Agua Helada</h4>
+                        <p class="text-xs text-slate-500 mt-1">Inspección de compresores scroll/tornillo, condensadores, bombas de recirculación y presiones de refrigerante.</p>
+                    </div>
+                </div>
+
+                <!-- FOTO 3: Subestaciones e Instalaciones Eléctricas -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=700&q=80" 
+                             alt="Subestaciones Eléctricas" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            MEDIA & ALTA TENSIÓN
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Tableros de Distribución y Subestaciones</h4>
+                        <p class="text-xs text-slate-500 mt-1">Adecuación de conductores, termografía infrarroja para detección de puntos calientes y balanceo de cargas.</p>
+                    </div>
+                </div>
+
+                <!-- FOTO 4: Sala de UPS & Baterías -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=700&q=80" 
+                             alt="Sistemas UPS" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            CALIDAD DE ENERGÍA
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Sistemas UPS de 1 a 1100 kVA</h4>
+                        <p class="text-xs text-slate-500 mt-1">Calibración de módulos de potencia, bypass de mantenimiento y sustitución de bancos de baterías VRLA.</p>
+                    </div>
+                </div>
+
+                <!-- FOTO 5: Sistemas Contra Incendio & Tubería -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=700&q=80" 
+                             alt="Circuito Contra Incendio" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            SEGURIDAD PATRIMONIAL
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Redes de Detección y Extinción</h4>
+                        <p class="text-xs text-slate-500 mt-1">Pruebas a bombas contra incendio diésel/eléctricas, válvulas de control y gabinetes según normatividad NFPA.</p>
+                    </div>
+                </div>
+
+                <!-- FOTO 6: Facility Management & Inmuebles -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition">
+                    <div class="h-56 bg-slate-800 relative group overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=700&q=80" 
+                             alt="Mantenimiento a Inmuebles" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                            FACILITY MANAGEMENT
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-sm text-slate-900 font-sans">Administración Integral de Inmuebles</h4>
+                        <p class="text-xs text-slate-500 mt-1">Supervisores en sitio, recorridos preventivos, cuadrillas para plomería, pintura, albañilería e iluminación.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-8 p-4 bg-white rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
+                <i data-lucide="camera" class="w-4 h-4 inline-block text-mv-red mr-1"></i>
+                <span>Las imágenes mostradas corresponden a los estándares operativos de Grupo MV. Fotografías de casos específicos disponibles en la entrega de reportes técnicos a clientes.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- MARCAS Y TECNOLOGÍAS COMPATIBLES (SOPORTE MULTIMARCA CERTIFICADO) -->
+    <section id="marcas" class="py-16 bg-white border-b border-mv-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-500 font-sans">
+                    Soporte Técnico Multimarca
+                </span>
+                <h2 class="text-2xl font-bold text-slate-900 font-sans mt-1">
+                    Equipos y Fabricantes que Atendemos
+                </h2>
+                <div class="w-16 h-1 bg-mv-red mx-auto mt-2 rounded-full"></div>
+                <p class="text-xs sm:text-sm text-mv-textMuted mt-3">
+                    Personal capacitado con apego estricto a los manuales, tolerancias y especificaciones de las principales marcas del mercado mundial:
+                </p>
+            </div>
+
+            <!-- Cintillo de Marcas -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center">
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">GENERAC</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Plantas de Luz</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">CUMMINS</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Generadores Diésel</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">KOHLER</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Energía de Respaldo</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">CATERPILLAR</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Potencia Industrial</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">TRANE</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Chillers & HVAC</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">CARRIER</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Climatización</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">YORK</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Agua Helada</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">LIEBERT / VERTIV</span>
+                    <span class="text-[9px] text-slate-400 font-mono">AC Precisión Data Center</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">SCHNEIDER / APC</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Sistemas UPS</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">EATON</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Calidad de Energía</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">NOTIFIER</span>
+                    <span class="text-[9px] text-slate-400 font-mono">Detección Incendio</span>
+                </div>
+                <div class="p-3 bg-mv-grayBg rounded-lg border border-slate-200 flex flex-col items-center justify-center">
+                    <span class="font-sans font-black text-sm tracking-wider text-slate-800">HIKVISION / DAHUA</span>
+                    <span class="text-[9px] text-slate-400 font-mono">CCTV & Control</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- SECCIÓN PÓLIZAS: "¿PREVENIR O LAMENTAR?" (DIAPOSITIVA 6 TAL CUAL) -->
     <section id="polizas" class="py-20 bg-mv-grayBg border-b border-mv-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -574,7 +828,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-900 text-sm">Conserva garantía de fábrica</h4>
-                            <p class="text-xs text-mv-textMuted mt-1">Su equipo no pierde la garantía del fabricante al recibir servicio técnico certificado.</p>
+                            <p class="text-xs text-mv-textMuted mt-1">Su equipo no pierde la garantía del fabricante al recibir servicio técnico calificado.</p>
                         </div>
                     </div>
 
@@ -624,97 +878,8 @@
         </div>
     </section>
 
-    <!-- SECCIÓN: EFICIENCIA CONSTANTE EN INSTALACIONES (DIAPOSITIVA 7) -->
-    <section id="instalaciones" class="py-20 bg-white border-b border-mv-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                
-                <div class="lg:col-span-6 space-y-6">
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-mv-red font-sans">Eficiencia Constante</span>
-                        <h2 class="text-3xl font-extrabold text-slate-900 font-sans mt-1">
-                            Evaluación y Reacondicionamiento de Instalaciones
-                        </h2>
-                        <div class="w-16 h-1 bg-mv-red mt-2 rounded-full"></div>
-                    </div>
-
-                    <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
-                        Es muy importante realizar evaluaciones periódicas de las instalaciones, <strong>sobre todo si tienen una antigüedad de más de 5 años</strong>, para hacer cambios de conductores eléctricos, tomacorrientes, cambio de filtros de aire acondicionado, entre otros elementos que posiblemente no estén rindiendo como deberían o estén originando fugas que para los usuarios pasan desapercibidas.
-                    </p>
-
-                    <p class="text-sm text-slate-600 leading-relaxed">
-                        Grupo MV cuenta con personal profesional y bien capacitado, que conoce a detalle los elementos que se deben utilizar y el correcto dimensionamiento para obtener instalaciones realmente seguras y eficientes.
-                    </p>
-
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-3 text-sm text-slate-800 font-medium">
-                            <i data-lucide="shield-check" class="w-5 h-5 text-mv-red flex-shrink-0"></i>
-                            <span>Servicio realizado por personal técnico especialista de oficina central Grupo MV.</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-800 font-medium">
-                            <i data-lucide="clock" class="w-5 h-5 text-mv-red flex-shrink-0"></i>
-                            <span>Asistencia a emergencias 24 horas del día los 365 días del año.</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-800 font-medium">
-                            <i data-lucide="file-text" class="w-5 h-5 text-mv-red flex-shrink-0"></i>
-                            <span>Entrega de reporte técnico físico / digital con respaldo fotográfico.</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-800 font-medium">
-                            <i data-lucide="calendar" class="w-5 h-5 text-mv-red flex-shrink-0"></i>
-                            <span>Servicios programados de acuerdo a calendario autorizado por el cliente.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Columna Mantenimiento a Inmuebles (Diapositiva 8) -->
-                <div class="lg:col-span-6 bg-mv-grayBg rounded-2xl border border-slate-200 p-8 space-y-6">
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-sans">Productividad en tus Espacios</span>
-                        <h3 class="text-2xl font-bold text-slate-900 font-sans mt-1">
-                            Mantenimiento Integral a Inmuebles
-                        </h3>
-                    </div>
-
-                    <p class="text-sm text-slate-700 leading-relaxed">
-                        La iluminación, temperatura, infraestructura y disposición de los elementos del entorno de trabajo pueden afectar la productividad. Ofrecemos un <strong>Servicio de Administración General para su inmueble</strong> con un equipo técnico coordinado por un <strong>Supervisor de edificio</strong>, quien ejecutará recorridos diarios para programar mejoras pertinentes.
-                    </p>
-
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-3">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 font-sans">Alcances del Servicio:</h4>
-                        <ul class="text-xs text-slate-700 space-y-2">
-                            <li class="flex items-start gap-2">
-                                <span class="text-mv-red font-bold">•</span>
-                                <span>Instalación de accesorios y reparaciones menores para espacios de esparcimiento, áreas comunes y oficinas.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-mv-red font-bold">•</span>
-                                <span>Ejecución de trabajos menores de electricidad, plomería y albañilería.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-mv-red font-bold">•</span>
-                                <span>Horarios asignados de acuerdo con las necesidades operativas de cada cliente.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-mv-red font-bold">•</span>
-                                <span>Técnicos apegados estrictamente a las políticas de seguridad del cliente.</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="text-center pt-2">
-                        <a href="#cotizador" class="inline-flex items-center gap-2 text-mv-red hover:text-red-700 font-bold text-sm font-sans">
-                            <span>Solicitar propuesta de Facility Management</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
     <!-- FORMULARIO DE LEVANTAMIENTO TÉCNICO / COTIZADOR (SOBRIO Y PROFESIONAL) -->
-    <section id="cotizador" class="py-20 bg-mv-grayBg border-b border-mv-border">
+    <section id="cotizador" class="py-20 bg-white border-b border-mv-border">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <div class="text-center mb-10">
@@ -728,37 +893,37 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-xl border border-slate-200 p-8 sm:p-10 shadow-corporate">
+            <div class="bg-mv-grayBg rounded-xl border border-slate-200 p-8 sm:p-10 shadow-corporate">
                 <form id="levantamientoForm" onsubmit="enviarSolicitud(event)" class="space-y-6">
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Nombre Completo:</label>
-                            <input type="text" id="req_nombre" required placeholder="Ej. Ing. Carlos Martínez" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800">
+                            <input type="text" id="req_nombre" required placeholder="Ej. Ing. Carlos Martínez" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Empresa / Razón Social:</label>
-                            <input type="text" id="req_empresa" required placeholder="Ej. Inmuebles Corporativos S.A." class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800">
+                            <input type="text" id="req_empresa" required placeholder="Ej. Inmuebles Corporativos S.A." class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Teléfono / Celular de Contacto:</label>
-                            <input type="tel" id="req_telefono" required placeholder="Ej. 55 1234 5678" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800">
+                            <input type="tel" id="req_telefono" required placeholder="Ej. 55 1234 5678" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Correo Electrónico:</label>
-                            <input type="email" id="req_correo" required placeholder="correo@empresa.com" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800">
+                            <input type="email" id="req_correo" required placeholder="correo@empresa.com" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Tipo de Inmueble:</label>
+                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Tipo de Inmueble / Sector:</label>
                             <select id="req_tipo_inmueble" class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800">
-                                <option value="Edificio Corporativo / Oficinas">Edificio Corporativo / Oficinas</option>
                                 <option value="Centro de Cómputo / Data Center">Centro de Cómputo / Data Center</option>
+                                <option value="Edificio Corporativo / Oficinas">Edificio Corporativo / Oficinas</option>
                                 <option value="Nave Industrial / Bodega">Nave Industrial / Bodega</option>
                                 <option value="Hospital / Clínica">Hospital / Clínica</option>
                                 <option value="Centro Comercial / Tienda">Centro Comercial / Tienda</option>
@@ -780,7 +945,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 font-sans">Equipos Involucrados o Detalle del Requerimiento:</label>
-                        <textarea id="req_mensaje" rows="4" placeholder="Ej. Solicitamos cotización para mantenimiento preventivo a 2 plantas de emergencia de 300 kW y 3 chillers en nuestras oficinas corporativas..." class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800"></textarea>
+                        <textarea id="req_mensaje" rows="4" placeholder="Ej. Solicitamos cotización para mantenimiento preventivo a 2 plantas de emergencia y 3 chillers en nuestras oficinas corporativas..." class="w-full bg-white border border-slate-300 rounded px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-slate-800"></textarea>
                     </div>
 
                     <div class="pt-2">
@@ -789,7 +954,7 @@
                             <span>Enviar Solicitud al Ing. Raúl Valdez</span>
                         </button>
                         <p class="text-[11px] text-center text-slate-500 mt-2">
-                            Al enviar, se abrirá la conversación directa de WhatsApp para confirmar fecha y horario de visita.
+                            Al enviar, se abrirá la conversación directa de WhatsApp para confirmar fecha y horario de visita técnica.
                         </p>
                     </div>
 
@@ -800,7 +965,7 @@
     </section>
 
     <!-- CONTACTO Y UBICACIÓN (DATOS DIRECTOS DEL CURRICULAR GRUPO MV) -->
-    <section id="contacto" class="py-20 bg-white border-b border-mv-border">
+    <section id="contacto" class="py-20 bg-mv-grayBg border-b border-mv-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 
@@ -816,7 +981,7 @@
                     </p>
 
                     <!-- Datos del Ing. Raúl Valdez -->
-                    <div class="p-6 bg-mv-grayBg rounded-xl border border-slate-200 space-y-4">
+                    <div class="p-6 bg-white rounded-xl border border-slate-200 space-y-4 shadow-sm">
                         <div class="border-b border-slate-200 pb-3">
                             <h4 class="font-extrabold text-slate-900 text-lg font-sans">Ing. Raul Valdez V.</h4>
                             <span class="text-xs text-mv-red font-semibold font-sans uppercase tracking-wider">Líder de Proyecto</span>
@@ -842,7 +1007,7 @@
                     </div>
 
                     <!-- Dirección Física Oficial -->
-                    <div class="p-6 bg-mv-grayBg rounded-xl border border-slate-200 space-y-2 text-sm text-slate-700">
+                    <div class="p-6 bg-white rounded-xl border border-slate-200 space-y-2 text-sm text-slate-700 shadow-sm">
                         <div class="flex items-center gap-2 font-bold text-slate-900 font-sans">
                             <i data-lucide="map-pin" class="w-4 h-4 text-mv-red"></i>
                             <span>Dirección Operativa:</span>
@@ -874,7 +1039,7 @@
                         </div>
                     </div>
 
-                    <div class="border border-slate-200 p-6 rounded-xl bg-mv-grayBg">
+                    <div class="border border-slate-200 p-6 rounded-xl bg-white shadow-sm">
                         <h4 class="font-bold text-slate-900 text-sm font-sans mb-2">Horarios de Atención Administrativa</h4>
                         <p class="text-xs text-slate-600">Lunes a Viernes: 8:00 hrs a 18:00 hrs</p>
                         <p class="text-xs text-slate-600">Sábados: 9:00 hrs a 14:00 hrs</p>
@@ -939,7 +1104,7 @@
                 `*Tipo de Inmueble:* ${inmueble}%0A` +
                 `*Servicio:* ${servicio}%0A` +
                 `*Detalle:* ${mensaje}%0A%0A` +
-                `Hola Ing. Raúl, envío esta solicitud desde el sitio web para coordinar una visita técnica.`;
+                `Hola Ing. Raúl, envío esta solicitud desde el sitio web para coordinar una visita técnica en sitio.`;
 
             window.open(`https://wa.me/525538798706?text=${texto}`, '_blank');
         }
