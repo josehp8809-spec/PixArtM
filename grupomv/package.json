@@ -1,0 +1,19 @@
+{
+  "name": "grupo-mv",
+  "version": "1.0.0",
+  "description": "GRUPO MV - Soluciones Integrales de Ingeniería Electromecánica, Mantenimiento Crítico y Automatización con IA",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "electromecanica",
+    "mantenimiento-industrial",
+    "ups",
+    "chillers",
+    "plantas-emergencia",
+    "facilities",
+    "grupo-mv"
+  ],
+  "author": "Grupo MV",
+  "license": "ISC"
+}
